@@ -1,104 +1,228 @@
-import { MongoClient } from 'mongodb'
-import { v4 as uuidv4 } from 'uuid'
-import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server';
+import { connectToDatabase } from '@/lib/mongodb';
+import Category from '@/lib/models/Category';
+import Subcategory from '@/lib/models/Subcategory';
+import ChatMessage from '@/lib/models/ChatMessage';
+import { generateChatResponse } from '@/lib/openai';
+import { v4 as uuidv4 } from 'uuid';
 
-// MongoDB connection
-let client
-let db
-
-async function connectToMongo() {
-  if (!client) {
-    client = new MongoClient(process.env.MONGO_URL)
-    await client.connect()
-    db = client.db(process.env.DB_NAME)
-  }
-  return db
+// Helper function to get path segments
+function getPathSegments(request) {
+  const url = new URL(request.url);
+  const path = url.pathname.replace('/api/', '').replace('/api', '');
+  return path ? path.split('/').filter(Boolean) : [];
 }
 
-// Helper function to handle CORS
-function handleCORS(response) {
-  response.headers.set('Access-Control-Allow-Origin', process.env.CORS_ORIGINS || '*')
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-  response.headers.set('Access-Control-Allow-Credentials', 'true')
-  return response
-}
-
-// OPTIONS handler for CORS
-export async function OPTIONS() {
-  return handleCORS(new NextResponse(null, { status: 200 }))
-}
-
-// Route handler function
-async function handleRoute(request, { params }) {
-  const { path = [] } = params
-  const route = `/${path.join('/')}`
-  const method = request.method
-
+// GET handler
+export async function GET(request) {
   try {
-    const db = await connectToMongo()
+    await connectToDatabase();
+    const segments = getPathSegments(request);
+    const { searchParams } = new URL(request.url);
 
-    // Root endpoint - GET /api/root (since /api/ is not accessible with catch-all)
-    if (route === '/root' && method === 'GET') {
-      return handleCORS(NextResponse.json({ message: "Hello World" }))
-    }
-    // Root endpoint - GET /api/root (since /api/ is not accessible with catch-all)
-    if (route === '/' && method === 'GET') {
-      return handleCORS(NextResponse.json({ message: "Hello World" }))
+    // GET /api/categories - Get all categories
+    if (segments[0] === 'categories' && segments.length === 1) {
+      const categories = await Category.find({}).sort({ createdAt: 1 });
+      return NextResponse.json({ categories });
     }
 
-    // Status endpoints - POST /api/status
-    if (route === '/status' && method === 'POST') {
-      const body = await request.json()
-      
-      if (!body.client_name) {
-        return handleCORS(NextResponse.json(
-          { error: "client_name is required" }, 
+    // GET /api/subcategories?categoryId=X - Get subcategories by category
+    if (segments[0] === 'subcategories' && segments.length === 1) {
+      const categoryId = searchParams.get('categoryId');
+      if (!categoryId) {
+        return NextResponse.json(
+          { error: 'categoryId is required' },
           { status: 400 }
-        ))
+        );
       }
-
-      const statusObj = {
-        id: uuidv4(),
-        client_name: body.client_name,
-        timestamp: new Date()
-      }
-
-      await db.collection('status_checks').insertOne(statusObj)
-      return handleCORS(NextResponse.json(statusObj))
+      const subcategories = await Subcategory.find({ categoryId }).sort({ createdAt: 1 });
+      return NextResponse.json({ subcategories });
     }
 
-    // Status endpoints - GET /api/status
-    if (route === '/status' && method === 'GET') {
-      const statusChecks = await db.collection('status_checks')
-        .find({})
-        .limit(1000)
-        .toArray()
-
-      // Remove MongoDB's _id field from response
-      const cleanedStatusChecks = statusChecks.map(({ _id, ...rest }) => rest)
+    // GET /api/chat/history?sessionId=X - Get chat history
+    if (segments[0] === 'chat' && segments[1] === 'history') {
+      const sessionId = searchParams.get('sessionId');
+      const userId = searchParams.get('userId');
       
-      return handleCORS(NextResponse.json(cleanedStatusChecks))
+      if (!sessionId || !userId) {
+        return NextResponse.json(
+          { error: 'sessionId and userId are required' },
+          { status: 400 }
+        );
+      }
+
+      const messages = await ChatMessage.find({ sessionId, userId })
+        .sort({ timestamp: 1 })
+        .lean();
+
+      return NextResponse.json({ messages });
     }
 
-    // Route not found
-    return handleCORS(NextResponse.json(
-      { error: `Route ${route} not found` }, 
-      { status: 404 }
-    ))
+    // GET /api/seed - Seed initial data
+    if (segments[0] === 'seed' && segments.length === 1) {
+      // Check if already seeded
+      const existingCategories = await Category.countDocuments();
+      if (existingCategories > 0) {
+        return NextResponse.json({ message: 'Database already seeded' });
+      }
+
+      // Seed categories
+      const categories = [
+        { id: uuidv4(), name: 'Health', icon: '🏥', description: 'Health and wellness topics' },
+        { id: uuidv4(), name: 'Economy', icon: '💰', description: 'Economic and financial matters' },
+        { id: uuidv4(), name: 'Education', icon: '📚', description: 'Education and learning resources' },
+        { id: uuidv4(), name: 'Moral Values', icon: '⚖️', description: 'Ethics and moral guidance' },
+        { id: uuidv4(), name: 'Employment', icon: '💼', description: 'Job opportunities and career guidance' },
+      ];
+
+      await Category.insertMany(categories);
+
+      // Seed subcategories for each category
+      const subcategories = [];
+      categories.forEach((category) => {
+        for (let i = 1; i <= 5; i++) {
+          subcategories.push({
+            id: uuidv4(),
+            categoryId: category.id,
+            name: `${category.name} Topic ${i}`,
+            description: `Placeholder description for ${category.name} topic ${i}`,
+          });
+        }
+      });
+
+      await Subcategory.insertMany(subcategories);
+
+      return NextResponse.json({ 
+        message: 'Database seeded successfully',
+        categoriesCount: categories.length,
+        subcategoriesCount: subcategories.length
+      });
+    }
+
+    return NextResponse.json({ message: 'API is working' });
 
   } catch (error) {
-    console.error('API Error:', error)
-    return handleCORS(NextResponse.json(
-      { error: "Internal server error" }, 
+    console.error('API GET Error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Internal server error' },
       { status: 500 }
-    ))
+    );
   }
 }
 
-// Export all HTTP methods
-export const GET = handleRoute
-export const POST = handleRoute
-export const PUT = handleRoute
-export const DELETE = handleRoute
-export const PATCH = handleRoute
+// POST handler
+export async function POST(request) {
+  try {
+    await connectToDatabase();
+    const segments = getPathSegments(request);
+    const body = await request.json();
+
+    // POST /api/chat - Context-aware chatbot
+    if (segments[0] === 'chat' && segments.length === 1) {
+      const { message, sessionId, userId, categoryId, categoryName } = body;
+
+      if (!message || !sessionId || !userId) {
+        return NextResponse.json(
+          { error: 'message, sessionId, and userId are required' },
+          { status: 400 }
+        );
+      }
+
+      // Get previous messages for context
+      const previousMessages = await ChatMessage.find({ sessionId, userId })
+        .sort({ timestamp: 1 })
+        .limit(10)
+        .lean();
+
+      const conversationHistory = previousMessages.map((msg) => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.content,
+      }));
+
+      const systemPrompt = `You are a helpful AI assistant for a mobile application focused on various life topics including Health, Economy, Education, Moral Values, and Employment. Provide clear, concise, and helpful responses.`;
+
+      // Generate AI response with category context
+      const aiResponse = await generateChatResponse(
+        [
+          ...conversationHistory,
+          {
+            role: 'user',
+            content: message,
+          },
+        ],
+        systemPrompt,
+        categoryName || ''
+      );
+
+      // Save user message
+      await ChatMessage.create({
+        id: uuidv4(),
+        sessionId,
+        userId,
+        categoryId: categoryId || '',
+        sender: 'user',
+        content: message,
+        timestamp: new Date(),
+      });
+
+      // Save bot response
+      await ChatMessage.create({
+        id: uuidv4(),
+        sessionId,
+        userId,
+        categoryId: categoryId || '',
+        sender: 'bot',
+        content: aiResponse,
+        timestamp: new Date(),
+      });
+
+      return NextResponse.json({ response: aiResponse });
+    }
+
+    // POST /api/categories - Create category
+    if (segments[0] === 'categories' && segments.length === 1) {
+      const { name, icon, description } = body;
+      if (!name) {
+        return NextResponse.json({ error: 'name is required' }, { status: 400 });
+      }
+
+      const category = await Category.create({
+        id: uuidv4(),
+        name,
+        icon: icon || '📋',
+        description: description || '',
+      });
+
+      return NextResponse.json({ category }, { status: 201 });
+    }
+
+    // POST /api/subcategories - Create subcategory
+    if (segments[0] === 'subcategories' && segments.length === 1) {
+      const { categoryId, name, description } = body;
+      if (!categoryId || !name) {
+        return NextResponse.json(
+          { error: 'categoryId and name are required' },
+          { status: 400 }
+        );
+      }
+
+      const subcategory = await Subcategory.create({
+        id: uuidv4(),
+        categoryId,
+        name,
+        description: description || '',
+      });
+
+      return NextResponse.json({ subcategory }, { status: 201 });
+    }
+
+    return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });
+
+  } catch (error) {
+    console.error('API POST Error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
