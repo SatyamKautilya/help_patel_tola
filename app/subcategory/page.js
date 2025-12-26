@@ -9,7 +9,8 @@ export default function SubcategoryPage() {
 
 	const [subcategories, setSubcategories] = useState([]);
 	const [loading, setLoading] = useState(true);
-
+	const categoryId = 'abc';
+	const categoryName = 'xyz';
 	useEffect(() => {
 		fetchSubcategories();
 	}, []);
