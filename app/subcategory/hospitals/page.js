@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import styles from '@/styles/categories.module.scss';
-import Chatbot from '@/components/Chatbot';
 
 export default function App() {
 	const router = useRouter();

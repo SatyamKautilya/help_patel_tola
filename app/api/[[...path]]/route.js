@@ -8,6 +8,9 @@ import { v4 as uuidv4 } from 'uuid';
 import Diseases from '@/lib/models/Diseases';
 import Contacts from '@/lib/models/Contacts';
 
+import mongoose from 'mongoose';
+import Crops from '@/lib/models/Crops';
+
 // Helper function to get path segments
 function getPathSegments(request) {
 	const url = new URL(request.url);
@@ -19,9 +22,20 @@ function getPathSegments(request) {
 export async function GET(request) {
 	try {
 		await connectToDatabase();
+
 		const segments = getPathSegments(request);
 		const { searchParams } = new URL(request.url);
+		// GET /api/subcategory/farming - Get farming subcategory details
 
+		if (segments[0] === 'subcategory' && segments[1] === 'crops') {
+			const name = searchParams.get('name');
+
+			const crops = await Crops.find({ ...(name ? { name } : {}) }).sort({
+				createdAt: 1,
+			});
+
+			return NextResponse.json({ crops });
+		}
 		if (segments[0] === 'subcategory' && segments[1] === 'contacts') {
 			const contacts = await Contacts.find({}).sort({ createdAt: 1 });
 			return NextResponse.json({ contacts });
@@ -152,7 +166,28 @@ export async function POST(request) {
 		await connectToDatabase();
 		const segments = getPathSegments(request);
 		const body = await request.json();
-
+		console.log(segments, body);
+		if (
+			segments[0] === 'subcategory' &&
+			segments[1] === 'contacts' &&
+			segments[2] === 'add'
+		) {
+			const { name, role, mobile } = body;
+			if (!name || !role || !mobile) {
+				return NextResponse.json(
+					{ error: 'name, role, and mobile are required' },
+					{ status: 400 },
+				);
+			}
+			const contact = await Contacts.create({
+				id: uuidv4(),
+				name,
+				role,
+				mobile,
+				createdAt: new Date(),
+			});
+			return NextResponse.json({ contact }, { status: 201 });
+		}
 		// POST /api/chat - Context-aware chatbot
 		if (segments[0] === 'chat' && segments.length === 1) {
 			const { message, sessionId, userId, categoryId, categoryName } = body;

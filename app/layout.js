@@ -6,24 +6,13 @@ export const metadata = {
 	viewport:
 		'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
 };
+import { Providers } from './providers';
 
 export default function RootLayout({ children }) {
 	return (
 		<html lang='en'>
-			<head>
-				<meta
-					name='viewport'
-					content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no'
-				/>
-			</head>
-			<body
-				style={{
-					margin: 0,
-					padding: 0,
-					fontFamily:
-						'-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-				}}>
-				{children}
+			<body className='app-gradient h-full min-h-screen	'>
+				<Providers>{children}</Providers>
 			</body>
 		</html>
 	);
