@@ -6,24 +6,17 @@ import Chatbot from '@/components/Chatbot';
 
 export default function SubcategoryPage() {
 	const router = useRouter();
-	const searchParams = useSearchParams();
-	const categoryId = searchParams.get('id');
-	const categoryName = searchParams.get('name');
 
 	const [subcategories, setSubcategories] = useState([]);
 	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		if (categoryId) {
-			fetchSubcategories();
-		}
-	}, [categoryId]);
+		fetchSubcategories();
+	}, []);
 
 	const fetchSubcategories = async () => {
 		try {
-			const response = await fetch(
-				`/api/subcategories?categoryId=${categoryId}`,
-			);
+			const response = await fetch(`/api/subcategories?categoryId=none}`);
 			if (response.ok) {
 				const data = await response.json();
 				setSubcategories(data.subcategories || []);
