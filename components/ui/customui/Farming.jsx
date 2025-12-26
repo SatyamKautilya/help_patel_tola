@@ -1,20 +1,24 @@
-import { Chip } from '@heroui/react';
+import { Button, Chip } from '@heroui/react';
+import { add } from 'date-fns';
+import Image from 'next/image';
 import React from 'react';
 
 const Farming = (props) => {
-	const { name, time, variety = [], sprays = [] } = props;
-
+	const { name, time, variety = [], sprays = [], additionalInfo = [] } = props;
+	const [showSchedule, setShowSchedule] = React.useState(false);
 	return (
 		<div className='p-6 max-w-4xl mx-auto'>
 			{/* Top Section */}
 			<div className='flex gap-6 mb-8'>
 				{/* Image Section */}
 				<div className='flex-shrink-0'>
-					<img
-						src='/farming-image.jpg'
+					{/* <Image
+						src={props?.img}
 						alt='Farming'
+						width={50}
+						height={50}
 						className='w-48 h-48 object-cover rounded-lg'
-					/>
+					/> */}
 				</div>
 
 				{/* Info Section */}
@@ -43,52 +47,72 @@ const Farming = (props) => {
 			</div>
 
 			<div className='flex flex-row justify-center my-8 w-full'>
-				<span className='text-2xl font-bold'>स्प्रे शैड्यूल</span>
+				<Button
+					onClick={() => {
+						setShowSchedule((pre) => !pre);
+					}}
+					color='primary'
+					size='lg'
+					className='text-2xl font-bold'>
+					स्प्रे शैड्यूल देखें
+				</Button>
 			</div>
 
 			{/* Items Box */}
-			{sprays?.map((spray, index) => (
-				<div key={index} className='mb-6'>
-					<div className='border rounded-lg p-6 bg-lime-100'>
-						<div className='space-y-2'>
-							{spray.note && (
+			{showSchedule &&
+				sprays?.map((spray, index) => (
+					<div key={index} className='mb-6'>
+						<div className='border rounded-lg p-6 bg-lime-100'>
+							<div className='space-y-2'>
+								{spray.note && (
+									<div className='flex flex-row justify-center'>
+										<Chip color={spray.notetype} size='md'>
+											{spray.note}
+										</Chip>
+									</div>
+								)}
+								<div className='p-4 bg-pink-700 border rounded-lg text-white text-2xl font-bold text-center hover:shadow-md cursor-pointer'>
+									<p className='te-bg-lime-100nt-semibold'>{spray.duedate}</p>
+								</div>
+
 								<div className='flex flex-row justify-center'>
-									<Chip color={spray.notetype} size='md'>
-										{spray.note}
+									<Chip color='primary' size='md'>
+										{spray.method === 'drenching'
+											? '50 एमएल जड़ मे डाले	'
+											: 'सुबह या शाम को छिड़काव करे'}
 									</Chip>
 								</div>
-							)}
-							<div className='p-4 bg-pink-700 border rounded-lg text-white text-2xl font-bold text-center hover:shadow-md cursor-pointer'>
-								<p className='te-bg-lime-100nt-semibold'>{spray.duedate}</p>
-							</div>
 
-							<div className='flex flex-row justify-center'>
-								<Chip color='primary' size='md'>
-									{spray.method === 'drenching'
-										? '50 एमएल जड़ मे डाले	'
-										: 'सुबह या शाम को छिड़काव करे'}
-								</Chip>
-							</div>
-
-							<div className='p-4 bg-white border rounded-lg text-gray-700 hover:shadow-md cursor-pointer'>
-								<p className='text-xl font-semibold'>{`प्रकार: ${spray.type}`}</p>
-							</div>
-							<div className='p-4 bg-white text-red-800 border rounded-lg text-gray-700 hover:shadow-md cursor-pointer'>
-								<p className='text-xl font-semibold'>{`टारगेट: ${spray.target}`}</p>
-							</div>
-							<div className='p-4 bg-white border rounded-lg text-gray-700 hover:shadow-md cursor-pointer'>
-								<p className='text-xl font-semibold'>{`दवाई: ${spray.name}`}</p>
-							</div>
-							<div className='p-4 bg-white border rounded-lg text-gray-700 hover:shadow-md cursor-pointer'>
-								<p className='text-xl font-semibold'>{`केमिकल: ${spray.chemical}`}</p>
-							</div>
-							<div className='p-4 bg-white border rounded-lg text-gray-700 hover:shadow-md cursor-pointer'>
-								<p className='text-xl font-semibold'>{`मात्रा: ${spray.quantity}`}</p>
+								<div className='p-4 bg-white border rounded-lg text-gray-700 hover:shadow-md cursor-pointer'>
+									<p className='text-xl font-semibold'>{`प्रकार: ${spray.type}`}</p>
+								</div>
+								<div className='p-4 bg-white text-red-800 border rounded-lg text-gray-700 hover:shadow-md cursor-pointer'>
+									<p className='text-xl font-semibold'>{`टारगेट: ${spray.target}`}</p>
+								</div>
+								<div className='p-4 bg-white border rounded-lg text-gray-700 hover:shadow-md cursor-pointer'>
+									<p className='text-xl font-semibold'>{`दवाई: ${spray.name}`}</p>
+								</div>
+								<div className='p-4 bg-white border rounded-lg text-gray-700 hover:shadow-md cursor-pointer'>
+									<p className='text-xl font-semibold'>{`केमिकल: ${spray.chemical}`}</p>
+								</div>
+								<div className='p-4 bg-white border rounded-lg text-gray-700 hover:shadow-md cursor-pointer'>
+									<p className='text-xl font-semibold'>{`मात्रा: ${spray.quantity}`}</p>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			))}
+				))}
+			<div className='font-bold text-xl pb-6'>ध्यान रखें 👇</div>
+			{additionalInfo.length > 0 &&
+				additionalInfo.map((info, index) => (
+					<div key={index} className='mb-2'>
+						<div className='border rounded-lg p-2 bg-yellow-400'>
+							<div className='p-2'>
+								<p className='font-semibold text-xl text-white'>{info}</p>
+							</div>
+						</div>
+					</div>
+				))}
 		</div>
 	);
 };

@@ -27,10 +27,11 @@ export async function GET(request) {
 		const { searchParams } = new URL(request.url);
 		// GET /api/subcategory/farming - Get farming subcategory details
 
-		if (segments[0] === 'subcategory' && segments[1] === 'crops') {
+		if (segments[0] === 'subcategory' && segments[1]?.includes('crops')) {
+			const { searchParams } = new URL(request.url);
 			const name = searchParams.get('name');
 
-			const crops = await Crops.find({ ...(name ? { name } : {}) }).sort({
+			const crops = await Crops.find({ ...(name ? { id: name } : {}) }).sort({
 				createdAt: 1,
 			});
 
