@@ -4,6 +4,10 @@
 .idea/
 .vscode/
 .env
+
+# Environment variables
+.env
+.env.*
 # Dependencies
 node_modules/
 /node_modules
