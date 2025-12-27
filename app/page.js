@@ -59,7 +59,7 @@ export default function App() {
 	return (
 		<div className='min-h-screen '>
 			<header className='bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 text-center shadow-md'>
-				<h1 className='m-0 text-2xl font-bold'>पटेल टोला गढ़ी*</h1>
+				<h1 className='m-0 text-2xl font-bold'>*पटेल टोला गढ़ी*</h1>
 				<p className='mt-2 text-sm opacity-90'>सुझाव</p>
 			</header>
 
