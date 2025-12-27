@@ -4,6 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import Contacts from '@/lib/models/Contacts';
 import Crops from '@/lib/models/Crops';
 import Healthtopics from '@/lib/models/Healthtopics';
+import { Hospital } from 'lucide-react';
+import HospitalLists from '@/lib/models/HospitalLists';
 
 // Helper function to get path segments
 function getPathSegments(request) {
@@ -22,13 +24,18 @@ export async function GET(request) {
 
 		const name = searchParams.get('name');
 
-		const healthtopics = await Healthtopics.find({
-			...(name ? { id: name } : {}),
-		}).sort({
-			createdAt: 1,
-		});
+		if (name === 'hospitals') {
+			const hospitallists = await HospitalLists.find().sort({ createdAt: -1 });
+			return NextResponse.json({ hospitallists });
+		} else {
+			const healthtopics = await Healthtopics.find({
+				...(name ? { id: name } : {}),
+			}).sort({
+				createdAt: 1,
+			});
 
-		return NextResponse.json({ healthtopics });
+			return NextResponse.json({ healthtopics });
+		}
 	} catch (error) {
 		console.error('API GET Error:', error);
 		return NextResponse.json(
@@ -45,26 +52,34 @@ export async function POST(request) {
 		const segments = getPathSegments(request);
 		const body = await request.json();
 		console.log(segments, body);
-		if (
-			segments[0] === 'subcategory' &&
-			segments[1] === 'contacts' &&
-			segments[2] === 'add'
-		) {
-			const { name, role, mobile } = body;
-			if (!name || !role || !mobile) {
-				return NextResponse.json(
-					{ error: 'name, role, and mobile are required' },
-					{ status: 400 },
-				);
+		const { searchParams } = new URL(request.url);
+		// GET /api/subcategory/farming - Get farming subcategory details
+
+		const name = searchParams.get('name');
+		if (name === 'feedback') {
+			const { hospitalId, experience } = body;
+			if (!mongoose.Types.ObjectId.isValid(hospitalId)) {
+				throw new Error('Invalid hospital ID');
 			}
-			const contact = await Contacts.create({
-				id: uuidv4(),
-				name,
-				role,
-				mobile,
-				createdAt: new Date(),
-			});
-			return NextResponse.json({ contact }, { status: 201 });
+			{
+				const updatedHospital = await Hospital.findByIdAndUpdate(
+					hospitalId,
+					{
+						$push: {
+							experiences: {
+								...experience,
+								createdAt: new Date(),
+							},
+						},
+					},
+					{ new: true }, // returns updated document
+				);
+				if (!updatedHospital) {
+					throw new Error('Hospital not found');
+				}
+
+				return updatedHospital;
+			}
 		}
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });
 	} catch (error) {

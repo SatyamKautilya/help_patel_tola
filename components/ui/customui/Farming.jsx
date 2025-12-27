@@ -106,7 +106,7 @@ const Farming = (props) => {
 			{additionalInfo.length > 0 &&
 				additionalInfo.map((info, index) => (
 					<div key={index} className='mb-2'>
-						<div className='border rounded-lg p-2 bg-yellow-400'>
+						<div className='border rounded-lg p-2 bg-yellow-600'>
 							<div className='p-2'>
 								<p className='font-semibold text-xl text-white'>{info}</p>
 							</div>
