@@ -5,7 +5,7 @@ import Contacts from '@/lib/models/Contacts';
 import Crops from '@/lib/models/Crops';
 import Healthtopics from '@/lib/models/Healthtopics';
 import { Hospital } from 'lucide-react';
-import HospitalLists from '@/lib/models/HospitalLists';
+import Hospitallists from '@/lib/models/HospitalLists';
 
 // Helper function to get path segments
 function getPathSegments(request) {
@@ -25,7 +25,7 @@ export async function GET(request) {
 		const name = searchParams.get('name');
 
 		if (name === 'hospitals') {
-			const hospitallists = await HospitalLists.find().sort({ createdAt: -1 });
+			const hospitallists = await Hospitallists.find().sort({ createdAt: -1 });
 			return NextResponse.json({ hospitallists });
 		} else {
 			const healthtopics = await Healthtopics.find({
