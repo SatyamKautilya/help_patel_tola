@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
-import { v4 as uuidv4 } from 'uuid';
-import Contacts from '@/lib/models/Contacts';
-import Crops from '@/lib/models/Crops';
+
 import Healthtopics from '@/lib/models/Healthtopics';
 import { Hospital } from 'lucide-react';
-import Hospitallists from '@/lib/models/HospitalLists';
+import Hospitallists from '@/lib/models/Hospitallists';
 
 // Helper function to get path segments
 function getPathSegments(request) {
