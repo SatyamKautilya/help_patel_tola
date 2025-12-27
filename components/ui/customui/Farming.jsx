@@ -11,14 +11,14 @@ const Farming = (props) => {
 			{/* Top Section */}
 			<div className='flex gap-6 mb-8'>
 				{/* Image Section */}
-				<div className='flex-shrink-0'>
-					{/* <Image
-						src={props?.img}
+				<div className='flex-shrink-0 shadow-lg	'>
+					<Image
+						src={props?.url}
 						alt='Farming'
 						width={50}
 						height={50}
 						className='w-48 h-48 object-cover rounded-lg'
-					/> */}
+					/>
 				</div>
 
 				{/* Info Section */}
@@ -78,8 +78,8 @@ const Farming = (props) => {
 								<div className='flex flex-row justify-center'>
 									<Chip color='primary' size='md'>
 										{spray.method === 'drenching'
-											? '50 एमएल जड़ मे डाले	'
-											: 'सुबह या शाम को छिड़काव करे'}
+											? '50 एमएल जड़ मे डाले'
+											: spray.method || 'सुबह या शाम को छिड़काव करे'}
 									</Chip>
 								</div>
 

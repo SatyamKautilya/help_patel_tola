@@ -2,63 +2,88 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button, Card, CardBody } from '@heroui/react';
 
 export default function App() {
 	const router = useRouter();
-	const [categories, setCategories] = useState([]);
+	const [topics, setTopics] = useState([]);
+	const [selectedTopic, setSelectedTopic] = useState(null);
+	const [topicData, setTopicData] = useState(null);
 	//	const [loading, setLoading] = useState(true);
 
-	// useEffect(() => {
-	// 	initializeApp();
-	// }, []);
+	useEffect(() => {
+		initializeApp();
+	}, []);
 
-	// const initializeApp = async () => {
-	// 	try {
-	// 		// First, seed the database if needed
+	useEffect(() => {
+		if (!selectedTopic) return;
+		const fetchTopicDetails = async () => {
+			try {
+				const response = await fetch(
+					`/api/subcategory/hospitals?name=${selectedTopic}`,
+				);
+				// const response = await fetch(`/api/crop/schedule/${selectedCrop}`, {
+				// 	method: 'POST',
+				// 	headers: { 'Content-Type': 'application/json' },
+				// 	body: JSON.stringify({ cropId: selectedCrop }),
+				// });
 
-	// 		// Then fetch categories
-	// 		const response = await fetch('/api/diseases');
-	// 		if (response.ok) {
-	// 			const data = await response.json();
-	// 			setCategories(data.categories || []);
-	// 		}
-	// 	} catch (error) {
-	// 		console.error('Failed to initialize app:', error);
-	// 	} finally {
-	// 		setLoading(false);
-	// 	}
-	// };
+				// const data = await response.json();
 
-	const handleCategoryClick = (category) => {
-		router.push(
-			`/subcategory?id=${category.id}&name=${encodeURIComponent(
-				category.name,
-			)}`,
-		);
+				if (response.ok) {
+					const data = await response.json();
+					setTopicData(data);
+				}
+			} catch (error) {
+				console.error('Failed to fetch crop details:', error);
+			}
+		};
+
+		fetchTopicDetails();
+	}, [selectedTopic]);
+
+	const initializeApp = async () => {
+		try {
+			const response = await fetch('/api/subcategory/hospitals');
+			if (response.ok) {
+				const data = await response.json();
+				setTopics(data.healthtopics || []);
+			}
+		} catch (error) {
+			console.error('Failed to initialize app:', error);
+		} finally {
+		}
 	};
 
-	// if (loading) {
-	// 	return (
-	// 		<div
-	// 			style={{
-	// 				display: 'flex',
-	// 				alignItems: 'center',
-	// 				justifyContent: 'center',
-	// 				height: '100vh',
-	// 				fontSize: '1.25rem',
-	// 				color: '#6b7280',
-	// 			}}>
-	// 			Loading...
-	// 		</div>
-	// 	);
-	// }
+	const handleBack = () => {
+		router.back();
+	};
 
 	return (
 		<div className=''>
-			<div className='p-4 h-30 w-full'>
-				<span>हृदय रोग</span>
-				<img src=''></img>
-				<span></span>
+			<div className=' flex flex-row py-4 border-b-2 pb-4 bg-slate-100 items-center'>
+				<Button
+					color='primary'
+					size='lg'
+					className='ml-6 text-xl font-bold'
+					onPress={handleBack}>
+					← Back
+				</Button>
+			</div>
+			<div className=' p-6 grid grid-cols-2 gap-6	'>
+				{topics.map((topic) => (
+					<Card
+						isPressable
+						onPress={() => {
+							setSelectedTopic(topic.topicName);
+						}}
+						className='h-50 p-5'
+						key={topic.id}>
+						<CardBody className='text-center'>
+							<h2 className='text-2xl font-bold mb-2'>{topic.topicName}</h2>
+						</CardBody>
+					</Card>
+				))}
 			</div>
 		</div>
 	);

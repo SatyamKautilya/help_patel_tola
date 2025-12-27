@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, useDisclosure, Card, CardBody, Image } from '@heroui/react';
 import Farming from '@/components/ui/customui/Farming';
+// import { generateScheduleResponse } from '@/lib/openai';
 
 export default function App() {
 	const router = useRouter();
@@ -21,11 +22,14 @@ export default function App() {
 				const response = await fetch(
 					`/api/subcategory/crops?name=${selectedCrop}`,
 				);
-				// const response = await generateScheduleResponse(
-				// 	selectedCrop,
-				// 	'Farming schedule generation',
-				// );
-				// console.log(response, 'response');
+				// const response = await fetch(`/api/crop/schedule/${selectedCrop}`, {
+				// 	method: 'POST',
+				// 	headers: { 'Content-Type': 'application/json' },
+				// 	body: JSON.stringify({ cropId: selectedCrop }),
+				// });
+
+				// const data = await response.json();
+
 				if (response.ok) {
 					const data = await response.json();
 					setSelectedCropData(data);
@@ -73,18 +77,18 @@ export default function App() {
 							isPressable
 							onPress={() => setSelectedCrop(item.id)}
 							key={item.id}
-							className='bg-gradient-to-br from-green-400 to-blue-500'>
+							className='bg-lime-200 shadow-lg hover:shadow-xl transition-shadow duration-300'>
 							<CardBody className='flex flex-col justify-between h-64'>
 								<div className='flex-1 flex items-center justify-center'>
 									<Image
-										src='"https://cdn.pixabay.com/photo/2016/08/11/23/25/tomatoes-1580273_1280.jpg'
+										src={item.url}
 										alt={item.name}
-										width={200}
-										height={200}
+										width={120}
+										height={190}
 										className='w-full h-full object-cover rounded'
 									/>
 								</div>
-								<div className='mt-4 text-white font-bold text-lg text-center'>
+								<div className='mt-2 mb-1 text-black font-bold text-xl text-center'>
 									{item.name}
 								</div>
 							</CardBody>
