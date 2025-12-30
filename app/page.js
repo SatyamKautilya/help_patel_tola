@@ -8,10 +8,30 @@ export default function App() {
 	const router = useRouter();
 	const [categories, setCategories] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const [text, setTexts] = useState({});
 
 	useEffect(() => {
 		initializeApp();
 	}, []);
+
+	const fetchTexts = async () => {
+		setLoading(true);
+		try {
+			const response = await fetch(`/api/query/database?name=texts`);
+			if (response.ok) {
+				const data = await response.json();
+				setTexts(data.titleandtexts || []);
+			}
+		} catch (error) {
+			console.error('Failed to fetch subcategories:', error);
+		} finally {
+			setLoading(false);
+		}
+	};
+	useEffect(() => {
+		fetchTexts();
+	}, []);
+	console.log(text, 'tex');
 
 	const initializeApp = async () => {
 		try {
@@ -68,7 +88,7 @@ export default function App() {
 					{categories.map((category) => (
 						<button
 							key={category.id}
-							className='aspect-square flex flex-col items-center justify-center  bg-blue-400 rounded-xl p-6 shadow-md text-white rounded-lg p-6 shadow-md cursor-pointer transition-transform duration-200 text-center text-white border-none w-full hover:shadow-lg hover:-translate-y-1 active:-translate-y-0.5'
+							className='aspect-square flex flex-col items-center justify-center bg-fuchsia-600 rounded-xl p-6 shadow-md text-white rounded-lg p-6 shadow-md cursor-pointer transition-transform duration-200 text-center text-white border-none w-full hover:shadow-lg hover:-translate-y-1 active:-translate-y-0.5'
 							onClick={() => handleCategoryClick(category)}>
 							<div className='text-4xl mb-3'>{category.icon}</div>
 							<h2 className='text-white font-bold text-xl'>{category.name}</h2>
