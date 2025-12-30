@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Card, CardBody, Chip, Input } from '@heroui/react';
 import HospitalDetails from './HospitalDetails';
+import { filterhospitals } from '@/hooks/utils';
 
 export default function App() {
 	const router = useRouter();
@@ -14,6 +15,16 @@ export default function App() {
 	const [selectedCity, setSelectedCity] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [boatResp, setBoatResp] = useState({});
+	const [filteredHsp, setFilteredHsp] = useState({});
+	useEffect(() => {
+		setFilteredHsp(topicData?.hospitallists);
+	}, [topicData]);
+
+	useEffect(() => {
+		setFilteredHsp(
+			filterhospitals(topicData?.hospitallists, boatResp?.specialityId),
+		);
+	}, [boatResp]);
 
 	useEffect(() => {
 		initializeApp();
@@ -37,6 +48,7 @@ export default function App() {
 
 					if (response.ok) {
 						const data = await response.json();
+
 						setTopicData(data);
 					}
 				} catch (error) {
@@ -74,30 +86,6 @@ export default function App() {
 		{ id: 'kabirdham', name: 'कबीरधाम' },
 	];
 
-	const specialityIds = [
-		'MG', // General Medicine
-		'SG', // General Surgery
-		'MC', // Cardiology (Heart)
-		'MO', // Orthopaedics
-		'SN', // Neurology
-		'MN', // Neuro Medicine
-		'SO', // Orthopaedics / Bone
-		'SB', // Paediatrics
-		'SE', // Ophthalmology (Eye)
-		'SM', // Dermatology (Skin)
-		'SL', // Laparoscopic Surgery
-		'SP', // Plastic Surgery
-		'ST', // Trauma
-		'ER', // Emergency
-		'SU', // General Surgery (Super/Advanced)
-		'SC', // Critical Care / ICU
-		'SV', // Vascular Surgery
-		'SS', // Super Speciality
-		'MP', // Psychiatry / Mental Health
-		'IN', // Internal Medicine
-		'NA', // Not Available / Not Specified
-	];
-
 	const handleSend = async () => {
 		setLoading(true);
 		try {
@@ -112,6 +100,7 @@ export default function App() {
 			if (!response.ok) throw new Error('Failed to get response');
 
 			const data = await response.json();
+			if (data?.response === '') return;
 
 			setBoatResp(JSON.parse(data?.response));
 		} catch (error) {
@@ -122,8 +111,22 @@ export default function App() {
 			setLoading(false);
 		}
 	};
-	console.log(boatResp, 'boat reps');
-	return (
+
+	return loading ? (
+		<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+			<div className='bg-white rounded-2xl px-8 py-6 shadow-xl text-center animate-fadeScale'>
+				<p className='text-lg font-semibold text-gray-800'>
+					आपके इनपुट के आधार पर अस्पताल ढूंढ रहा हूँ
+				</p>
+				<p className='text-sm text-gray-500 mt-1'>कृपया प्रतीक्षा करें...</p>
+
+				{/* Spinner */}
+				<div className='mt-4 flex justify-center'>
+					<div className='h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin' />
+				</div>
+			</div>
+		</div>
+	) : (
 		<div className=''>
 			<div className=' flex flex-row py-4 border-b-2 pb-4 bg-slate-100 items-center'>
 				<Button
@@ -168,7 +171,7 @@ export default function App() {
 									onClick={() => {
 										setSelectedCity(city.id);
 									}}
-									color='primary'
+									color={selectedCity === city.id ? 'warning' : 'primary'}
 									size='lg'>
 									{city.name}
 								</Chip>
@@ -178,10 +181,8 @@ export default function App() {
 					<HospitalDetails
 						hospitals={
 							selectedCity
-								? topicData?.hospitallists?.filter(
-										(hosp) => hosp.cityId === selectedCity,
-								  )
-								: topicData?.hospitallists
+								? filteredHsp?.filter((hosp) => hosp.cityId === selectedCity)
+								: filteredHsp
 						}
 					/>
 					<div className='fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200'>
@@ -208,7 +209,7 @@ export default function App() {
 							</div>
 						) : (
 							<>
-								<div className='mx-4 bg-yellow-500 p-3 rounded-lg'>
+								<div className='mx-4 mt-4 bg-yellow-500 p-3 rounded-lg'>
 									<div>{boatResp?.msg}</div>
 								</div>
 								<div className='flex flex-row justify-center py-3'>

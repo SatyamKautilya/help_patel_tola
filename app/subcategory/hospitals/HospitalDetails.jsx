@@ -59,40 +59,44 @@ const HospitalDetails = (props) => {
 							<p className='text-lg'>{`पता: ${hospital.address}`}</p>
 							<p className='text-lg'>{`संपर्क: ${hospital.contact}`} </p>
 							<p className='text-lg font-extrabold'>{`विशेषग्यता: ${hospital.speciality} `}</p>
-							<Accordion
-								selectionMode='single'
-								onSelectionChange={(keys) => {
-									setIsOpen(keys.size > 0);
-								}}
-								className='max-w-3xl mt-2 mx-0 px-0'
-								itemClasses={{
-									base: 'rounded-2xl px-3 bg-white/70  shadow-lg border border-pink-100',
-									title: 'text-sm font-semibold text-slate-800',
-									content: 'px-4 pb-4',
-								}}>
-								<AccordionItem
-									key='experience'
-									className='text-lg'
-									title={!isOpen ? '⬇ अनुभव देखें' : '⬆ अनुभव'}>
-									<ul className='space-y-3'>
-										{hospital?.experiences?.map((exp) => (
-											<li
-												key={exp.id}
-												className='rounded-xl bg-pink-50 border border-pink-100 p-4'>
-												<div className='flex justify-between items-center mb-1'>
-													<span className='font-medium text-slate-900'>
-														{exp.name}
-													</span>
-													<span className='text-sm text-pink-600'>
-														⭐ {exp.rating}/5
-													</span>
-												</div>
-												<p className='text-sm text-slate-700'>{exp.feedback}</p>
-											</li>
-										))}
-									</ul>
-								</AccordionItem>
-							</Accordion>
+							{hospital.experiences?.length ? (
+								<Accordion
+									selectionMode='single'
+									onSelectionChange={(keys) => {
+										setIsOpen(keys.size > 0);
+									}}
+									className='max-w-3xl mt-2 mx-0 px-0'
+									itemClasses={{
+										base: 'rounded-2xl px-3 bg-white/70  shadow-lg border border-pink-100',
+										title: 'text-sm font-semibold text-slate-800',
+										content: 'px-4 pb-4',
+									}}>
+									<AccordionItem
+										key='experience'
+										className='text-lg'
+										title={!isOpen ? '⬇ अनुभव देखें' : '⬆ अनुभव'}>
+										<ul className='space-y-3'>
+											{hospital?.experiences?.map((exp) => (
+												<li
+													key={exp.id}
+													className='rounded-xl bg-pink-50 border border-pink-100 p-4'>
+													<div className='flex justify-between items-center mb-1'>
+														<span className='font-medium text-slate-900'>
+															{exp.name}
+														</span>
+														<span className='text-sm text-pink-600'>
+															⭐ {exp.rating}/5
+														</span>
+													</div>
+													<p className='text-sm text-slate-700'>
+														{exp.feedback}
+													</p>
+												</li>
+											))}
+										</ul>
+									</AccordionItem>
+								</Accordion>
+							) : null}
 							{!hideAccord && (
 								<Accordion
 									selectionMode='single'
