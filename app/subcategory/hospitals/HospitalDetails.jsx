@@ -23,7 +23,7 @@ const HospitalDetails = (props) => {
 	});
 	const [hideAccord, setHideAccord] = React.useState(false);
 
-	const handleSubmit = async () => {
+	const handleSubmit = async (hospId) => {
 		setHideAccord(true);
 		if (!form.name || !form.feedback || !form.rating) return;
 
@@ -31,7 +31,7 @@ const HospitalDetails = (props) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				hospitalId: 'disha',
+				hospitalId: hospId,
 				form,
 			}),
 		});
@@ -157,7 +157,7 @@ const HospitalDetails = (props) => {
 											<Button
 												color='primary'
 												className='w-full bg-pink-500 text-white font-semibold'
-												onPress={handleSubmit}>
+												onPress={() => handleSubmit(hospital.id)}>
 												अनुभव सबमिट करें
 											</Button>
 										</div>
