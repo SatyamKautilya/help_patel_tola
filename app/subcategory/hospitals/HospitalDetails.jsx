@@ -44,7 +44,7 @@ const HospitalDetails = (props) => {
 	return Array.isArray(hospitals)
 		? hospitals?.map((hospital) => {
 				return (
-					<div>
+					<div key={hospital.id}>
 						<Card className='m-4 p-6 bg-green-400 rounded-2xl shadow-lg'>
 							{hospital.experiences?.length ? (
 								<div className='mb-2'>

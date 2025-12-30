@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, Card, CardBody, Chip } from '@heroui/react';
+import { Button, Card, CardBody, Chip, Input } from '@heroui/react';
 import HospitalDetails from './HospitalDetails';
 
 export default function App() {
@@ -10,6 +10,8 @@ export default function App() {
 	const [topics, setTopics] = useState([]);
 	const [selectedTopic, setSelectedTopic] = useState(null);
 	const [topicData, setTopicData] = useState(null);
+	const [message, setMessage] = useState(null);
+	const [selectedCity, setSelectedCity] = useState(null);
 	//	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
@@ -66,6 +68,9 @@ export default function App() {
 		{ id: 'balaghat', name: 'बालाघाट' },
 		{ id: 'raipur', name: 'रायपुर' },
 		{ id: 'nagpur', name: 'नागपुर' },
+		{ id: 'bilaspur', name: 'बिलासपुर' },
+		{ id: 'gondia', name: 'गोंदिया' },
+		{ id: 'kabirdham', name: 'कबीरधाम' },
 	];
 
 	const specialityIds = [
@@ -130,36 +135,49 @@ export default function App() {
 			)}
 			{selectedTopic === 'hospitals' && (
 				<>
-					<div className='px-4 py-3 flex flex-row gap-3'>
+					<div className='px-4 py-3 flex flex-row flex-wrap gap-3'>
 						{cities?.map((city) => {
 							return (
-								<Chip color='primary' size='lg'>
+								<Chip
+									onClick={() => {
+										setSelectedCity(city.id);
+									}}
+									color='primary'
+									size='lg'>
 									{city.name}
 								</Chip>
 							);
 						})}
 					</div>
-					<HospitalDetails hospitals={topicData?.hospitallists} />
+					<HospitalDetails
+						hospitals={
+							selectedCity
+								? topicData?.hospitallists?.filter(
+										(hosp) => hosp.cityId === selectedCity,
+								  )
+								: topicData?.hospitallists
+						}
+					/>
 					<div className='fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200'>
 						<div className='max-w-3xl mx-auto p-4 flex gap-3 items-end'>
-							<Input
+							{/* <Input
 								size='lg'
 								label='अपनी समस्या लिखें'
 								placeholder='जैसे: सीने में दर्द और सांस की तकलीफ'
 								value={message}
 								onChange={(e) => setMessage(e.target.value)}
-								isDisabled={loading}
+								//	isDisabled={loading}
 								className='flex-1'
 							/>
 
 							<Button
 								color='primary'
 								size='lg'
-								isLoading={loading}
+								//			isLoading={loading}
 								onPress={handleSend}
 								className='shrink-0'>
 								सलाह प्राप्त करें
-							</Button>
+							</Button> */}
 						</div>
 					</div>
 				</>
