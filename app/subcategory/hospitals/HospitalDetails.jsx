@@ -5,8 +5,10 @@ import {
 	Card,
 	Input,
 	Textarea,
+	Chip,
 } from '@heroui/react';
-import { set } from 'mongoose';
+
+import { NextResponse } from 'next/server';
 
 import React from 'react';
 
@@ -21,56 +23,56 @@ const HospitalDetails = (props) => {
 	});
 	const [hideAccord, setHideAccord] = React.useState(false);
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		setHideAccord(true);
 		if (!form.name || !form.feedback || !form.rating) return;
 
+		const updateExp = await fetch('/api/subcategory/hospitals?name=feedback', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				hospitalId: 'disha',
+				form,
+			}),
+		});
+
+		return NextResponse.json({ updateExp });
 		console.log('Submitted experience:', form);
 		// TODO: call API here
 	};
-	const experiences = [
-		{
-			id: 1,
-			name: 'रामलाल यादव',
-			feedback: 'डॉक्टर ने सही समय पर इलाज किया।',
-			rating: 5,
-		},
-		{
-			id: 2,
-			name: 'सीता देवी',
-			feedback: 'आयुष्मान कार्ड आसानी से स्वीकार किया गया।',
-			rating: 4,
-		},
-		{
-			id: 3,
-			name: 'मोहन सिंह',
-			feedback: 'स्टाफ सहयोगी था और दवाइयाँ समय पर मिली।',
-			rating: 5,
-		},
-	];
 
 	return Array.isArray(hospitals)
 		? hospitals?.map((hospital) => {
 				return (
 					<div>
-						<Card className='m-4 p-6 bg-green-100 rounded-2xl shadow-lg'>
+						<Card className='m-4 p-6 bg-green-400 rounded-2xl shadow-lg'>
+							{hospital.experiences?.length ? (
+								<div className='mb-2'>
+									<Chip
+										color='warning'
+										className='text-black text-lg font-semibold'>
+										परिचित
+									</Chip>
+								</div>
+							) : null}
 							<h2 className='text-2xl font-bold mb-4'>{hospital.name}</h2>
 							<p className='text-lg'>{`पता: ${hospital.address}`}</p>
 							<p className='text-lg'>{`संपर्क: ${hospital.contact}`} </p>
-							<p className='text-lg'>{`विशेषग्यता: ${hospital.speciality} `}</p>
+							<p className='text-lg font-extrabold'>{`विशेषग्यता: ${hospital.speciality} `}</p>
 							<Accordion
 								selectionMode='single'
 								onSelectionChange={(keys) => {
 									setIsOpen(keys.size > 0);
 								}}
-								className='max-w-3xl mx-0 px-0'
+								className='max-w-3xl mt-2 mx-0 px-0'
 								itemClasses={{
-									base: 'rounded-2xl bg-white/70  shadow-lg border border-pink-100',
+									base: 'rounded-2xl px-3 bg-white/70  shadow-lg border border-pink-100',
 									title: 'text-sm font-semibold text-slate-800',
 									content: 'px-4 pb-4',
 								}}>
 								<AccordionItem
 									key='experience'
+									className='text-lg'
 									title={!isOpen ? '⬇ अनुभव देखें' : '⬆ अनुभव'}>
 									<ul className='space-y-3'>
 										{hospital?.experiences?.map((exp) => (
@@ -97,7 +99,7 @@ const HospitalDetails = (props) => {
 									onSelectionChange={(keys) => setIsOpen2(true)}
 									className='max-w-3xl mx-auto mt-6 px-0 mx-0'
 									itemClasses={{
-										base: 'rounded-2xl bg-white/70 shadow-lg border border-pink-100',
+										base: 'rounded-2xl px-3 bg-white/70 shadow-lg border border-pink-100',
 										title: 'text-sm font-semibold text-slate-800',
 										content: 'px-4 pb-5',
 									}}>
@@ -130,7 +132,7 @@ const HospitalDetails = (props) => {
 												}
 												classNames={{
 													inputWrapper: 'bg-white',
-													input: 'text-lg font-semibold',
+													input: 'text-lg font-semibold bg-gray-500',
 													label: 'text-lg font-semibold',
 												}}
 											/>

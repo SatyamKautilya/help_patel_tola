@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/mongodb';
 
 import Healthtopics from '@/lib/models/Healthtopics';
-import { Hospital } from 'lucide-react';
 import Hospitallists from '@/lib/models/Hospitallists';
 
+import mongoose from 'mongoose';
 // Helper function to get path segments
 function getPathSegments(request) {
 	const url = new URL(request.url);
@@ -55,13 +55,11 @@ export async function POST(request) {
 
 		const name = searchParams.get('name');
 		if (name === 'feedback') {
-			const { hospitalId, experience } = body;
-			if (!mongoose.Types.ObjectId.isValid(hospitalId)) {
-				throw new Error('Invalid hospital ID');
-			}
+			const { hospitalId, form: experience } = body;
+
 			{
-				const updatedHospital = await Hospital.findByIdAndUpdate(
-					hospitalId,
+				const updatedHospital = await Hospitallists.findOneAndUpdate(
+					{ id: hospitalId }, // 👈 match your custom `id` field
 					{
 						$push: {
 							experiences: {
@@ -76,7 +74,7 @@ export async function POST(request) {
 					throw new Error('Hospital not found');
 				}
 
-				return updatedHospital;
+				return NextResponse.json(updatedHospital);
 			}
 		}
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });

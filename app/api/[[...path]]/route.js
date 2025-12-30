@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid';
 import Diseases from '@/lib/models/Diseases';
 import Contacts from '@/lib/models/Contacts';
 
-import mongoose from 'mongoose';
 import Crops from '@/lib/models/Crops';
 
 // Helper function to get path segments
@@ -86,70 +85,6 @@ export async function GET(request) {
 		}
 
 		// GET /api/seed - Seed initial data
-		if (segments[0] === 'seed' && segments.length === 1) {
-			// Check if already seeded
-			const existingCategories = await Category.countDocuments();
-			if (existingCategories > 0) {
-				return NextResponse.json({ message: 'Database already seeded' });
-			}
-
-			// Seed categories
-			const categories = [
-				{
-					id: uuidv4(),
-					name: 'Health',
-					icon: '🏥',
-					description: 'Health and wellness topics',
-				},
-				{
-					id: uuidv4(),
-					name: 'Economy',
-					icon: '💰',
-					description: 'Economic and financial matters',
-				},
-				{
-					id: uuidv4(),
-					name: 'Education',
-					icon: '📚',
-					description: 'Education and learning resources',
-				},
-				{
-					id: uuidv4(),
-					name: 'Moral Values',
-					icon: '⚖️',
-					description: 'Ethics and moral guidance',
-				},
-				{
-					id: uuidv4(),
-					name: 'Employment',
-					icon: '💼',
-					description: 'Job opportunities and career guidance',
-				},
-			];
-
-			await Category.insertMany(categories);
-
-			// Seed subcategories for each category
-			const subcategories = [];
-			categories.forEach((category) => {
-				for (let i = 1; i <= 5; i++) {
-					subcategories.push({
-						id: uuidv4(),
-						categoryId: category.id,
-						name: `${category.name} Topic ${i}`,
-						description: `Placeholder description for ${category.name} topic ${i}`,
-					});
-				}
-			});
-
-			await Subcategory.insertMany(subcategories);
-
-			return NextResponse.json({
-				message: 'Database seeded successfully',
-				categoriesCount: categories.length,
-				subcategoriesCount: subcategories.length,
-			});
-		}
 
 		return NextResponse.json({ message: 'API is working' });
 	} catch (error) {
@@ -188,6 +123,71 @@ export async function POST(request) {
 				createdAt: new Date(),
 			});
 			return NextResponse.json({ contact }, { status: 201 });
+		}
+		if (segments[0] === 'findhospital') {
+			if (segments[0] === 'chat' && segments.length === 1) {
+				const { message, sessionId, userId, categoryId, categoryName } = body;
+
+				if (!message || !sessionId || !userId) {
+					return NextResponse.json(
+						{ error: 'message, sessionId, and userId are required' },
+						{ status: 400 },
+					);
+				}
+
+				// 🔍 Detect speciality
+				let specialityIds = detectSpecialitiesFromText(message);
+
+				// 🧠 AI fallback if nothing detected
+				if (specialityIds.length === 0) {
+					const specialityPrompt = `
+Identify medical speciality IDs from the text.
+Return ONLY a JSON array from this list:
+MG, SG, MC, MO, SN, SB, SE, SM, ER, MP, ST, IN
+
+Text:
+"${message}"
+`;
+
+					const aiSpecialityResponse = await generateChatResponse(
+						[{ role: 'user', content: specialityPrompt }],
+						'You are a medical classification AI.',
+						'',
+					);
+
+					try {
+						specialityIds = JSON.parse(aiSpecialityResponse);
+					} catch {
+						specialityIds = [];
+					}
+				}
+
+				// 🧠 Generate chatbot response (NOT STORED)
+				const aiResponse = await generateChatResponse(
+					[{ role: 'user', content: message }],
+					'You are a helpful health assistant.',
+					categoryName || '',
+				);
+
+				// ✅ Store ONLY user message
+				await ChatMessage.create({
+					id: uuidv4(),
+					sessionId,
+					userId,
+					categoryId: categoryId || '',
+					sender: 'user',
+					content: message,
+					specialityIds,
+					timestamp: new Date(),
+				});
+
+				// ❌ DO NOT STORE BOT MESSAGE
+
+				return NextResponse.json({
+					response: aiResponse,
+					specialityIds,
+				});
+			}
 		}
 		// POST /api/chat - Context-aware chatbot
 		if (segments[0] === 'chat' && segments.length === 1) {

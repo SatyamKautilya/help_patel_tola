@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button, Card, CardBody } from '@heroui/react';
+import { Button, Card, CardBody, Chip } from '@heroui/react';
 import HospitalDetails from './HospitalDetails';
 
 export default function App() {
@@ -61,6 +61,37 @@ export default function App() {
 		router.back();
 	};
 
+	const cities = [
+		{ id: 'jabalpur', name: 'जबलपुर' },
+		{ id: 'balaghat', name: 'बालाघाट' },
+		{ id: 'raipur', name: 'रायपुर' },
+		{ id: 'nagpur', name: 'नागपुर' },
+	];
+
+	const specialityIds = [
+		'MG', // General Medicine
+		'SG', // General Surgery
+		'MC', // Cardiology (Heart)
+		'MO', // Orthopaedics
+		'SN', // Neurology
+		'MN', // Neuro Medicine
+		'SO', // Orthopaedics / Bone
+		'SB', // Paediatrics
+		'SE', // Ophthalmology (Eye)
+		'SM', // Dermatology (Skin)
+		'SL', // Laparoscopic Surgery
+		'SP', // Plastic Surgery
+		'ST', // Trauma
+		'ER', // Emergency
+		'SU', // General Surgery (Super/Advanced)
+		'SC', // Critical Care / ICU
+		'SV', // Vascular Surgery
+		'SS', // Super Speciality
+		'MP', // Psychiatry / Mental Health
+		'IN', // Internal Medicine
+		'NA', // Not Available / Not Specified
+	];
+
 	return (
 		<div className=''>
 			<div className=' flex flex-row py-4 border-b-2 pb-4 bg-slate-100 items-center'>
@@ -98,7 +129,40 @@ export default function App() {
 				</div>
 			)}
 			{selectedTopic === 'hospitals' && (
-				<HospitalDetails hospitals={topicData?.hospitallists} />
+				<>
+					<div className='px-4 py-3 flex flex-row gap-3'>
+						{cities?.map((city) => {
+							return (
+								<Chip color='primary' size='lg'>
+									{city.name}
+								</Chip>
+							);
+						})}
+					</div>
+					<HospitalDetails hospitals={topicData?.hospitallists} />
+					<div className='fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200'>
+						<div className='max-w-3xl mx-auto p-4 flex gap-3 items-end'>
+							<Input
+								size='lg'
+								label='अपनी समस्या लिखें'
+								placeholder='जैसे: सीने में दर्द और सांस की तकलीफ'
+								value={message}
+								onChange={(e) => setMessage(e.target.value)}
+								isDisabled={loading}
+								className='flex-1'
+							/>
+
+							<Button
+								color='primary'
+								size='lg'
+								isLoading={loading}
+								onPress={handleSend}
+								className='shrink-0'>
+								सलाह प्राप्त करें
+							</Button>
+						</div>
+					</div>
+				</>
 			)}
 		</div>
 	);
