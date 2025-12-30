@@ -124,71 +124,7 @@ export async function POST(request) {
 			});
 			return NextResponse.json({ contact }, { status: 201 });
 		}
-		if (segments[0] === 'findhospital') {
-			if (segments[0] === 'chat' && segments.length === 1) {
-				const { message, sessionId, userId, categoryId, categoryName } = body;
 
-				if (!message || !sessionId || !userId) {
-					return NextResponse.json(
-						{ error: 'message, sessionId, and userId are required' },
-						{ status: 400 },
-					);
-				}
-
-				// 🔍 Detect speciality
-				let specialityIds = detectSpecialitiesFromText(message);
-
-				// 🧠 AI fallback if nothing detected
-				if (specialityIds.length === 0) {
-					const specialityPrompt = `
-Identify medical speciality IDs from the text.
-Return ONLY a JSON array from this list:
-MG, SG, MC, MO, SN, SB, SE, SM, ER, MP, ST, IN
-
-Text:
-"${message}"
-`;
-
-					const aiSpecialityResponse = await generateChatResponse(
-						[{ role: 'user', content: specialityPrompt }],
-						'You are a medical classification AI.',
-						'',
-					);
-
-					try {
-						specialityIds = JSON.parse(aiSpecialityResponse);
-					} catch {
-						specialityIds = [];
-					}
-				}
-
-				// 🧠 Generate chatbot response (NOT STORED)
-				const aiResponse = await generateChatResponse(
-					[{ role: 'user', content: message }],
-					'You are a helpful health assistant.',
-					categoryName || '',
-				);
-
-				// ✅ Store ONLY user message
-				await ChatMessage.create({
-					id: uuidv4(),
-					sessionId,
-					userId,
-					categoryId: categoryId || '',
-					sender: 'user',
-					content: message,
-					specialityIds,
-					timestamp: new Date(),
-				});
-
-				// ❌ DO NOT STORE BOT MESSAGE
-
-				return NextResponse.json({
-					response: aiResponse,
-					specialityIds,
-				});
-			}
-		}
 		// POST /api/chat - Context-aware chatbot
 		if (segments[0] === 'chat' && segments.length === 1) {
 			const { message, sessionId, userId, categoryId, categoryName } = body;

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Chatbot from '@/components/Chatbot';
+import { getTextById } from '@/hooks/utils';
 
 export default function App() {
 	const router = useRouter();
@@ -20,6 +21,7 @@ export default function App() {
 			const response = await fetch(`/api/query/database?name=texts`);
 			if (response.ok) {
 				const data = await response.json();
+				console.log(data, 'data');
 				setTexts(data.titleandtexts || []);
 			}
 		} catch (error) {
@@ -31,7 +33,6 @@ export default function App() {
 	useEffect(() => {
 		fetchTexts();
 	}, []);
-	console.log(text, 'tex');
 
 	const initializeApp = async () => {
 		try {
@@ -79,8 +80,12 @@ export default function App() {
 	return (
 		<div className='min-h-screen '>
 			<header className='bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 text-center shadow-md'>
-				<h1 className='m-0 text-2xl font-bold'>*पटेल टोला गढ़ी*</h1>
-				<p className='mt-2 text-sm opacity-90'>सुझाव</p>
+				<h1 className='m-0 text-2xl font-bold'>
+					{getTextById(text, 'toptitle')}
+				</h1>
+				<p className='mt-2 text-sm opacity-90'>
+					{getTextById(text, 'subtitle')}
+				</p>
 			</header>
 
 			<main>
@@ -88,7 +93,7 @@ export default function App() {
 					{categories.map((category) => (
 						<button
 							key={category.id}
-							className='aspect-square flex flex-col items-center justify-center bg-fuchsia-600 rounded-xl p-6 shadow-md text-white rounded-lg p-6 shadow-md cursor-pointer transition-transform duration-200 text-center text-white border-none w-full hover:shadow-lg hover:-translate-y-1 active:-translate-y-0.5'
+							className='aspect-square flex flex-col items-center justify-center  bg-gradient-to-br from-blue-400 via-indigo-600 to-violet-700 rounded-xl p-6 shadow-md text-white rounded-lg p-6 shadow-md cursor-pointer transition-transform duration-200 text-center text-white border-none w-full hover:shadow-lg hover:-translate-y-1 active:-translate-y-0.5'
 							onClick={() => handleCategoryClick(category)}>
 							<div className='text-4xl mb-3'>{category.icon}</div>
 							<h2 className='text-white font-bold text-xl'>{category.name}</h2>

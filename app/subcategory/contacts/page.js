@@ -22,6 +22,7 @@ export default function App() {
 	const [role, setRole] = useState('');
 	const [mobile, setMobile] = useState('');
 	const { isOpen, onOpen, onOpenChange } = useDisclosure();
+	const [access, setAccess] = useState(undefined);
 
 	useEffect(() => {
 		initializeApp();
@@ -72,7 +73,7 @@ export default function App() {
 				</button>
 			</div>
 			{numbers.map((contact) => (
-				<Card key={contact.id} className='max-w-md mx-4 mt-4  bg-teal-400 mb-4'>
+				<Card key={contact.id} className='max-w-md mx-4 mt-4  bg-blue-200 mb-4'>
 					<CardBody className='flex flex-row items-center gap-4'>
 						<div className='flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xl font-semibold'>
 							{contact.name.charAt(0)}
@@ -81,7 +82,7 @@ export default function App() {
 							<p className='text-base font-semibold text-black'>
 								{contact.name}
 							</p>
-							<p className='text-sm text-gray-500'>{contact.role}</p>
+							<p className='text-sm text-black text-lg'>{contact.role}</p>
 							<p className='text-sm text-gray-700 mt-1'>
 								📞{' '}
 								<a
@@ -95,9 +96,27 @@ export default function App() {
 				</Card>
 			))}
 			<div className='flex justify-center mt-6'>
-				<Button color='success' size='md' onPress={onOpen}>
-					+ Add New Contact
-				</Button>
+				{access !== 'access' ? (
+					<Input
+						label='password'
+						value={access}
+						classNames={{
+							input: 'text-white placeholder:text-white/60',
+							inputWrapper: 'bg-transparent border-white/30',
+						}}
+						onValueChange={(e) => {
+							setAccess(e);
+						}}
+					/>
+				) : (
+					<Button
+						color='primary'
+						className='text-white font-bold'
+						size='lg'
+						onPress={onOpen}>
+						+ Add New Contact
+					</Button>
+				)}
 			</div>
 
 			<Modal isOpen={isOpen} onOpenChange={onOpenChange}>

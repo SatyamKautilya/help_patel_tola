@@ -10,9 +10,10 @@ export default function App() {
 	const [topics, setTopics] = useState([]);
 	const [selectedTopic, setSelectedTopic] = useState(null);
 	const [topicData, setTopicData] = useState(null);
-	const [message, setMessage] = useState(null);
+	const [message, setMessage] = useState('');
 	const [selectedCity, setSelectedCity] = useState(null);
-	//	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
+	const [boatResp, setBoatResp] = useState({});
 
 	useEffect(() => {
 		initializeApp();
@@ -97,6 +98,31 @@ export default function App() {
 		'NA', // Not Available / Not Specified
 	];
 
+	const handleSend = async () => {
+		setLoading(true);
+		try {
+			const response = await fetch('/api/query/database?name=findhospital', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					message: message,
+				}),
+			});
+
+			if (!response.ok) throw new Error('Failed to get response');
+
+			const data = await response.json();
+
+			setBoatResp(JSON.parse(data?.response));
+		} catch (error) {
+			console.error('Chat error:', error);
+
+			//	setMessages((prev) => [...prev, errorMessage]);
+		} finally {
+			setLoading(false);
+		}
+	};
+	console.log(boatResp, 'boat reps');
 	return (
 		<div className=''>
 			<div className=' flex flex-row py-4 border-b-2 pb-4 bg-slate-100 items-center'>
@@ -122,7 +148,7 @@ export default function App() {
 							onPress={() => {
 								setSelectedTopic(topic.id);
 							}}
-							className='h-50 bg-pink-500 rounded-2xl shadow-xl p-6'
+							className='h-50 bg-cyan-600 rounded-2xl shadow-xl p-6'
 							key={topic.id}>
 							<CardBody className='text-center'>
 								<h2 className='text-2xl text-pink-100  font-bold mb-2'>
@@ -159,26 +185,44 @@ export default function App() {
 						}
 					/>
 					<div className='fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200'>
-						<div className='max-w-3xl mx-auto p-4 flex gap-3 items-end'>
-							{/* <Input
-								size='lg'
-								label='अपनी समस्या लिखें'
-								placeholder='जैसे: सीने में दर्द और सांस की तकलीफ'
-								value={message}
-								onChange={(e) => setMessage(e.target.value)}
-								//	isDisabled={loading}
-								className='flex-1'
-							/>
+						{!boatResp?.msg ? (
+							<div className='max-w-3xl mx-auto p-4 flex gap-3 items-end'>
+								<Input
+									size='lg'
+									label='अपनी समस्या लिखें'
+									placeholder='जैसे: सीने में दर्द और सांस की तकलीफ'
+									value={message}
+									onChange={(e) => setMessage(e.target.value)}
+									//isDisabled={loading}
+									className='flex-1'
+								/>
 
-							<Button
-								color='primary'
-								size='lg'
-								//			isLoading={loading}
-								onPress={handleSend}
-								className='shrink-0'>
-								सलाह प्राप्त करें
-							</Button> */}
-						</div>
+								<Button
+									color='primary'
+									size='lg'
+									//	isLoading={loading}
+									onPress={() => handleSend()}
+									className='shrink-0'>
+									अस्पताल ढूँढे
+								</Button>
+							</div>
+						) : (
+							<>
+								<div className='mx-4 bg-yellow-500 p-3 rounded-lg'>
+									<div>{boatResp?.msg}</div>
+								</div>
+								<div className='flex flex-row justify-center py-3'>
+									<Button
+										onPress={() => {
+											setBoatResp({});
+										}}
+										color='primary'
+										className=' font-bold'>
+										फिर से ढूँढे
+									</Button>
+								</div>
+							</>
+						)}
 					</div>
 				</>
 			)}
