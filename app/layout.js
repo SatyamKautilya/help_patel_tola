@@ -11,9 +11,9 @@ import { Providers } from './providers';
 export default function RootLayout({ children }) {
 	return (
 		<html lang='en'>
-			<body className='app-gradient h-full min-h-screen flex flex-col'>
+			<body className='app-gradient pt-10 h-full min-h-screen flex flex-col'>
 				<Providers>{children}</Providers>
-				<div className='mt-auto border-t-1 border-gray-300 text-center px-8 py-3 text-gray-400'>
+				<div className='mt-auto border-t-1 mb-10 border-gray-300 text-center px-8 py-3 text-gray-400'>
 					© Created and Managed by Satyam Kautilya
 				</div>
 			</body>
