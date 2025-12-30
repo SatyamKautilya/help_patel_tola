@@ -185,7 +185,7 @@ export default function App() {
 								: filteredHsp
 						}
 					/>
-					<div className='fixed bottom-40 left-0 right-0 z-50 bg-white border-t border-gray-200'>
+					<div className='fixed bottom-10 left-0 right-0 z-50 bg-white border-t border-gray-200'>
 						{!boatResp?.msg ? (
 							<div className='max-w-3xl mx-auto p-4 flex gap-3 items-end'>
 								<Input
