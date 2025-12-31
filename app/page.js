@@ -11,7 +11,7 @@ export default function App() {
 	const [loading, setLoading] = useState(true);
 	const [text, setTexts] = useState({});
 
-	const [showWelcom, setShowWelcome] = useState(true);
+	const [showWelcom, setShowWelcome] = useState(false);
 	useEffect(() => {
 		initializeApp();
 	}, []);
@@ -22,7 +22,7 @@ export default function App() {
 			const response = await fetch(`/api/query/database?name=texts`);
 			if (response.ok) {
 				const data = await response.json();
-				console.log(data, 'data');
+
 				setTexts(data.titleandtexts || []);
 			}
 		} catch (error) {
@@ -72,21 +72,30 @@ export default function App() {
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
-			if (localStorage.getItem('userToken') === 'token') return;
+			if (localStorage.getItem('userToken') === 'token') setShowWelcome(false);
+			return;
 		}
+		setShowWelcome(true);
 		setTimeout(() => {
-			setShowWelcome(false);
+			setShowWelcome(true);
 			if (typeof window !== 'undefined') {
-				localStorage.setItem('userToken', token);
+				localStorage.setItem('userToken', 'token');
 			}
 		}, [5000]);
 	}, []);
 
-	if (loading || showWelcom) {
+	if (showWelcom) {
 		return (
 			<div class='splash'>
 				<h1 class='slok'>तमसो मा ज्योतिर्गमय</h1>
 				<p class='meaning'>अंधकार से प्रकाश की ओर</p>
+			</div>
+		);
+	}
+	if (loading) {
+		return (
+			<div class='splash'>
+				<h1 class='slok'>डाटा लोड हो रहा हैं।</h1>
 			</div>
 		);
 	}
