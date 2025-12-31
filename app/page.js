@@ -84,18 +84,11 @@ export default function App() {
 		}, [5000]);
 	}, []);
 
-	if (showWelcom) {
+	if (loading || showWelcom) {
 		return (
 			<div class='splash'>
 				<h1 class='slok'>तमसो मा ज्योतिर्गमय</h1>
 				<p class='meaning'>अंधकार से प्रकाश की ओर</p>
-			</div>
-		);
-	}
-	if (loading) {
-		return (
-			<div class='splash'>
-				<h1 class='slok'>डाटा लोड हो रहा हैं।</h1>
 			</div>
 		);
 	}
