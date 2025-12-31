@@ -11,6 +11,7 @@ export default function App() {
 	const [loading, setLoading] = useState(true);
 	const [text, setTexts] = useState({});
 
+	const [showWelcom, setShowWelcome] = useState(true);
 	useEffect(() => {
 		initializeApp();
 	}, []);
@@ -69,7 +70,13 @@ export default function App() {
 		);
 	};
 
-	if (loading) {
+	useEffect(() => {
+		setTimeout(() => {
+			setShowWelcome(false);
+		}, [5000]);
+	}, []);
+
+	if (loading || showWelcom) {
 		return (
 			<div class='splash'>
 				<h1 class='slok'>तमसो मा ज्योतिर्गमय</h1>
