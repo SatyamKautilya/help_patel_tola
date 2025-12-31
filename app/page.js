@@ -71,12 +71,20 @@ export default function App() {
 
 	if (loading) {
 		return (
-			<div className='flex items-center justify-center h-screen text-lg text-gray-600'>
-				Loading...
+			<div class='splash'>
+				<h1 class='slok'>तमसो मा ज्योतिर्गमय</h1>
+				<p class='meaning'>अंधकार से प्रकाश की ओर</p>
 			</div>
 		);
 	}
 
+	if (getTextById(text, 'launch') === 'Locked') {
+		return (
+			<div className=' px-6 h-screen bg-[radial-gradient(circle_at_top,_#1e293b,_#020617)] flex flex-row justify-center items-center text-white text-3xl'>
+				हम कुछ विशेष और सार्थक तैयार कर रहे हैं।
+			</div>
+		);
+	}
 	return (
 		<div className='min-h-screen '>
 			<header className='bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 text-center shadow-md'>
