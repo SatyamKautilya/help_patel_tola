@@ -71,8 +71,14 @@ export default function App() {
 	};
 
 	useEffect(() => {
+		if (typeof window !== 'undefined') {
+			if (localStorage.getItem('userToken') === 'token') return;
+		}
 		setTimeout(() => {
 			setShowWelcome(false);
+			if (typeof window !== 'undefined') {
+				localStorage.setItem('userToken', token);
+			}
 		}, [5000]);
 	}, []);
 
