@@ -151,10 +151,10 @@ export default function App() {
 							onPress={() => {
 								setSelectedTopic(topic.id);
 							}}
-							className='h-50 bg-cyan-600 rounded-2xl shadow-xl p-6'
+							className='h-50v bg-[radial-gradient(circle_at_top,_#1e293b,_#020617)]  rounded-2xl shadow-xl p-6'
 							key={topic.id}>
 							<CardBody className='text-center'>
-								<h2 className='text-2xl text-pink-100  font-bold mb-2'>
+								<h2 className='text-2xl text-white  font-bold mb-2'>
 									{topic.topicName}
 								</h2>
 							</CardBody>
