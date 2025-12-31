@@ -11,7 +11,7 @@ export default function App() {
 	const [loading, setLoading] = useState(true);
 	const [text, setTexts] = useState({});
 
-	const [showWelcom, setShowWelcome] = useState(false);
+	const [showWelcom, setShowWelcome] = useState(true);
 	useEffect(() => {
 		initializeApp();
 	}, []);
@@ -72,16 +72,17 @@ export default function App() {
 
 	useEffect(() => {
 		if (typeof window !== 'undefined') {
-			if (localStorage.getItem('userToken') === 'token') setShowWelcome(false);
-			return;
-		}
-		setShowWelcome(true);
-		setTimeout(() => {
-			setShowWelcome(true);
-			if (typeof window !== 'undefined') {
-				localStorage.setItem('userToken', 'token');
+			if (localStorage.getItem('showthis') === 'token') {
+				setShowWelcome(false);
+			} else {
+				setTimeout(() => {
+					setShowWelcome(false);
+					if (typeof window !== 'undefined') {
+						localStorage.setItem('showthis', 'token');
+					}
+				}, [5000]);
 			}
-		}, [5000]);
+		}
 	}, []);
 
 	if (loading || showWelcom) {
