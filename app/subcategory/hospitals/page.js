@@ -32,6 +32,10 @@ export default function App() {
 
 	useEffect(() => {
 		if (!selectedTopic) return;
+		if (selectedTopic === 'sop') {
+			router.push('/subcategory/hospitals/treatment');
+			return;
+		}
 		const fetchTopicDetails = async () => {
 			if (selectedTopic === 'hospitals')
 				try {
