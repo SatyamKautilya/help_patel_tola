@@ -5,6 +5,7 @@ import Healthtopics from '@/lib/models/Healthtopics';
 import Hospitallists from '@/lib/models/Hospitallists';
 
 import mongoose from 'mongoose';
+import Sops from '@/lib/models/Sops';
 // Helper function to get path segments
 function getPathSegments(request) {
 	const url = new URL(request.url);
@@ -25,6 +26,12 @@ export async function GET(request) {
 		if (name === 'hospitals') {
 			const hospitallists = await Hospitallists.find().sort({ createdAt: -1 });
 			return NextResponse.json({ hospitallists });
+		} else if (name === 'sops') {
+			const sops = await Sops.find({}).sort({
+				createdAt: 1,
+			});
+
+			return NextResponse.json({ sops });
 		} else {
 			const healthtopics = await Healthtopics.find({
 				...(name ? { id: name } : {}),
@@ -49,7 +56,7 @@ export async function POST(request) {
 		await connectToDatabase();
 		const segments = getPathSegments(request);
 		const body = await request.json();
-		console.log(segments, body);
+
 		const { searchParams } = new URL(request.url);
 		// GET /api/subcategory/farming - Get farming subcategory details
 
@@ -77,6 +84,24 @@ export async function POST(request) {
 				return NextResponse.json(updatedHospital);
 			}
 		}
+		if (name === 'sops') {
+			const { form: sop } = body;
+
+			if (!sop?.name) {
+				return NextResponse.json(
+					{ error: 'SOP name is required' },
+					{ status: 400 },
+				);
+			}
+
+			const newSop = await Sops.create({
+				id: sop.name, // custom id
+				...sop,
+			});
+
+			return NextResponse.json(newSop);
+		}
+
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });
 	} catch (error) {
 		console.error('API POST Error:', error);
