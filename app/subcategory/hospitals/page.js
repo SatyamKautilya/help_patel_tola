@@ -128,35 +128,44 @@ export default function App() {
 		</div>
 	) : (
 		<div className=''>
-			<div className=' flex flex-row py-4 border-b-2 pb-4 bg-slate-100 items-center'>
+			<div className='fixed top-0 left-0 right-0 z-50 flex flex-row py-4 border-b-2 bg-slate-100 items-center'>
 				<Button
 					color='primary'
 					size='lg'
 					className='ml-6 text-xl font-bold'
-					onPress={
-						selectedTopic
-							? () => {
-									setSelectedTopic(null);
-							  }
-							: handleBack
-					}>
+					onPress={selectedTopic ? () => setSelectedTopic(null) : handleBack}>
 					← Back
 				</Button>
 			</div>
 			{!selectedTopic && (
-				<div className=' p-6 grid grid-cols-2 gap-6	'>
+				<div className=' pt-[72px] p-6 grid grid-cols-2 gap-6	'>
 					{topics.map((topic) => (
 						<Card
+							key={topic.id}
 							isPressable
-							onPress={() => {
-								setSelectedTopic(topic.id);
-							}}
-							className='h-50v bg-[radial-gradient(circle_at_top,_#1e293b,_#020617)]  rounded-2xl shadow-xl p-6'
-							key={topic.id}>
-							<CardBody className='text-center'>
-								<h2 className='text-2xl text-white  font-bold mb-2'>
+							onPress={() => setSelectedTopic(topic.id)}
+							className='
+      h-64 
+      rounded-2xl 
+      shadow-xl 
+      bg-gradient-to-br from-indigo-600 via-purple-600 to-purple-300
+      hover:scale-[1.02] transition-transform
+    '>
+							<CardBody className='flex flex-col justify-between items-center p-6'>
+								{/* Title */}
+								<h2 className='text-2xl text-white font-bold text-center'>
 									{topic.topicName}
 								</h2>
+
+								{/* Button */}
+								<Button
+									color='success'
+									variant='shadow'
+									size='lg'
+									onPress={() => setSelectedTopic(topic.id)}
+									className='mt-4 bg-green-400'>
+									देखें
+								</Button>
 							</CardBody>
 						</Card>
 					))}
@@ -164,7 +173,7 @@ export default function App() {
 			)}
 			{selectedTopic === 'hospitals' && (
 				<>
-					<div className='px-4 py-3 flex flex-row flex-wrap gap-3'>
+					<div className='pt-[72px] px-4 py-3 flex flex-row flex-wrap gap-3'>
 						{cities?.map((city) => {
 							return (
 								<Chip
