@@ -221,6 +221,9 @@ export default function App() {
 								<div className='mx-4 mt-4 bg-yellow-500 p-3 rounded-lg'>
 									<div>{boatResp?.msg}</div>
 								</div>
+								<div className='mx-4 mt-4 bg-pink-300 p-3 rounded-lg'>
+									<div>ऊपर संबन्धित अस्पतालो की सूची है</div>
+								</div>
 								<div className='flex flex-row justify-center py-3'>
 									<Button
 										onPress={() => {
