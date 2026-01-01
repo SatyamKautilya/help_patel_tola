@@ -153,6 +153,8 @@ export default function App() {
     '>
 							<CardBody className='flex flex-col justify-between items-center p-6'>
 								{/* Title */}
+								{topic.owner && <Chip color='warning'>{topic.owner}</Chip>}
+
 								<h2 className='text-2xl text-white font-bold text-center'>
 									{topic.topicName}
 								</h2>
