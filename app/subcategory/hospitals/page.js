@@ -128,7 +128,7 @@ export default function App() {
 		</div>
 	) : (
 		<div className=''>
-			<div className='fixed top-8 left-0 right-0 z-50 flex flex-row py-4 border-b-2 bg-slate-100 items-center'>
+			<div className='fixed top-0  left-0 right-0 z-50 flex flex-row pb-4 pt-12 border-b-2 bg-slate-100 items-center'>
 				<Button
 					color='primary'
 					size='lg'
