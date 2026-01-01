@@ -58,9 +58,11 @@ const HospitalDetails = (props) => {
 							<h2 className='text-2xl text-white font-bold mb-4'>
 								{hospital.name}
 							</h2>
-							<p className='text-lg'>{`पता: ${hospital.address}`}</p>
-							<p className='text-lg'>{`संपर्क: ${hospital.contact}`} </p>
-							<p className='text-lg font-extrabold'>{`विशेषग्यता: ${hospital.speciality} `}</p>
+							<p className='text-lg text-white'>{`पता: ${hospital.address}`}</p>
+							<p className='text-lg text-white py-1'>
+								{`संपर्क: ${hospital.contact}`}{' '}
+							</p>
+							<p className='text-lg text-white font-extrabold'>{`विशेषग्यता: ${hospital.speciality} `}</p>
 							{hospital.experiences?.length ? (
 								<Accordion
 									selectionMode='single'
