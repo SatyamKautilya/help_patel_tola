@@ -72,7 +72,7 @@ export default function DiseaseCard({ disease }) {
 						{/* Steps */}
 						{disease.steps?.length > 0 && (
 							<Section
-								title='कदम दर कदम इलाज'
+								title='उपचार के चरण'
 								color='blue'
 								items={disease.steps}
 							/>
