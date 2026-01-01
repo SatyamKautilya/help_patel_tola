@@ -12,6 +12,8 @@ import {
 	Button,
 	Input,
 	Textarea,
+	CardBody,
+	Card,
 } from '@heroui/react';
 const page = () => {
 	const router = useRouter();
@@ -78,26 +80,53 @@ const page = () => {
 						onPress={() => {
 							setAddInfo(true);
 						}}
-						variant='light'>
+						size='lg'
+						variant='solid'>
 						+ बीमारी की जानकारी जोड़े।
 					</Button>
 				</div>
 			</div>
 
-			<Modal size='lg' isOpen={addInfo} onClose={() => setAddInfo(false)}>
+			{addInfo && (
+				<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
+					<Card
+						className='
+      h-64
+      w-96
+      rounded-2xl
+      shadow-2xl
+      bg-gradient-to-br from-indigo-600 via-purple-600 to-purple-300
+      hover:scale-[1.02] transition-transform
+    '>
+						<CardBody className='flex items-center justify-center text-white'>
+							{/* Your content here */}
+							<label className='text-2xl mb-4'>
+								डॉ पाटिल, आपका स्वागत है!🌺
+							</label>
+							<div className='mx-20'>
+								<Input
+									value={auth}
+									onPress={(e) => setAuth(e.target.value)}
+									classNames={{ input: 'text-lg' }}
+									placeholder='Please Enter The Code'></Input>
+							</div>
+						</CardBody>
+						<Button
+							size='md'
+							className='w-max mx-auto mb-4'
+							color='danger'
+							onPress={() => setAddInfo(false)}>
+							बंद करें
+						</Button>
+					</Card>
+				</div>
+			)}
+
+			<Modal size='lg' isOpen={false} onClose={() => setAddInfo(false)}>
 				<ModalContent>
-					{auth !== 'amit' ? (
-						<ModalBody className='space-y-4'>
-							<Input
-								label='WELCOME "Dr. Amit" '
-								placeholder='please enter password'
-								value={auth}
-								onChange={(e) => setAuth(e.target.value)}
-							/>
-						</ModalBody>
-					) : (
+					{auth === 'amit' && (
 						<>
-							<ModalHeader className='text-xl font-bold mb-10'>
+							<ModalHeader className='text-xl font-bold '>
 								बीमारी की जानकारी
 							</ModalHeader>
 							<ModalBody className='space-y-4'>
@@ -174,7 +203,7 @@ const page = () => {
 									</Button>
 								</div>
 							</ModalBody>
-							<ModalFooter>
+							<ModalFooter className='mb-10'>
 								<Button variant='light' onPress={onClose}>
 									रद्द करें
 								</Button>
