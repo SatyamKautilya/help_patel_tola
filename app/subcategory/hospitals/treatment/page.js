@@ -97,7 +97,7 @@ const page = () => {
 						</ModalBody>
 					) : (
 						<>
-							<ModalHeader className='text-xl font-bold'>
+							<ModalHeader className='text-xl font-bold mb-10'>
 								बीमारी की जानकारी
 							</ModalHeader>
 							<ModalBody className='space-y-4'>
