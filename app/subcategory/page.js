@@ -11,7 +11,7 @@ export default function SubcategoryPage() {
 
 	const [loading, setLoading] = useState(true);
 	const categoryId = 'abc';
-	const categoryName = 'xyz';
+	const categoryName = 'Coming Soon';
 	useEffect(() => {
 		fetchSubcategories();
 	}, []);
@@ -52,8 +52,8 @@ export default function SubcategoryPage() {
 					<p className='text-base'>Loading...</p>
 				</div>
 			) : subcategories.length === 0 ? (
-				<div className='text-center py-12 text-gray-600'>
-					<p className='text-base'>No subcategories found</p>
+				<div className=' px-6 h-screen bg-[radial-gradient(circle_at_top,_#1e293b,_#020617)] flex flex-row justify-center items-center text-white text-3xl'>
+					हम कुछ विशेष और सार्थक तैयार कर रहे हैं। जल्द ही जानकारी जोड़ी जाएगी !!
 				</div>
 			) : (
 				<div className='flex flex-col gap-4'>
