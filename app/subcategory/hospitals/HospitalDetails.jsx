@@ -45,7 +45,7 @@ const HospitalDetails = (props) => {
 		? hospitals?.map((hospital) => {
 				return (
 					<div key={hospital.id}>
-						<Card className='m-4 p-6 bg-green-400 rounded-2xl shadow-lg'>
+						<Card className='m-4 p-6 bg-gradient-to-br from-indigo-600 via-purple-600 to-purple-300 rounded-2xl shadow-lg'>
 							{hospital.experiences?.length ? (
 								<div className='mb-2'>
 									<Chip
@@ -55,7 +55,9 @@ const HospitalDetails = (props) => {
 									</Chip>
 								</div>
 							) : null}
-							<h2 className='text-2xl font-bold mb-4'>{hospital.name}</h2>
+							<h2 className='text-2xl text-white font-bold mb-4'>
+								{hospital.name}
+							</h2>
 							<p className='text-lg'>{`पता: ${hospital.address}`}</p>
 							<p className='text-lg'>{`संपर्क: ${hospital.contact}`} </p>
 							<p className='text-lg font-extrabold'>{`विशेषग्यता: ${hospital.speciality} `}</p>

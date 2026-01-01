@@ -171,7 +171,7 @@ export default function App() {
 					))}
 				</div>
 			)}
-			{selectedTopic === 'hospitals' && (
+			{selectedTopic === 'hospitals' ? (
 				<>
 					<div className='pt-[84px] px-4 py-3 flex flex-row flex-wrap gap-3'>
 						{cities?.map((city) => {
@@ -235,6 +235,13 @@ export default function App() {
 						)}
 					</div>
 				</>
+			) : (
+				selectedTopic !== null && (
+					<div className=' px-6 h-screen bg-[radial-gradient(circle_at_top,_#1e293b,_#020617)] flex flex-row justify-center items-center text-white text-3xl'>
+						हम कुछ विशेष और सार्थक तैयार कर रहे हैं। जल्द ही जानकारी जोड़ी जाएगी
+						!!
+					</div>
+				)
 			)}
 		</div>
 	);
