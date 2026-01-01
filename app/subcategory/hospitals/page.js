@@ -128,7 +128,7 @@ export default function App() {
 		</div>
 	) : (
 		<div className=''>
-			<div className='fixed top-0 left-0 right-0 z-50 flex flex-row py-4 border-b-2 bg-slate-100 items-center'>
+			<div className='fixed top-8 left-0 right-0 z-50 flex flex-row py-4 border-b-2 bg-slate-100 items-center'>
 				<Button
 					color='primary'
 					size='lg'
@@ -138,7 +138,7 @@ export default function App() {
 				</Button>
 			</div>
 			{!selectedTopic && (
-				<div className=' pt-[72px] p-6 grid grid-cols-2 gap-6	'>
+				<div className=' pt-[84px] p-6 grid grid-cols-2 gap-6	'>
 					{topics.map((topic) => (
 						<Card
 							key={topic.id}
@@ -173,7 +173,7 @@ export default function App() {
 			)}
 			{selectedTopic === 'hospitals' && (
 				<>
-					<div className='pt-[72px] px-4 py-3 flex flex-row flex-wrap gap-3'>
+					<div className='pt-[84px] px-4 py-3 flex flex-row flex-wrap gap-3'>
 						{cities?.map((city) => {
 							return (
 								<Chip
