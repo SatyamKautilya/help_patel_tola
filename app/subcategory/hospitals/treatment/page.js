@@ -15,16 +15,13 @@ import {
 	CardBody,
 	Card,
 } from '@heroui/react';
-import { NextResponse } from 'next/server';
+
 import DiseaseCard from './DiseaseCard';
 const page = () => {
 	const router = useRouter();
 	const handleBack = () => {
 		router.back();
 	};
-
-	('use client');
-
 	const [name, setName] = useState('');
 	const [isOpen, setIsOpen] = useState(false);
 	const [symptoms, setSymptoms] = useState('');
@@ -35,7 +32,7 @@ const page = () => {
 	const [dontCare, setDontCare] = useState(['']);
 	const [saving, setSaving] = useState(0);
 	const [sops, setSops] = useState([]);
-	console.log(sops);
+
 	const addCarePoint = () => {
 		setCarePoints([...carePoints, '']);
 	};
