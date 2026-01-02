@@ -15,7 +15,7 @@ export default function DiseaseCard({ disease }) {
 				: disease.symptoms,
 	};
 
-	function Section({ title, items, color }) {
+	function Section({ title, items, color, titleClass }) {
 		const colorMap = {
 			red: 'bg-red-300',
 			blue: 'bg-blue-300',
@@ -25,7 +25,7 @@ export default function DiseaseCard({ disease }) {
 
 		return (
 			<div className='mx-6'>
-				<h3 className='text-lg font-bold text-white mb-3'>{title}</h3>
+				<h3 className={`text-lg font-bold 	 mb-3 ${titleClass}`}>{title}</h3>
 
 				<ul className='space-y-2'>
 					{items.map((item, index) => (
@@ -63,6 +63,7 @@ export default function DiseaseCard({ disease }) {
 						{/* Symptoms */}
 						{normalizedDisease.symptoms && (
 							<Section
+								titleClass='text-white text-2xl font-bold'
 								title='लक्षण'
 								color='red'
 								items={normalizedDisease.symptoms}
@@ -72,6 +73,7 @@ export default function DiseaseCard({ disease }) {
 						{/* Steps */}
 						{disease.steps?.length > 0 && (
 							<Section
+								titleClass='text-white text-2xl font-bold'
 								title='उपचार के चरण'
 								color='blue'
 								items={disease.steps}
@@ -80,12 +82,18 @@ export default function DiseaseCard({ disease }) {
 
 						{/* Dos */}
 						{disease.dos?.length > 0 && (
-							<Section title='क्या करें' color='green' items={disease.dos} />
+							<Section
+								titleClass='text-green-300 text-2xl font-bold'
+								title='क्या करें'
+								color='green'
+								items={disease.dos}
+							/>
 						)}
 
 						{/* Don'ts */}
 						{disease.donts?.length > 0 && (
 							<Section
+								titleClass='text-red-700 text-4xl  font-bold'
 								title='क्या न करें'
 								color='orange'
 								items={disease.donts}
