@@ -10,6 +10,9 @@ const UserWelcome = () => {
 			setUser(window.APP_CONTEXT);
 		}
 	}, []);
+	useEffect(() => {
+		console.log('APP_CONTEXT →', window.APP_CONTEXT);
+	}, []);
 
 	if (!user) {
 		return null; // or fallback UI
