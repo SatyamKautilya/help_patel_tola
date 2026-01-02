@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, useDisclosure, Card, CardBody, Image } from '@heroui/react';
 import Farming from '@/components/ui/customui/Farming';
+import UserWelcome from './userWelcome';
 // import { generateScheduleResponse } from '@/lib/openai';
 
 export default function App() {
@@ -98,6 +99,7 @@ export default function App() {
 			{selectedCrop && selectedCropData && (
 				<Farming {...selectedCropData?.crops?.[0]} />
 			)}
+			<UserWelcome />
 		</>
 	);
 }
