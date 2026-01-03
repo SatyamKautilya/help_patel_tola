@@ -140,7 +140,7 @@ export default function App() {
 	}
 	return (
 		<div className='min-h-screen max-h-screen '>
-			<header className='fixed w-full top-8 bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 text-center shadow-md'>
+			<header className='fixed w-full top-0 bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 text-center shadow-md'>
 				<h1 className='m-0 text-2xl font-bold'>
 					{getTextById(text, 'toptitle')}
 				</h1>
@@ -150,7 +150,7 @@ export default function App() {
 			</header>
 
 			<main>
-				<div className='mt-24 grid grid-cols-2 gap-4 p-4 max-w-sm mx-auto'>
+				<div className='mt-16 grid grid-cols-2 gap-4 p-4 max-w-sm mx-auto'>
 					{categories.map((category) => (
 						<button
 							key={category.id}
