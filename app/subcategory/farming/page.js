@@ -63,7 +63,7 @@ export default function App() {
 	console.log('Farming Data:', selectedCropData);
 	return (
 		<>
-			<div className=' flex flex-row py-4 border-b-2 pb-4 bg-slate-100 items-center'>
+			<div className='fixed w-full pt-12 top-0 z-50 flex flex-row pb-4 border-b-2 bg-slate-100 items-center'>
 				<Button
 					color='primary'
 					size='lg'
@@ -72,7 +72,7 @@ export default function App() {
 					← Back
 				</Button>
 			</div>
-			<div className=' p-6 grid grid-cols-2 gap-6'>
+			<div className='mt-16 p-6 grid grid-cols-2 gap-6'>
 				{!selectedCrop &&
 					farming.map((item) => (
 						<Card
@@ -100,7 +100,6 @@ export default function App() {
 			{selectedCrop && selectedCropData && (
 				<Farming {...selectedCropData?.crops?.[0]} />
 			)}
-			
 		</>
 	);
 }
