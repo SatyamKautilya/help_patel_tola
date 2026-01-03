@@ -7,12 +7,15 @@ export const metadata = {
 		'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
 };
 import { Providers } from './providers';
+import ReduxProvider from './store/ReduxProvider';
 
 export default function RootLayout({ children }) {
 	return (
 		<html lang='en'>
 			<body className='app-gradient pt-10 h-full min-h-screen flex flex-col'>
-				<Providers>{children}</Providers>
+				<ReduxProvider>
+					<Providers>{children}</Providers>
+				</ReduxProvider>
 			</body>
 		</html>
 	);

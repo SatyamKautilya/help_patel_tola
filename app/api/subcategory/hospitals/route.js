@@ -7,6 +7,7 @@ import Hospitallists from '@/lib/models/Hospitallists';
 import mongoose from 'mongoose';
 import Sops from '@/lib/models/Sops';
 import Successstorys from '@/lib/models/Successstorys';
+import Users from '@/lib/models/Users';
 // Helper function to get path segments
 function getPathSegments(request) {
 	const url = new URL(request.url);
@@ -124,6 +125,34 @@ export async function POST(request) {
 			});
 
 			return NextResponse.json(successstory);
+		}
+		if (name === 'users') {
+			const { form: content } = body;
+
+			if (!content?.name) {
+				return NextResponse.json(
+					{ error: 'content name is required' },
+					{ status: 400 },
+				);
+			}
+
+			const user = await Users.findOneAndUpdate(
+				{ id: content.appInstanceId }, // search condition
+				{
+					$set: {
+						name: content.name,
+						villageName: content.villageName,
+						lastSeen: content.lastSeen,
+					},
+				},
+				{
+					upsert: true, // 🔥 create if not exists
+					new: true, // return updated document
+					setDefaultsOnInsert: true,
+				},
+			);
+
+			return NextResponse.json(user);
 		}
 
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });

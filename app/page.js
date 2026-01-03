@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Chatbot from '@/components/Chatbot';
 import { getTextById } from '@/hooks/utils';
+import { useDispatch, useSelector } from 'react-redux';
+import { setAppContext } from './store/appSlice';
 
 export default function App() {
 	const router = useRouter();
@@ -12,15 +13,46 @@ export default function App() {
 	const [text, setTexts] = useState({});
 	const [user, setUser] = useState(null);
 	const [showWelcom, setShowWelcome] = useState(true);
+	const dispatch = useDispatch();
+
+	const appContext = useSelector((state) => state.appContext.appContext);
+
+	console.log(appContext, 'app');
 	useEffect(() => {
 		initializeApp();
 	}, []);
 
 	useEffect(() => {
 		if (typeof window !== 'undefined' && window.APP_CONTEXT) {
-			setUser(window.APP_CONTEXT);
+			const context = window.APP_CONTEXT;
+
+			setUser(context); // local state
+			dispatch(setAppContext({ ...context })); // redux state
 		}
 	}, []);
+	useEffect(() => {
+		if (!appContext) return;
+
+		const hasVisited = sessionStorage.getItem('user_last_seen_sent');
+
+		if (hasVisited) return;
+
+		sessionStorage.setItem('user_last_seen_sent', 'true');
+
+		const now = new Date().toISOString();
+
+		fetch('/api/subcategory/hospitals?name=users', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				form: {
+					...appContext,
+					lastSeen: now,
+				},
+			}),
+		}).catch(console.error);
+	}, [appContext]);
+
 	const fetchTexts = async () => {
 		setLoading(true);
 		try {
