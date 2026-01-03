@@ -24,6 +24,12 @@ export async function GET(request) {
 
 		const name = searchParams.get('name');
 
+		if (name === 'content') {
+			const records = await Successstorys.find().sort({ createdAt: -1 });
+
+			return NextResponse.json(records);
+		}
+
 		if (name === 'hospitals') {
 			const hospitallists = await Hospitallists.find().sort({ createdAt: -1 });
 			return NextResponse.json({ hospitallists });
