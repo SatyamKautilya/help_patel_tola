@@ -10,12 +10,17 @@ export default function App() {
 	const [categories, setCategories] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [text, setTexts] = useState({});
-
+	const [user, setUser] = useState(null);
 	const [showWelcom, setShowWelcome] = useState(true);
 	useEffect(() => {
 		initializeApp();
 	}, []);
 
+	useEffect(() => {
+		if (typeof window !== 'undefined' && window.APP_CONTEXT) {
+			setUser(window.APP_CONTEXT);
+		}
+	}, []);
 	const fetchTexts = async () => {
 		setLoading(true);
 		try {
@@ -102,18 +107,18 @@ export default function App() {
 		);
 	}
 	return (
-		<div className='min-h-screen '>
-			<header className='bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 text-center shadow-md'>
+		<div className='min-h-screen max-h-screen '>
+			<header className='fixed w-full top-8 bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 text-center shadow-md'>
 				<h1 className='m-0 text-2xl font-bold'>
 					{getTextById(text, 'toptitle')}
 				</h1>
 				<p className='mt-2 text-sm opacity-90'>
-					{getTextById(text, 'subtitle')}
+					{`${getTextById(text, 'subtitle')} ${user?.name ?? ''}`}
 				</p>
 			</header>
 
 			<main>
-				<div className='grid grid-cols-2 gap-4 p-4 max-w-sm mx-auto'>
+				<div className='mt-24 grid grid-cols-2 gap-4 p-4 max-w-sm mx-auto'>
 					{categories.map((category) => (
 						<button
 							key={category.id}
@@ -125,8 +130,10 @@ export default function App() {
 					))}
 				</div>
 			</main>
-
-			<Chatbot />
+			<div className='fixed w-full bottom-0 border-t-1 pb-10  app-gradient border-gray-300 text-center px-8 py-3 text-gray-400'>
+				© Created and Managed by Satyam Kautilya
+			</div>
+			{/* <Chatbot /> */}
 		</div>
 	);
 }

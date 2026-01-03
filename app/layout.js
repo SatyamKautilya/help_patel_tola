@@ -13,9 +13,6 @@ export default function RootLayout({ children }) {
 		<html lang='en'>
 			<body className='app-gradient pt-10 h-full min-h-screen flex flex-col'>
 				<Providers>{children}</Providers>
-				<div className='mt-auto border-t-1 mb-10 border-gray-300 text-center px-8 py-3 text-gray-400'>
-					© Created and Managed by Satyam Kautilya
-				</div>
 			</body>
 		</html>
 	);
