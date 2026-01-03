@@ -36,6 +36,10 @@ export default function App() {
 			router.push('/subcategory/hospitals/treatment');
 			return;
 		}
+		if (selectedTopic === 'successStory') {
+			router.push('/subcategory/hospitals/casestory');
+			return;
+		}
 		const fetchTopicDetails = async () => {
 			if (selectedTopic === 'hospitals')
 				try {
