@@ -121,6 +121,7 @@ export async function POST(request) {
 
 			const successstory = await Successstorys.create({
 				id: content.name, // custom id
+				subtitle: content.subtitle,
 				storySegment: content.storySegment,
 			});
 
