@@ -64,44 +64,50 @@ export default function AddContentModal({ isOpen, onClose }) {
 						value={name}
 						onChange={(e) => setName(e.target.value)}
 					/>
-					{items.map((item, index) => (
-						<div
-							key={index}
-							className='border rounded-xl p-4 space-y-3 bg-slate-50'>
-							<Input
-								label='Heading'
-								placeholder='Enter heading'
-								value={item.heading}
-								onChange={(e) => updateItem(index, 'heading', e.target.value)}
-							/>
+					<div>
+						{items.map((item, index) => (
+							<div
+								key={index}
+								className='border rounded-xl p-4 space-y-3 bg-slate-50'>
+								<Input
+									label='Heading'
+									placeholder='Enter heading'
+									value={item.heading}
+									onChange={(e) => updateItem(index, 'heading', e.target.value)}
+								/>
 
-							<Textarea
-								label='Description'
-								placeholder='Enter description'
-								value={item.description}
-								onChange={(e) =>
-									updateItem(index, 'description', e.target.value)
-								}
-							/>
+								<Textarea
+									label='Description'
+									placeholder='Enter description'
+									value={item.description}
+									onChange={(e) =>
+										updateItem(index, 'description', e.target.value)
+									}
+								/>
 
-							{items.length > 1 && (
-								<Button
-									color='danger'
-									variant='light'
-									size='sm'
-									onPress={() => removeItem(index)}>
-									Remove
-								</Button>
-							)}
-						</div>
-					))}
+								{items.length > 1 && (
+									<Button
+										color='danger'
+										variant='light'
+										size='sm'
+										onPress={() => removeItem(index)}>
+										Remove
+									</Button>
+								)}
+							</div>
+						))}
 
-					<Button color='secondary' variant='flat' onPress={addItem}>
-						+ Add Another
-					</Button>
+						<Button
+							className='mt-4'
+							color='secondary'
+							variant='flat'
+							onPress={addItem}>
+							+ Add Another
+						</Button>
+					</div>
 				</ModalBody>
 
-				<ModalFooter>
+				<ModalFooter className='pb-10'>
 					<Button variant='light' onPress={onClose}>
 						Cancel
 					</Button>
