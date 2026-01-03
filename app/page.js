@@ -141,7 +141,7 @@ export default function App() {
 	return (
 		<div className='min-h-screen max-h-screen '>
 			<header className='fixed w-full top-0 bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 text-center shadow-md'>
-				<h1 className='m-0 text-2xl font-bold'>
+				<h1 className='m-1 text-2xl font-bold'>
 					{getTextById(text, 'toptitle')}
 				</h1>
 				<p className='mt-2 text-sm opacity-90'>
