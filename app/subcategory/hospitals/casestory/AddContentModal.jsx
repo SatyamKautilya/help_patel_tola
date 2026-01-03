@@ -49,7 +49,11 @@ export default function AddContentModal({ isOpen, onClose }) {
 	};
 
 	return (
-		<Modal isOpen={isOpen} onOpenChange={onClose} size='xl'>
+		<Modal
+			scrollBehavior='inside'
+			isOpen={isOpen}
+			onOpenChange={onClose}
+			size='xl'>
 			<ModalContent>
 				<ModalHeader className='text-xl font-bold'>Add Content</ModalHeader>
 
