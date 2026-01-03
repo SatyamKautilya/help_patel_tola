@@ -100,7 +100,7 @@ export default function App() {
 			{selectedCrop && selectedCropData && (
 				<Farming {...selectedCropData?.crops?.[0]} />
 			)}
-			<UserWelcome />
+			
 		</>
 	);
 }

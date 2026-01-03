@@ -72,7 +72,7 @@ Text:
 					undefined,
 					`
 Identify medical speciality IDs from the text. 
-Return ONLY an object {msg:your one liner suggestion in hindi,specialityId: JSON array from this list:
+Return ONLY an object {msg:your one liner suggestion in the same language user used, specialityId: JSON array from this list:
 MG, SG, MC, MO, SN, SB, SE, SM, ER, MP, ST, IN }
 don't provide empty string
 Text:
