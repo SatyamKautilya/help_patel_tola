@@ -94,7 +94,6 @@ const page = () => {
 		dothis();
 	}, []);
 
-	console.log(sops);
 	const handleSave = async () => {
 		if (!name) return;
 		setSaving(1);

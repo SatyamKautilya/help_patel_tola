@@ -15,6 +15,7 @@ import {
 export default function AddContentModal({ isOpen, onClose }) {
 	const [items, setItems] = useState([{ heading: '', description: '' }]);
 	const [loading, setLoading] = useState(false);
+	const [name, setName] = useState('');
 
 	const addItem = () => {
 		setItems([...items, { heading: '', description: '' }]);
@@ -33,10 +34,10 @@ export default function AddContentModal({ isOpen, onClose }) {
 	const handleSubmit = async () => {
 		setLoading(true);
 		try {
-			await fetch('/api/query/database?name=content', {
+			await fetch('/api/subcategory/hospitals?name=content', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ items }),
+				body: JSON.stringify({ form: { name, storySegment: items } }),
 			});
 			onClose();
 			setItems([{ heading: '', description: '' }]);
@@ -53,6 +54,12 @@ export default function AddContentModal({ isOpen, onClose }) {
 				<ModalHeader className='text-xl font-bold'>Add Content</ModalHeader>
 
 				<ModalBody className='space-y-6'>
+					<Input
+						label='Story Title'
+						placeholder='Enter heading'
+						value={name}
+						onChange={(e) => setName(e.target.value)}
+					/>
 					{items.map((item, index) => (
 						<div
 							key={index}

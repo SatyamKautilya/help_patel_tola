@@ -92,6 +92,8 @@ Text:
 			return NextResponse.json({ response });
 		}
 
+		if (name === 'content') {
+		}
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });
 	} catch (error) {
 		console.error('API POST Error:', error);

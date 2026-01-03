@@ -6,6 +6,7 @@ import Hospitallists from '@/lib/models/Hospitallists';
 
 import mongoose from 'mongoose';
 import Sops from '@/lib/models/Sops';
+import Successstorys from '@/lib/models/Successstorys';
 // Helper function to get path segments
 function getPathSegments(request) {
 	const url = new URL(request.url);
@@ -100,6 +101,23 @@ export async function POST(request) {
 			});
 
 			return NextResponse.json(newSop);
+		}
+		if (name === 'content') {
+			const { form: content } = body;
+
+			if (!content?.name) {
+				return NextResponse.json(
+					{ error: 'content name is required' },
+					{ status: 400 },
+				);
+			}
+
+			const successstory = await Successstorys.create({
+				id: content.name, // custom id
+				storySegment: content.storySegment,
+			});
+
+			return NextResponse.json(successstory);
 		}
 
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });
