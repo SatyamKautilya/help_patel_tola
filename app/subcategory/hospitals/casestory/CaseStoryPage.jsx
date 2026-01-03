@@ -24,8 +24,11 @@ export default function CaseStoryPage({ props }) {
 									content: 'bg-transparent',
 								}}
 								title={
-									<div className='flex flex-col text-white'>
+									<div className='flex flex-col gap-2 text-white'>
 										<span className='text-3xl font-bold'>{caseData?.id}</span>
+										<span className='text-md italic font-bold'>
+											{caseData?.subtitle}
+										</span>
 									</div>
 								}>
 								{/* STORY SEGMENTS */}
@@ -49,6 +52,9 @@ export default function CaseStoryPage({ props }) {
 														</h2>
 														<p className=' text-black text-lg mt-1'>
 															{segment.description}
+														</p>
+														<p className=' border-red-500	border-1 p-2 bg-red-300 rounded-md text-black text-lg mt-1'>
+															{segment.takeaway}
 														</p>
 													</div>
 												</div>

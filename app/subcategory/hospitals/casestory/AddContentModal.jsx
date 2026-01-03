@@ -16,6 +16,7 @@ export default function AddContentModal({ isOpen, onClose }) {
 	const [items, setItems] = useState([{ heading: '', description: '' }]);
 	const [loading, setLoading] = useState(false);
 	const [name, setName] = useState('');
+	const [subtitle, setSubtitle] = useState('');
 
 	const addItem = () => {
 		setItems([...items, { heading: '', description: '' }]);
@@ -37,7 +38,7 @@ export default function AddContentModal({ isOpen, onClose }) {
 			await fetch('/api/subcategory/hospitals?name=content', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ form: { name, storySegment: items } }),
+				body: JSON.stringify({ form: { name, subtitle, storySegment: items } }),
 			});
 			onClose();
 			setItems([{ heading: '', description: '' }]);
@@ -64,6 +65,12 @@ export default function AddContentModal({ isOpen, onClose }) {
 						value={name}
 						onChange={(e) => setName(e.target.value)}
 					/>
+					<Input
+						label='Story Subtitle'
+						placeholder='Enter Subtitle'
+						value={subtitle}
+						onChange={(e) => setSubtitle(e.target.value)}
+					/>
 					<div>
 						{items.map((item, index) => (
 							<div
@@ -82,6 +89,14 @@ export default function AddContentModal({ isOpen, onClose }) {
 									value={item.description}
 									onChange={(e) =>
 										updateItem(index, 'description', e.target.value)
+									}
+								/>
+								<Textarea
+									label='Takeaway'
+									placeholder='Enter takeaway'
+									value={item.takeaway}
+									onChange={(e) =>
+										updateItem(index, 'takeaway', e.target.value)
 									}
 								/>
 
