@@ -17,7 +17,6 @@ export default function App() {
 
 	const appContext = useSelector((state) => state.appContext.appContext);
 
-	console.log(appContext, 'app');
 	useEffect(() => {
 		initializeApp();
 	}, []);
@@ -30,8 +29,9 @@ export default function App() {
 			dispatch(setAppContext({ ...context })); // redux state
 		}
 	}, []);
+
 	useEffect(() => {
-		if (!appContext) return;
+		if (!appContext?.name) return;
 
 		const hasVisited = sessionStorage.getItem('user_last_seen_sent');
 
