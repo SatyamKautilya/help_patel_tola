@@ -1,0 +1,484 @@
+'use client';
+
+import { Card, CardBody, Chip, Divider } from '@heroui/react';
+
+export default function TamoharHindiMissionPage() {
+	return (
+		<div className='min-h-screen bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50 px-4 py-6'>
+			{/* Title */}
+			<section className='mb-10 text-center'>
+				<h1 className='text-4xl font-extrabold text-indigo-900'>
+					तमोहर (Tamohar)
+				</h1>
+				<p className='mt-3 text-lg text-indigo-700 font-medium'>
+					गाँव के समग्र और सतत परिवर्तन का सामुदायिक मॉडल
+				</p>
+			</section>
+
+			{/* Abstract */}
+			<Card className='mb-10 border-l-4 border-indigo-500'>
+				<CardBody className='space-y-4'>
+					<Chip color='primary' variant='flat' className='text-base'>
+						सारांश (Abstract)
+					</Chip>
+
+					<p className='text-lg leading-relaxed text-slate-800'>
+						आधुनिक चिकित्सा ज्ञान, सरकारी योजनाओं और तकनीकी संसाधनों की उपलब्धता
+						के बावजूद, ग्रामीण समाज आज भी रोकथाम योग्य बीमारियों, आर्थिक
+						असुरक्षा, शैक्षणिक अज्ञानता और सामाजिक पतन से जूझ रहा है।
+					</p>
+
+					<p className='text-lg leading-relaxed text-slate-800'>
+						तमोहर एक दीर्घकालिक, समुदाय-प्रेरित परिवर्तन मॉडल है, जो नियमित
+						ग्राम बैठकों, नैतिक एवं सामाजिक पुनर्निर्माण, और एक तकनीकी मंच
+						(Tamohar App) के माध्यम से स्वास्थ्य, कृषि, शिक्षा, व्यवसाय, सरकारी
+						योजनाओं और नैतिक मूल्यों से जुड़ी प्रणालीगत समस्याओं का समाधान करता
+						है।
+					</p>
+
+					<p className='text-lg leading-relaxed text-slate-800'>
+						यह दस्तावेज़ तमोहर मिशन के समस्या कथन (Problem Statements), मूल
+						कारणों, और समाधान रणनीतियों को प्रस्तुत करता है।
+					</p>
+				</CardBody>
+			</Card>
+
+			{/* HEALTH */}
+			<Card shadow='sm' className='rounded-2xl bg-red-50 border border-red-100'>
+				<CardBody className='space-y-6 text-gray-800 text-sm leading-relaxed'>
+					<h2 className='text-lg font-bold'>1. स्वास्थ्य (Health)</h2>
+
+					<p className='font-semibold'>समस्या कथन</p>
+
+					<p>
+						गाँव में बड़ी संख्या में लोग ऐसी बीमारियों से मर रहे हैं, जिनका इलाज
+						संभव है। इसके मुख्य कारण निम्नलिखित हैं:
+					</p>
+
+					<ol className='list-decimal pl-5 space-y-4'>
+						<li>
+							<strong>बीमारियों के प्रति जागरूकता का अभाव</strong>
+							<p className='mt-1'>
+								लोगों को बीमारी की गंभीरता, प्रारंभिक लक्षण और समय पर इलाज के
+								महत्व की जानकारी नहीं होती।
+							</p>
+						</li>
+
+						<li>
+							<strong>आर्थिक असमर्थता</strong>
+							<p className='mt-1'>
+								कई लोग इलाज के पात्र होते हुए भी सही दस्तावेज़ न होने के कारण
+								उपचार से वंचित रह जाते हैं।
+							</p>
+						</li>
+
+						<li>
+							<strong>अस्पताल और इलाज प्रक्रिया की जानकारी का अभाव</strong>
+							<p className='mt-1'>
+								किस बीमारी में कौन-सा अस्पताल, कौन-सा डॉक्टर और कौन-सी प्रक्रिया
+								अपनानी है—यह स्पष्ट नहीं होता।
+							</p>
+						</li>
+
+						<li>
+							<strong>अवैज्ञानिक देसी टोटकों पर निर्भरता</strong>
+							<p className='mt-1'>
+								अस्थायी राहत को इलाज समझ लिया जाता है, जिससे बीमारी और गंभीर हो
+								जाती है।
+							</p>
+						</li>
+
+						<li>
+							<strong>नई पीढ़ी की नैतिक उदासीनता</strong>
+							<p className='mt-1'>
+								माता-पिता के कष्ट और पीड़ा नई पीढ़ी को मानसिक रूप से प्रभावित
+								नहीं करते।
+							</p>
+						</li>
+					</ol>
+
+					<Divider />
+
+					<p className='font-semibold'>समाधान रणनीति</p>
+
+					<div className='space-y-4'>
+						<div>
+							<p className='font-medium'>1. सामुदायिक स्वास्थ्य जागरूकता</p>
+							<ul className='list-disc pl-5 space-y-1 mt-1'>
+								<li>गाँव वालों द्वारा गाँव वालों के लिए जागरूकता अभियान</li>
+								<li>
+									हर त्योहार, धार्मिक सभा या सामाजिक आयोजन में कम से कम एक
+									बीमारी पर चर्चा:
+									<ul className='list-circle pl-5 mt-1 space-y-1'>
+										<li>लक्षण</li>
+										<li>बचाव</li>
+										<li>इलाज</li>
+										<li>क्या करें / क्या न करें</li>
+										<li>गाँव के वास्तविक केस स्टडी</li>
+									</ul>
+								</li>
+								<li>
+									बार-बार चर्चा से जानकारी केवल सुनी नहीं जाती, बल्कि मन में बैठ
+									जाती है।
+								</li>
+							</ul>
+						</div>
+
+						<div>
+							<p className='font-medium'>2. आर्थिक पात्रता सुनिश्चित करना</p>
+							<ul className='list-disc pl-5 space-y-1 mt-1'>
+								<li>निम्न दस्तावेज़ों का सुधार और सत्यापन:</li>
+								<ul className='list-circle pl-5 space-y-1'>
+									<li>आधार कार्ड</li>
+									<li>समग्र आईडी</li>
+									<li>आयुष्मान भारत कार्ड</li>
+								</ul>
+								<li>
+									यह सुनिश्चित करना कि कोई भी पात्र व्यक्ति इलाज से वंचित न रहे।
+								</li>
+							</ul>
+						</div>
+
+						<div>
+							<p className='font-medium'>3. इलाज मार्गदर्शन प्रणाली</p>
+							<ul className='list-disc pl-5 space-y-1 mt-1'>
+								<li>नज़दीकी शहरों के अस्पतालों की सत्यापित सूची</li>
+								<li>सही इलाज पाने की चरण-दर-चरण मार्गदर्शिका</li>
+								<li>आपातकालीन सहायता निर्देश</li>
+							</ul>
+						</div>
+
+						<div>
+							<p className='font-medium'>
+								4. देसी टोटकों का वैज्ञानिक विश्लेषण
+							</p>
+							<ul className='list-disc pl-5 space-y-1 mt-1'>
+								<li>यह स्पष्ट किया जाएगा कि:</li>
+								<ul className='list-circle pl-5 space-y-1'>
+									<li>कुछ टोटके क्यों प्रभावी लगते हैं</li>
+									<li>और वे चिकित्सकीय रूप से क्यों असफल हैं</li>
+								</ul>
+								<li>
+									उद्देश्य विश्वास तोड़ना नहीं, बल्कि भ्रम को धीरे-धीरे हटाना
+									है।
+								</li>
+							</ul>
+						</div>
+
+						<div>
+							<p className='font-medium'>5. नैतिक जिम्मेदारी का पुनर्निर्माण</p>
+							<ul className='list-disc pl-5 space-y-1 mt-1'>
+								<li>दीर्घकालिक नैतिक शिक्षा कार्यक्रम:</li>
+								<ul className='list-circle pl-5 space-y-1'>
+									<li>संवेदनशीलता</li>
+									<li>पारिवारिक जिम्मेदारी</li>
+									<li>पीड़ा के प्रति सहानुभूति</li>
+								</ul>
+							</ul>
+						</div>
+					</div>
+
+					<Divider />
+
+					<p className='font-semibold'>तमोहर ऐप की भूमिका – स्वास्थ्य अनुभाग</p>
+
+					<ul className='list-disc pl-5 space-y-1'>
+						<li>शहर-आधारित फ़िल्टर के साथ अस्पतालों की सूची</li>
+						<li>किसी भी भाषा में बीमारी या इलाज से संबंधित खोज (AI आधारित)</li>
+						<li>
+							आदर्श उपचार प्रक्रिया (Ideal Treatment Procedure):
+							<ul className='list-circle pl-5 space-y-1'>
+								<li>लक्षण पहचान</li>
+								<li>किस विशेषज्ञ को दिखाना है</li>
+								<li>तुरंत क्या करना है</li>
+								<li>क्या नहीं करना है</li>
+							</ul>
+						</li>
+						<li>गाँव में हुए सफल इलाज की केस स्टडी</li>
+						<li>अवैज्ञानिक प्रक्रियाओं के उन्मूलन हेतु विशेष अनुभाग</li>
+					</ul>
+				</CardBody>
+			</Card>
+
+			<Card
+				shadow='sm'
+				className='rounded-2xl bg-green-50 border border-green-100'>
+				<CardBody className='space-y-6 text-gray-800 text-sm leading-relaxed'>
+					<h2 className='text-lg font-bold text-green-800'>
+						2. कृषि (Agriculture)
+					</h2>
+
+					<p className='font-semibold'>समस्या कथन</p>
+
+					<p>कृषि ज्ञान असंगठित और अप्रलेखित है, जिसके कारण:</p>
+
+					<ol className='list-decimal pl-5 space-y-2'>
+						<li>किसान फसल रोग पहचान नहीं पाते</li>
+						<li>आधुनिक कृषि तकनीकों की जानकारी नहीं होती</li>
+						<li>स्प्रे, फर्टिगेशन और बीज चयन का ज्ञान नहीं</li>
+						<li>उत्पाद बेचने के सही बाज़ार की जानकारी नहीं</li>
+					</ol>
+
+					<Divider className='bg-green-200' />
+
+					<p className='font-semibold'>समाधान – तमोहर के माध्यम से</p>
+
+					<ul className='list-disc pl-5 space-y-2'>
+						<li>
+							हर फसल की संपूर्ण जानकारी:
+							<ul className='list-circle pl-5 mt-1 space-y-1'>
+								<li>बीज चयन</li>
+								<li>बोने का समय</li>
+								<li>रोग पहचान</li>
+								<li>स्प्रे व फर्टिगेशन शेड्यूल</li>
+							</ul>
+						</li>
+						<li>सरल भाषा और दृश्यात्मक UI</li>
+						<li>
+							किसी भी भाषा में कृषि संबंधी प्रश्न पूछने की सुविधा (AI आधारित)
+						</li>
+						<li>बाज़ार मार्गदर्शन: कहाँ, कब और कैसे बेचें</li>
+					</ul>
+				</CardBody>
+			</Card>
+
+			<Card
+				shadow='sm'
+				className='rounded-2xl bg-blue-50 border border-blue-100'>
+				<CardBody className='space-y-6 text-gray-800 text-sm leading-relaxed'>
+					<h2 className='text-lg font-bold text-blue-800'>
+						3. शिक्षा (Education)
+					</h2>
+
+					<p className='font-semibold'>समस्या कथन</p>
+
+					<p>छात्रों में करियर और वास्तविक शिक्षा को लेकर भारी भ्रम है:</p>
+
+					<ol className='list-decimal pl-5 space-y-2'>
+						<li>विभिन्न शैक्षणिक क्षेत्रों की जानकारी नहीं</li>
+						<li>पढ़ाई केवल पाठ्यपुस्तकों तक सीमित</li>
+						<li>कोचिंग और सही सामग्री गरीब छात्रों की पहुँच से बाहर</li>
+						<li>करियर काउंसलिंग का अभाव</li>
+					</ol>
+
+					<Divider className='bg-blue-200' />
+
+					<p className='font-semibold'>समाधान रणनीति</p>
+					<p className='font-medium'>तमोहर शिक्षा संरचना</p>
+
+					<ol className='list-decimal pl-5 space-y-4'>
+						<li>
+							<strong>करियर जागरूकता अनुभाग</strong>
+							<ul className='list-circle pl-5 mt-1 space-y-1'>
+								<li>इंजीनियरिंग, मेडिकल, सिविल सेवा, उद्यमिता आदि</li>
+							</ul>
+						</li>
+
+						<li>
+							<strong>पाठ्यपुस्तक से आगे की शिक्षा</strong>
+							<ul className='list-circle pl-5 mt-1 space-y-1'>
+								<li>कौशल और वैचारिक विकास</li>
+							</ul>
+						</li>
+
+						<li>
+							<strong>सुलभ परीक्षा तैयारी सामग्री</strong>
+							<ul className='list-circle pl-5 mt-1 space-y-1'>
+								<li>प्रवेश परीक्षाओं से लेकर नौकरी परीक्षाओं तक</li>
+								<li>ई-बुक्स और लेक्चर, ग्रामीण छात्रों को ध्यान में रखकर</li>
+							</ul>
+						</li>
+
+						<li>
+							<strong>कक्षा-स्तर अनुसार करियर दिशा</strong>
+						</li>
+
+						<li>
+							<strong>वास्तविक पेशेवरों द्वारा मार्गदर्शन</strong>
+							<ul className='list-circle pl-5 mt-1 space-y-1'>
+								<li>इंजीनियर, डॉक्टर, शिक्षक, बैंककर्मी, सिविल सेवक</li>
+							</ul>
+						</li>
+					</ol>
+				</CardBody>
+			</Card>
+			<Card
+				shadow='sm'
+				className='rounded-2xl bg-amber-50 border border-amber-100'>
+				<CardBody className='space-y-6 text-gray-800 text-sm leading-relaxed'>
+					<h2 className='text-lg font-bold text-amber-800'>
+						4. व्यवसाय एवं उद्यमिता (Business)
+					</h2>
+
+					<p className='font-semibold'>समस्या कथन</p>
+
+					<p>गाँव में व्यवसायिक असफलता और उद्यमिता की कमी के कारण:</p>
+
+					<ol className='list-decimal pl-5 space-y-2'>
+						<li>संभावित व्यवसायों की जानकारी नहीं</li>
+						<li>गाँव से बाहर या वैश्विक स्तर पर व्यापार की समझ नहीं</li>
+						<li>सप्लाई चेन और मांग का ज्ञान नहीं</li>
+						<li>सरकारी सहायता और ऋण प्रक्रियाओं की जानकारी नहीं</li>
+					</ol>
+
+					<Divider className='bg-amber-200' />
+
+					<p className='font-semibold'>तमोहर की भूमिका</p>
+
+					<ul className='list-disc pl-5 space-y-2'>
+						<li>गाँव में संभव सभी व्यवसायों की सूची</li>
+						<li>वैश्विक लॉजिस्टिक्स आधारित व्यापार मॉडल</li>
+						<li>सप्लायर, उत्पाद और मूल्य सूची</li>
+						<li>
+							बाज़ार अध्ययन:
+							<ul className='list-circle pl-5 mt-1 space-y-1'>
+								<li>मांग</li>
+								<li>प्रचार</li>
+								<li>वितरण</li>
+							</ul>
+						</li>
+						<li>
+							प्रत्येक व्यवसाय के लिए:
+							<ul className='list-circle pl-5 mt-1 space-y-1'>
+								<li>सरकारी योजनाएँ</li>
+								<li>फंडिंग और ऋण प्रक्रिया</li>
+							</ul>
+						</li>
+					</ul>
+				</CardBody>
+			</Card>
+			<Card
+				shadow='sm'
+				className='rounded-2xl bg-teal-50 border border-teal-100'>
+				<CardBody className='space-y-6 text-gray-800 text-sm leading-relaxed'>
+					<h2 className='text-lg font-bold text-teal-800'>
+						5. सरकारी योजनाएँ (Government Schemes)
+					</h2>
+
+					<p className='font-semibold'>समस्या कथन</p>
+
+					<p>ग्रामीणों को सरकारी योजनाओं की जानकारी नहीं होती।</p>
+
+					<Divider className='bg-teal-200' />
+
+					<p className='font-semibold'>समाधान</p>
+
+					<ul className='list-disc pl-5 space-y-2'>
+						<li>
+							सभी योजनाओं की विस्तृत जानकारी:
+							<ul className='list-circle pl-5 mt-1 space-y-1'>
+								<li>पात्रता</li>
+								<li>लाभ</li>
+								<li>आवेदन प्रक्रिया</li>
+							</ul>
+						</li>
+					</ul>
+				</CardBody>
+			</Card>
+			<Card
+				shadow='sm'
+				className='rounded-2xl bg-violet-50 border border-violet-100'>
+				<CardBody className='space-y-6 text-gray-800 text-sm leading-relaxed'>
+					<h2 className='text-lg font-bold text-violet-800'>
+						6. नैतिक मूल्य एवं सामाजिक विकास (Moral Values)
+					</h2>
+
+					<p className='font-semibold'>समस्या कथन</p>
+
+					<p>बच्चे आज:</p>
+
+					<ul className='list-disc pl-5 space-y-1'>
+						<li>मोबाइल</li>
+						<li>सोशल मीडिया</li>
+						<li>नशे और त्वरित मनोरंजन</li>
+					</ul>
+
+					<p>के प्रभाव में पल रहे हैं।</p>
+
+					<Divider className='bg-violet-200' />
+
+					<p className='font-semibold'>समाधान रणनीति</p>
+
+					<p>तमोहर माता-पिता के लिए मार्गदर्शन प्रदान करता है:</p>
+
+					<ul className='list-disc pl-5 space-y-2'>
+						<li>आयु-समूह आधारित पालन-पोषण</li>
+						<li>आधुनिक बच्चों से संवाद के तरीके</li>
+						<li>दैनिक जीवन की सरल दिनचर्या</li>
+						<li>संवेदनशील, जिम्मेदार और समाज-चेतन व्यक्तित्व का निर्माण</li>
+					</ul>
+
+					<p>लक्ष्य ऐसे व्यक्तियों का निर्माण है जो:</p>
+
+					<ul className='list-disc pl-5 space-y-2'>
+						<li>माता-पिता की पीड़ा समझें</li>
+						<li>गाँव, देश और कमजोर वर्गों के लिए सोचें</li>
+						<li>तमस (अज्ञान) से तमोहर (प्रकाश) की ओर बढ़ें</li>
+					</ul>
+				</CardBody>
+			</Card>
+
+			{/* Repeat same pattern for other sections */}
+			{/* (Agriculture, Education, Business, Govt Schemes, Moral Values, Philosophy) */}
+			{/* Content intentionally unchanged – only wrapped */}
+
+			<Card className='mt-14 bg-gradient-to-br from-indigo-900 to-slate-900 text-white'>
+				<CardBody className='space-y-4'>
+					<h2 className='text-2xl font-bold'>तमोहर का दर्शन</h2>
+					<p className='text-lg'>
+						तमोहर कोई ऐप नहीं है। कोई भी ऐप तमोहर नहीं हो सकता।
+					</p>
+					<List
+						items={[
+							'निरंतर विकास के लिए बैठक तमोहर है!',
+							'सबकी ज़िम्मेदारी तमोहर है!',
+							'जो लोग इस प्रयास से जुड़ते हैं, वही तमोहर हैं',
+						]}
+						light
+					/>
+					<p className='text-base text-indigo-200'>
+						अंततः, जो लोग निरंतर कार्य करते हैं, सीखते हैं और गाँव को आगे बढ़ाते
+						हैं—वही सच्चे तमोहर हैं।
+					</p>
+				</CardBody>
+			</Card>
+
+			<footer className='mt-14 mb-10 text-center text-sm text-slate-600'>
+				यह दस्तावेज़ एक जीवित प्रारूप (Living Draft) है, जो निरंतर विचार, अनुभव
+				और सामुदायिक सहभागिता के साथ विकसित हो रहा है।
+				<br />
+				<span className='font-medium'>— सत्यम कौटिल्य</span>
+			</footer>
+		</div>
+	);
+}
+
+/* ---------- Helpers ---------- */
+
+function Section({ title, children }) {
+	return (
+		<Card className='mb-10 border-l-4 border-emerald-500'>
+			<CardBody className='space-y-4 text-lg text-slate-800 leading-relaxed'>
+				<h2 className='text-2xl font-bold text-emerald-800'>{title}</h2>
+				{children}
+			</CardBody>
+		</Card>
+	);
+}
+
+function SubTitle({ children }) {
+	return (
+		<h3 className='text-xl font-semibold text-indigo-800 mt-4'>{children}</h3>
+	);
+}
+
+function List({ items, light }) {
+	return (
+		<ul
+			className={`list-disc pl-6 space-y-1 ${light ? 'text-indigo-100' : ''}`}>
+			{items.map((item, i) => (
+				<li key={i}>{item}</li>
+			))}
+		</ul>
+	);
+}

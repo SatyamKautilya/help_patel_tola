@@ -16,4 +16,26 @@ module.exports = {
 	},
 	darkMode: 'class',
 	plugins: [heroui()],
+	safelist: [
+		'border-emerald-500',
+		'border-amber-500',
+		'border-violet-500',
+		'border-rose-500',
+		'border-cyan-500',
+		'border-indigo-500',
+
+		'text-emerald-800',
+		'text-amber-800',
+		'text-violet-800',
+		'text-rose-800',
+		'text-cyan-800',
+		'text-indigo-800',
+
+		'bg-emerald-50',
+		'bg-amber-50',
+		'bg-violet-50',
+		'bg-rose-50',
+		'bg-cyan-50',
+		'bg-indigo-50',
+	],
 };
