@@ -155,7 +155,7 @@ export default function App() {
 			</header>
 
 			<main>
-				<div className='mt-16 grid grid-cols-2 gap-4 p-4 max-w-sm mx-auto'>
+				<div className='mt-16 grid grid-cols-2 gap-4 p-4 max-w-sm mx-auto mb-10'>
 					{categories.map((category) => (
 						<button
 							key={category.id}
