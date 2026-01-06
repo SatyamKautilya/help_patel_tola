@@ -104,7 +104,10 @@ export default function App() {
 			router.push('/about');
 			return;
 		}
-
+		if (category?.id === 'government-schemes') {
+			router.push('/govt-schemes');
+			return;
+		}
 		router.push(
 			`/subcategory?id=${category.id}&name=${encodeURIComponent(
 				category.name,

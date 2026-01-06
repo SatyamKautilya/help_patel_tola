@@ -3,6 +3,7 @@ import { connectToDatabase } from '@/lib/mongodb';
 
 import Titleandtexts from '@/lib/models/Titleandtexts';
 import { generateChatResponse } from '@/lib/openai';
+import GovtSchemes from '@/lib/models/GovtSchemes';
 // Helper function to get path segments
 function getPathSegments(request) {
 	const url = new URL(request.url);
@@ -19,7 +20,10 @@ export async function GET(request) {
 		// GET /api/subcategory/farming - Get farming subcategory details
 
 		const name = searchParams.get('name');
-
+		if (name === 'getgovtschemes') {
+			const govtSchemes = await GovtSchemes.find().sort({ createdAt: -1 });
+			return NextResponse.json({ govtSchemes });
+		}
 		if (name === 'texts') {
 			const titleandtexts = await Titleandtexts.find().sort({ createdAt: -1 });
 			return NextResponse.json({ titleandtexts });
@@ -92,13 +96,33 @@ Text:
 			return NextResponse.json({ response });
 		}
 
-		if (name === 'content') {
+		if (name === 'setgovtschemes') {
+			const { form: content } = body;
+
+			if (!content?.name) {
+				return NextResponse.json(
+					{ error: 'content name is required' },
+					{ status: 400 },
+				);
+			}
+
+			const govtSchemes = await GovtSchemes.create({
+				id: content.name, // custom id
+				name: content.name,
+				eligibility: content.eligibility,
+				details: content.details,
+				benefits: content.benefits,
+				howToEnroll: content.howToEnroll,
+			});
+
+			return NextResponse.json(govtSchemes);
 		}
+
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });
 	} catch (error) {
 		console.error('API POST Error:', error);
 		return NextResponse.json(
-			{ error: 'Internal server error' },
+			{ error: 'Internal Server Error' },
 			{ status: 500 },
 		);
 	}

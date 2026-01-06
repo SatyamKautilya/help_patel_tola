@@ -16,7 +16,7 @@ export default function TamoharMissionPage() {
 					← Back
 				</Button>
 			</div>
-			<div className='min-h-screen mt-24 bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50 px-4 py-6'>
+			<div className='min-h-screen mt-16 bg-gradient-to-br from-indigo-50 via-sky-50 to-emerald-50 px-4 py-6'>
 				{/* Header */}
 				<section className='mb-10 text-center'>
 					<h1 className='text-4xl font-extrabold text-indigo-900 tracking-tight'>
