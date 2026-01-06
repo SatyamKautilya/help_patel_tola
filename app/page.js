@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { getTextById } from '@/hooks/utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { setAppContext } from './store/appSlice';
+import Link from 'next/link';
 
 export default function App() {
 	const router = useRouter();
@@ -99,6 +100,10 @@ export default function App() {
 			router.push('/subcategory/farming');
 			return;
 		}
+		if (category?.id === 'about') {
+			router.push('/about');
+			return;
+		}
 
 		router.push(
 			`/subcategory?id=${category.id}&name=${encodeURIComponent(
@@ -147,6 +152,7 @@ export default function App() {
 				<p className='mt-2 text-sm opacity-90'>
 					{`${getTextById(text, 'subtitle')} ${user?.name ?? ''}`}
 				</p>
+				<Link href={'/about'}>तमोहर के बारे मे?</Link>
 			</header>
 
 			<main>
@@ -162,7 +168,7 @@ export default function App() {
 					))}
 				</div>
 			</main>
-			<div className='fixed w-full bottom-0 border-t-1 pb-10  app-gradient border-gray-300 text-center px-8 py-3 text-gray-400'>
+			<div className='fixed w-full bottom-0 border-t-1 pb-10  app-gradient border-gray-300 text-center px-8 py-1 text-gray-400'>
 				© Created and Managed by Satyam Kautilya
 			</div>
 			{/* <Chatbot /> */}
