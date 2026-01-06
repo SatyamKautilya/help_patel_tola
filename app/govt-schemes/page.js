@@ -152,7 +152,7 @@ export default function GovtSchemesPage() {
 				{/* Add Scheme Button */}
 				<div className='flex justify-center mb-6'>
 					<Button
-						color='secondary'
+						color='primary'
 						size='lg'
 						className='text-lg font-bold shadow-lg'
 						onPress={() => setOpenPass(true)}>
@@ -161,7 +161,7 @@ export default function GovtSchemesPage() {
 				</div>
 
 				{/* Accordions with Dark Theme Cards */}
-				<Card className='max-w-4xl bg-gradient-to-br from-pink-300 via-purple-700 to-blue-800 mx-auto shadow-xl rounded-2xl border border-violet-200'>
+				<Card className='max-w-4xl bg-gradient-to-br from-indigo-600 via-purple-600 to-purple-300 mx-auto shadow-xl rounded-2xl border border-violet-200'>
 					<CardBody>
 						<Chip color='primary' variant='solid' className='mb-4 text-base'>
 							उपलब्ध योजनाएँ
