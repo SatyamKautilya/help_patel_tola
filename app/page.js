@@ -152,7 +152,6 @@ export default function App() {
 				<p className='mt-2 text-sm opacity-90'>
 					{`${getTextById(text, 'subtitle')} ${user?.name ?? ''}`}
 				</p>
-				<Link href={'/about'}>तमोहर के बारे मे?</Link>
 			</header>
 
 			<main>
