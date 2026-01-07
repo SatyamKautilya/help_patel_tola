@@ -13,3 +13,16 @@ export const filterhospitals = (mainResp, specialityIds) => {
 		hospital.specialityId?.some((id) => specialityIds.includes(id)),
 	);
 };
+export function getInjectedAppVersion() {
+	try {
+		if (typeof window === 'undefined') return 'unknown';
+
+		const ctx = window.APP_CONTEXT;
+
+		return ctx?.appVersion || ctx?.appVersionName || 'unknown';
+	} catch (err) {
+		return 'unknown';
+	}
+}
+
+export const hideBackButton = () => getInjectedAppVersion() === '1.0.2';

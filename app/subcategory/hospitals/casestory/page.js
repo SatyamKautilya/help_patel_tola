@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import AddContentModal from './AddContentModal';
 import { useRouter } from 'next/navigation';
 import CaseStoryPage from './CaseStoryPage';
+import { hideBackButton } from '@/hooks/utils';
 
 export default function Page() {
 	const [open, setOpen] = useState(false);
@@ -42,7 +43,10 @@ export default function Page() {
 
 	return (
 		<>
-			<div className='fixed top-0  left-0 right-0 z-50 flex flex-row pb-4 pt-12 border-b-2 bg-slate-100 items-center'>
+			<div
+				className={` ${
+					hideBackButton() ? 'hidden' : ''
+				} fixed top-0  left-0 right-0 z-50 flex flex-row pb-4 pt-12 border-b-2 bg-slate-100 items-center`}>
 				<Button
 					color='primary'
 					size='lg'

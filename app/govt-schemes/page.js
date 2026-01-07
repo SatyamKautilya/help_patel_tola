@@ -19,6 +19,7 @@ import {
 } from '@heroui/react';
 
 import { useRouter } from 'next/navigation';
+import { hideBackButton } from '@/hooks/utils';
 
 export default function GovtSchemesPage() {
 	const router = useRouter();
@@ -150,7 +151,10 @@ export default function GovtSchemesPage() {
 				</section>
 
 				{/* Add Scheme Button */}
-				<div className='flex justify-center mb-6'>
+				<div
+					className={`${
+						hideBackButton() ? 'hidden' : ''
+					} flex justify-center mb-6`}>
 					<Button
 						color='primary'
 						size='lg'

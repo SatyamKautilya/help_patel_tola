@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Chatbot from '@/components/Chatbot';
+import { hideBackButton } from '@/hooks/utils';
 
 export default function SubcategoryPage() {
 	const router = useRouter();
@@ -36,7 +37,10 @@ export default function SubcategoryPage() {
 
 	return (
 		<div className='p-4 max-w-md mx-auto min-h-screen'>
-			<div className='flex items-center gap-4 mb-6 pb-4 border-b-2 border-gray-300'>
+			<div
+				className={`${
+					hideBackButton() ? 'hidden' : ''
+				} flex items-center gap-4 mb-6 pb-4 border-b-2 border-gray-300`}>
 				<button
 					className='bg-indigo-600 text-white rounded-lg py-2 px-3 flex items-center gap-2 cursor-pointer text-sm font-medium transition duration-200 hover:bg-indigo-500'
 					onClick={handleBack}>

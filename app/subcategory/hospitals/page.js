@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Card, CardBody, Chip, Input } from '@heroui/react';
 import HospitalDetails from './HospitalDetails';
-import { filterhospitals } from '@/hooks/utils';
+import { filterhospitals, hideBackButton } from '@/hooks/utils';
 
 export default function App() {
 	const router = useRouter();
@@ -136,7 +136,10 @@ export default function App() {
 		</div>
 	) : (
 		<div className=''>
-			<div className='fixed top-0  left-0 right-0 z-50 flex flex-row pb-4 pt-12 border-b-2 bg-slate-100 items-center'>
+			<div
+				className={` ${
+					hideBackButton() ? 'hidden' : ''
+				} fixed top-0  left-0 right-0 z-50 flex flex-row pb-4 pt-12 border-b-2 bg-slate-100 items-center`}>
 				<Button
 					color='primary'
 					size='lg'

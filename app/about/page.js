@@ -1,5 +1,6 @@
 'use client';
 
+import { hideBackButton } from '@/hooks/utils';
 import { Button, Card, CardBody, Chip } from '@heroui/react';
 import { useRouter } from 'next/navigation';
 
@@ -7,7 +8,10 @@ export default function TamoharMissionPage() {
 	const router = useRouter();
 	return (
 		<div>
-			<div className='fixed w-full pt-12 top-0 z-50 flex flex-row pb-4 border-b-2 bg-slate-100 items-center'>
+			<div
+				className={`${
+					hideBackButton() ? 'hidden' : ''
+				} fixed w-full pt-12 top-0 z-50 flex flex-row pb-4 border-b-2 bg-slate-100 items-center`}>
 				<Button
 					color='primary'
 					size='lg'

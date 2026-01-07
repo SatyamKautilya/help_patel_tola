@@ -14,6 +14,7 @@ import {
 	Card,
 	CardBody,
 } from '@heroui/react';
+import { hideBackButton } from '@/hooks/utils';
 
 export default function App() {
 	const router = useRouter();
@@ -65,12 +66,18 @@ export default function App() {
 
 	return (
 		<>
-			<div className='flex flex-row py-4 border-b-2 pb-4 bg-slate-100 items-center'>
+			<div
+				className={`${
+					hideBackButton() ? 'hidden' : ''
+				} flex flex-row py-4 border-b-2 pb-4 bg-slate-100 items-center`}>
 				<button
 					className='mx-4 px-4 py-2 text-white font-bold text-xl border bg-blue-600 rounded-lg'
 					onClick={handleBack}>
 					← Back
 				</button>
+				<div className='flex-1 text-lg font-semibold text-gray-800'>
+					{typeof window !== 'undefined' && window.APP_CONTEXT}
+				</div>
 			</div>
 			{numbers.map((contact) => (
 				<Card key={contact.id} className='max-w-md mx-4 mt-4  bg-blue-200 mb-4'>

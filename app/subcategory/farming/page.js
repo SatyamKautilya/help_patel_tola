@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button, useDisclosure, Card, CardBody, Image } from '@heroui/react';
 import Farming from '@/components/ui/customui/Farming';
 import UserWelcome from '../contacts/UserWelcome';
+import { hideBackButton } from '@/hooks/utils';
 
 // import { generateScheduleResponse } from '@/lib/openai';
 
@@ -63,7 +64,10 @@ export default function App() {
 	console.log('Farming Data:', selectedCropData);
 	return (
 		<>
-			<div className='fixed w-full pt-12 top-0 z-50 flex flex-row pb-4 border-b-2 bg-slate-100 items-center'>
+			<div
+				className={`${
+					hideBackButton() ? 'hidden' : ''
+				} fixed w-full pt-12 top-0 z-50 flex flex-row pb-4 border-b-2 bg-slate-100 items-center`}>
 				<Button
 					color='primary'
 					size='lg'

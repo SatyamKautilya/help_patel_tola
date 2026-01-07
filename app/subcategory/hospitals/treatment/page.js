@@ -17,6 +17,7 @@ import {
 } from '@heroui/react';
 
 import DiseaseCard from './DiseaseCard';
+import { hideBackButton } from '@/hooks/utils';
 const page = () => {
 	const router = useRouter();
 	const handleBack = () => {
@@ -164,7 +165,10 @@ const page = () => {
 	return (
 		<>
 			<div className=''>
-				<div className='fixed top-0  left-0 right-0 z-50 flex flex-row pb-4 pt-12 border-b-2 bg-slate-100 items-center'>
+				<div
+					className={` ${
+						hideBackButton() ? 'hidden' : ''
+					} fixed top-0  left-0 right-0 z-50 flex flex-row pb-4 pt-12 border-b-2 bg-slate-100 items-center`}>
 					<Button
 						color='primary'
 						size='lg'
