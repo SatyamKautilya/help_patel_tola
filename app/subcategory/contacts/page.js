@@ -76,7 +76,7 @@ export default function App() {
 					← Back
 				</button>
 				<div className='flex-1 text-lg font-semibold text-gray-800'>
-					{typeof window !== 'undefined' && window.APP_CONTEXT}
+					{typeof window !== 'undefined' && JSON.stringify(window.APP_CONTEXT)}
 				</div>
 			</div>
 			{numbers.map((contact) => (
