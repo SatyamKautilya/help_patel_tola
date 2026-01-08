@@ -164,7 +164,7 @@ export default function HomePage() {
 				{/* Moral Values Footer */}
 				<footer
 					onClick={() => {
-						router.push('/about');
+						router.push('/about-hindi');
 					}}
 					className='rounded-2xl mb-16 bg-gradient-to-r from-[#f2d28b] to-[#e8b85c] p-5 text-center'>
 					<p className='text-sm text-[#5a3d12]'>“तमोहर के बारे मे जानें”</p>
