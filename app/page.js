@@ -1,179 +1,133 @@
-'use client';
+import { Button } from '@heroui/react';
+import Image from 'next/image';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { getTextById } from '@/hooks/utils';
-import { useDispatch, useSelector } from 'react-redux';
-import { setAppContext } from './store/appSlice';
-import Link from 'next/link';
-
-export default function App() {
-	const router = useRouter();
-	const [categories, setCategories] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [text, setTexts] = useState({});
-	const [user, setUser] = useState(null);
-	const [showWelcom, setShowWelcome] = useState(true);
-	const dispatch = useDispatch();
-
-	const appContext = useSelector((state) => state.appContext.appContext);
-
-	useEffect(() => {
-		initializeApp();
-	}, []);
-
-	useEffect(() => {
-		if (typeof window !== 'undefined' && window.APP_CONTEXT) {
-			const context = window.APP_CONTEXT;
-
-			setUser(context); // local state
-			dispatch(setAppContext({ ...context })); // redux state
-		}
-	}, []);
-
-	useEffect(() => {
-		if (!appContext?.name) return;
-
-		const hasVisited = sessionStorage.getItem('user_last_seen_sent');
-
-		if (hasVisited) return;
-
-		sessionStorage.setItem('user_last_seen_sent', 'true');
-
-		const now = new Date().toISOString();
-
-		fetch('/api/subcategory/hospitals?name=users', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				form: {
-					...appContext,
-					lastSeen: now,
-				},
-			}),
-		}).catch(console.error);
-	}, [appContext]);
-
-	const fetchTexts = async () => {
-		setLoading(true);
-		try {
-			const response = await fetch(`/api/query/database?name=texts`);
-			if (response.ok) {
-				const data = await response.json();
-
-				setTexts(data.titleandtexts || []);
-			}
-		} catch (error) {
-			console.error('Failed to fetch subcategories:', error);
-		} finally {
-			setLoading(false);
-		}
-	};
-	useEffect(() => {
-		fetchTexts();
-	}, []);
-
-	const initializeApp = async () => {
-		try {
-			const response = await fetch('/api/categories');
-			if (response.ok) {
-				const data = await response.json();
-				setCategories(data.categories || []);
-			}
-		} catch (error) {
-			console.error('Failed to initialize app:', error);
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	const handleCategoryClick = (category) => {
-		if (category?.id === 'diseases') {
-			router.push('/subcategory/hospitals');
-			return;
-		}
-		if (category?.id === 'contacts') {
-			router.push('subcategory/contacts');
-			return;
-		}
-		if (category?.id === 'farming') {
-			router.push('/subcategory/farming');
-			return;
-		}
-		if (category?.id === 'about') {
-			router.push('/about');
-			return;
-		}
-		if (category?.id === 'government-schemes') {
-			router.push('/govt-schemes');
-			return;
-		}
-		router.push(
-			`/subcategory?id=${category.id}&name=${encodeURIComponent(
-				category.name,
-			)}`,
-		);
-	};
-
-	useEffect(() => {
-		if (typeof window !== 'undefined') {
-			if (localStorage.getItem('showthis') === 'token') {
-				setShowWelcome(false);
-			} else {
-				setTimeout(() => {
-					setShowWelcome(false);
-					if (typeof window !== 'undefined') {
-						localStorage.setItem('showthis', 'token');
-					}
-				}, [5000]);
-			}
-		}
-	}, []);
-
-	if (loading || showWelcom) {
-		return (
-			<div class='splash'>
-				<h1 class='slok'>तमसो मा ज्योतिर्गमय</h1>
-				<p class='meaning'>अंधकार से प्रकाश की ओर</p>
-			</div>
-		);
-	}
-
-	if (getTextById(text, 'launch') === 'Locked') {
-		return (
-			<div className=' px-6 h-screen bg-[radial-gradient(circle_at_top,_#1e293b,_#020617)] flex flex-row justify-center items-center text-white text-3xl'>
-				हम कुछ विशेष और सार्थक तैयार कर रहे हैं।
-			</div>
-		);
-	}
+export default function HomePage() {
 	return (
-		<div className='min-h-screen max-h-screen '>
-			<header className='fixed w-full top-0 bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-6 text-center shadow-md'>
-				<h1 className='m-1 text-2xl font-bold'>
-					{getTextById(text, 'toptitle')}
-				</h1>
-				<p className='mt-2 text-sm opacity-90'>
-					{`${getTextById(text, 'subtitle')} ${user?.name ?? ''}`}
+		<main className='min-h-screen '>
+			{/* Header / Moral Anchor */}
+			<header className='text-center flex flex-col pt-10 items-center justify-center  bg-gradient-to-b from-charcoal via-charcoal-soft to-[#f7f3eb] space-y-2'>
+				<Image
+					src='https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/logotrimmed.png'
+					alt='Help Patel Tola Logo'
+					width={300}
+					height={60}
+					priority
+				/>
+
+				<p className='text-sm text-[#6b5a3a]'>
+					जीवन को संतुलन में लाने का प्रयास
 				</p>
 			</header>
+			<div className=' bg-[#f7f3eb] px-4 py-6 space-y-6'>
+				{/* Moral / Light Section */}
+				<section className='rounded-2xl bg-gradient-to-r from-[#cfa44a] to-[#8f6b2f] p-5 text-white'>
+					<h2 className='text-xl font-semibold'>तत्त्वबोध</h2>
+					<p className='text-sm mt-2'>
+						सही सोच से ही सही जीवन की शुरुआत होती है।
+					</p>
+				</section>
+				<section
+					className='rounded-2xl h-50 bg-[#dfeee3] flex flex-row  space-y-3 bg-cover bg-center'
+					style={{
+						backgroundImage:
+							'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/healthbg.png)',
+					}}>
+					<div className='flex flex-col justify-end'>
+						<span className='pr-24 pl-4 py-2 text-white text-lg font-semibold bg-gradient-to-r from-teal-900 to-black/0 rounded-bl-md rounded-r-md'>
+							स्वास्थ्य
+						</span>
+					</div>
+					<div className='w-full h-[150px] flex flex-col justify-end items-end space-y-2 p-4'>
+						<Button
+							className='
+		w-max rounded-3xl px-5 py-2
+		bg-gradient-to-br from-gray-100 via-gray-300 to-gray-100
+		text-gray-800 
+		border border-gray-300
+		shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.15)]
+		hover:shadow-[inset_0_1px_1px_rgba(255,255,255,1),0_4px_10px_rgba(0,0,0,0.2)]
+		hover:brightness-105
+		active:scale-95
+		transition-all duration-200 font-bold
+	'>
+							आयुष्मान अस्पताल देखें
+						</Button>
+						<Button
+							className='
+		w-max rounded-3xl px-5 py-2
+		bg-gradient-to-r from-[#e6f4ec] via-[#d3eee2] to-[#e6f4ec]
+		text-[#1f6b4f] font-medium
+		border border-[#b9e2cf]
+		shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.12)]
+		hover:shadow-[0_4px_10px_rgba(31,107,79,0.25)]
+		hover:brightness-105
+		active:scale-95
+		transition-all duration-200
+	'>
+							स्वस्थ कैसे रहें
+						</Button>
+					</div>
+				</section>
 
-			<main>
-				<div className='mt-16 grid grid-cols-2 gap-4 p-4 max-w-sm mx-auto mb-10'>
-					{categories.map((category) => (
-						<button
-							key={category.id}
-							className='aspect-square flex flex-col items-center justify-center  bg-gradient-to-br from-blue-400 via-indigo-600 to-violet-700 rounded-xl p-6 shadow-md text-white rounded-lg p-6 shadow-md cursor-pointer transition-transform duration-200 text-center text-white border-none w-full hover:shadow-lg hover:-translate-y-1 active:-translate-y-0.5'
-							onClick={() => handleCategoryClick(category)}>
-							<div className='text-4xl mb-3'>{category.icon}</div>
-							<h2 className='text-white font-bold text-xl'>{category.name}</h2>
-						</button>
-					))}
-				</div>
-			</main>
-			<div className='fixed w-full bottom-0 border-t-1 pb-10  app-gradient border-gray-300 text-center px-8 py-1 text-gray-400'>
-				© Created and Managed by Satyam Kautilya
+				<section className='grid grid-cols-2 gap-4'>
+					<div
+						style={{
+							backgroundImage:
+								'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/bgfarming.png)',
+							backgroundPosition: 'center',
+							backgroundSize: 'cover',
+						}}
+						className='rounded-2xl   h-30'>
+						<div className='flex h-full flex-row justify-end items-end'>
+							<span className=' w-full text-end pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-l from-teal-900 to-black/30 rounded-bl-md rounded-r-md'>
+								आधुनिक कृषि
+							</span>
+						</div>
+					</div>
+
+					<div
+						style={{
+							backgroundImage:
+								'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/education.png)',
+							backgroundPosition: 'center',
+							backgroundSize: 'cover',
+						}}
+						className='rounded-xl   w-full h-48'>
+						<div className='flex h-full flex-row justify-end items-end'>
+							<span className=' w-full text-end pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-l from-cyan-900 to-cyan/30 rounded-bl-md rounded-r-md'>
+								शिक्षा
+							</span>
+						</div>
+					</div>
+				</section>
+				{/* Livelihood & Growth */}
+				<section className='rounded-2xl bg-[#e7e3f5] p-5 space-y-4'>
+					<h2 className='text-lg font-semibold text-[#3f3c7a]'>
+						जीविका एवं विकास
+					</h2>
+
+					<div className='grid grid-cols-2 gap-4'>
+						<div className='rounded-xl bg-white p-4 shadow'>
+							<h3 className='font-medium'>रोज़गार</h3>
+							<p className='text-xs mt-1'>काम और अवसर</p>
+						</div>
+
+						<div className='rounded-xl bg-white p-4 shadow'>
+							<h3 className='font-medium'>आर्थिक विकास</h3>
+							<p className='text-xs mt-1'>योजनाएँ, सहायता</p>
+						</div>
+					</div>
+				</section>
+				{/* Contacts / Community */}
+				<section className='rounded-2xl bg-[#f1ede6] p-5'>
+					<h2 className='text-lg font-semibold text-[#5b4a2f]'>संपर्क सूत्र</h2>
+					<p className='text-sm mt-2'>डॉक्टर, स्वयंसेवक, अधिकारी</p>
+				</section>
+				{/* Moral Values Footer */}
+				<footer className='rounded-2xl bg-gradient-to-r from-[#f2d28b] to-[#e8b85c] p-5 text-center'>
+					<p className='text-sm text-[#5a3d12]'>“संतुलन ही सच्ची प्रगति है”</p>
+				</footer>
 			</div>
-			{/* <Chatbot /> */}
-		</div>
+		</main>
 	);
 }

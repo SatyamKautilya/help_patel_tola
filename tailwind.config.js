@@ -12,7 +12,20 @@ module.exports = {
 		'./node_modules/@heroui/react/**/*.{js,ts,jsx,tsx}',
 	],
 	theme: {
-		extend: {},
+		extend: {
+			colors: {
+				charcoal: {
+					DEFAULT: '#1C1C1C',
+					soft: '#222222',
+					muted: '#2A2A2A',
+					border: '#333333',
+				},
+				gold: {
+					DEFAULT: '#D4AF37',
+					soft: '#F2D28B',
+				},
+			},
+		},
 	},
 	darkMode: 'class',
 	plugins: [heroui()],
