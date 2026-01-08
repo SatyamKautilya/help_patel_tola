@@ -1,7 +1,10 @@
+'use client';
 import { Button } from '@heroui/react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
+	const router = useRouter();
 	return (
 		<main className='min-h-screen '>
 			{/* Header / Moral Anchor */}
@@ -71,6 +74,9 @@ export default function HomePage() {
 
 				<section className='grid grid-cols-2 gap-4'>
 					<div
+						onClick={() => {
+							router.push('/subcategory/farming');
+						}}
 						style={{
 							backgroundImage:
 								'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/bgfarming.png)',
@@ -109,14 +115,44 @@ export default function HomePage() {
 					</h2>
 
 					<div className='grid grid-cols-2 gap-4'>
-						<div className='rounded-xl bg-blue-700/10 p-4 shadow'>
-							<h3 className='font-medium'>रोज़गार</h3>
-							<p className='text-xs mt-1'>काम और अवसर</p>
+						<div className='rounded-xl bg-blue-700/10 pt-4 shadow'>
+							<Image
+								src={
+									'https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/kindpng_1337272.png'
+								}
+								alt='Livelihood'
+								width={600}
+								height={100}
+								className='-mt-8'
+							/>
+							<div className='w-full  flex flex-row justify-end items-end'>
+								<span className=' w-full text-end pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-l from-blue-400 to-cyan/30 rounded-bl-md rounded-br-xl'>
+									रोजगार
+								</span>
+							</div>
 						</div>
 
-						<div className='rounded-xl bg-gold/15 p-4 shadow'>
-							<h3 className='font-medium'>आर्थिक विकास</h3>
-							<p className='text-xs mt-1'>योजनाएँ, सहायता</p>
+						<div
+							onClick={() => {
+								router.push('govt-schemes');
+							}}
+							className='rounded-xl bg-yellow-400/20 pt-4 shadow'>
+							<Image
+								src={
+									'https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/tree.png'
+								}
+								alt='Livelihood'
+								width={200}
+								height={30}
+								className='-mt-9 w-36 h-16'
+							/>
+							<div
+								onClick={() => {}}
+								className='w-full  flex flex-row justify-end items-end'>
+								<span className=' w-full text-end pr-3 py-2 text-teal-900 text-lg font-semibold bg-gradient-to-l from-gold to-cyan/30 rounded-bl-md rounded-br-xl'>
+									सरकारी योजनाएँ
+								</span>
+							</div>
 						</div>
 					</div>
 				</section>
@@ -126,8 +162,12 @@ export default function HomePage() {
 					<p className='text-sm mt-2'>डॉक्टर, स्वयंसेवक, अधिकारी</p>
 				</section>
 				{/* Moral Values Footer */}
-				<footer className='rounded-2xl bg-gradient-to-r from-[#f2d28b] to-[#e8b85c] p-5 text-center'>
-					<p className='text-sm text-[#5a3d12]'>“संतुलन ही सच्ची प्रगति है”</p>
+				<footer
+					onClick={() => {
+						router.push('/about');
+					}}
+					className='rounded-2xl mb-16 bg-gradient-to-r from-[#f2d28b] to-[#e8b85c] p-5 text-center'>
+					<p className='text-sm text-[#5a3d12]'>“तमोहर के बारे मे जानें”</p>
 				</footer>
 			</div>
 		</main>

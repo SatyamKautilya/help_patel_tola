@@ -61,7 +61,6 @@ export default function App() {
 		router.back();
 	};
 
-	console.log('Farming Data:', selectedCropData);
 	return (
 		<>
 			<div
