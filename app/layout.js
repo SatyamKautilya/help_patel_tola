@@ -12,7 +12,7 @@ import ReduxProvider from './store/ReduxProvider';
 export default function RootLayout({ children }) {
 	return (
 		<html lang='en'>
-			<body className='app-gradient h-full min-h-screen flex flex-col'>
+			<body className='app-gradient border-3 h-full min-h-screen flex flex-col'>
 				<ReduxProvider>
 					<Providers>{children}</Providers>
 				</ReduxProvider>

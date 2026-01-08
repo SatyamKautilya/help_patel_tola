@@ -5,12 +5,12 @@ export default function HomePage() {
 	return (
 		<main className='min-h-screen '>
 			{/* Header / Moral Anchor */}
-			<header className='text-center flex flex-col pt-10 items-center justify-center  bg-gradient-to-b from-charcoal via-charcoal-soft to-[#f7f3eb] space-y-2'>
+			<header className='fixed z-50 top-0 w-full text-center flex flex-col pt-8 items-center justify-center  bg-gradient-to-b from-blue-900 via-blue-700  to-[#f7f3eb] space-y-2'>
 				<Image
 					src='https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/logotrimmed.png'
 					alt='Help Patel Tola Logo'
-					width={300}
-					height={60}
+					width={250}
+					height={50}
 					priority
 				/>
 
@@ -18,7 +18,7 @@ export default function HomePage() {
 					जीवन को संतुलन में लाने का प्रयास
 				</p>
 			</header>
-			<div className=' bg-[#f7f3eb] px-4 py-6 space-y-6'>
+			<div className=' bg-[#f7f3eb] mt-36 px-4 py-6 space-y-6'>
 				{/* Moral / Light Section */}
 				<section className='rounded-2xl bg-gradient-to-r from-[#cfa44a] to-[#8f6b2f] p-5 text-white'>
 					<h2 className='text-xl font-semibold'>तत्त्वबोध</h2>
@@ -101,8 +101,8 @@ export default function HomePage() {
 					</div>
 				</section>
 				{/* Livelihood & Growth */}
-				<section className='rounded-2xl bg-[#e7e3f5] p-5 space-y-4'>
-					<h2 className='text-lg font-semibold text-[#3f3c7a]'>
+				<section className='rounded-2xl bg-gradient-to-br from-[#e6f0ff] via-[#cfe3ff] to-[#b7d3ff] p-5 space-y-4'>
+					<h2 className='text-lg font-semibold text-blue-700 text-center'>
 						जीविका एवं विकास
 					</h2>
 
