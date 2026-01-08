@@ -75,9 +75,7 @@ export default function App() {
 					onClick={handleBack}>
 					← Back
 				</button>
-				<div className='flex-1 text-lg font-semibold text-gray-800'>
-					{typeof window !== 'undefined' && JSON.stringify(window.APP_CONTEXT)}
-				</div>
+				
 			</div>
 			{numbers.map((contact) => (
 				<Card key={contact.id} className='max-w-md mx-4 mt-4  bg-blue-200 mb-4'>
