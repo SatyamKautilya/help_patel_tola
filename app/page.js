@@ -14,8 +14,8 @@ export default function HomePage() {
 					priority
 				/>
 
-				<p className='text-sm text-[#6b5a3a]'>
-					जीवन को संतुलन में लाने का प्रयास
+				<p className='text-sm text-blue-900 pb-2'>
+					ग्रामीण जीवन को आधुनिक एवं सुखद बनाने का अभियान
 				</p>
 			</header>
 			<div className=' bg-[#f7f3eb] mt-36 px-4 py-6 space-y-6'>
@@ -101,18 +101,20 @@ export default function HomePage() {
 					</div>
 				</section>
 				{/* Livelihood & Growth */}
-				<section className='rounded-2xl bg-gradient-to-br from-[#e6f0ff] via-[#cfe3ff] to-[#b7d3ff] p-5 space-y-4'>
-					<h2 className='text-lg font-semibold text-blue-700 text-center'>
-						जीविका एवं विकास
+				<section
+					className='rounded-2xl bg-[linear-gradient(to_right,#e6f0ff_0%,#bfdbfe_40%,#f7e7b4_75%,#e6c46b_100%)]
+ p-5 space-y-4'>
+					<h2 className='text-lg font-bold text-lime-700  text-center'>
+						आजीविका एवं विकास
 					</h2>
 
 					<div className='grid grid-cols-2 gap-4'>
-						<div className='rounded-xl bg-white p-4 shadow'>
+						<div className='rounded-xl bg-blue-700/10 p-4 shadow'>
 							<h3 className='font-medium'>रोज़गार</h3>
 							<p className='text-xs mt-1'>काम और अवसर</p>
 						</div>
 
-						<div className='rounded-xl bg-white p-4 shadow'>
+						<div className='rounded-xl bg-gold/15 p-4 shadow'>
 							<h3 className='font-medium'>आर्थिक विकास</h3>
 							<p className='text-xs mt-1'>योजनाएँ, सहायता</p>
 						</div>
