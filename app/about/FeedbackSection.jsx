@@ -34,13 +34,14 @@ export default function FeedbackSection({ sender }) {
 			<Card
 				className='
           w-full max-w-md
-          bg-teal-900/10 backdrop-blur-xl
+          bg-teal-900/10 
           shadow-xl
           rounded-2xl
+		  border-2 border-golden-200/50
           animate-float
         '>
 				<CardBody className='gap-4'>
-					<h2 className='text-lg font-semibold text-center text-gray-600'>
+					<h2 className='text-lg font-semibold text-center text-golden-200'>
 						💬 सत्यम के लिए संदेश
 					</h2>
 
@@ -50,12 +51,13 @@ export default function FeedbackSection({ sender }) {
 						placeholder='अपना सुझाव लिखें…'
 						minRows={4}
 						classNames={{
-							input: 'text-sm',
-							inputWrapper: `
-                bg-white/90
+							placeholder: 'text-white',
+							input: 'text-sm text-white bg-transparent',
+							inputWrapper: ` p-2
+                bg-black/20
                 border border-slate-200
                 focus-within:border-blue-500
-                focus-within:ring-2 focus-within:ring-blue-200
+                focus-within:ring-2 focus-withing:bg-black-40 focus-within:ring-blue-200
                 transition-all
               `,
 						}}

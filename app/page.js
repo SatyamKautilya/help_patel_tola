@@ -101,7 +101,7 @@ export default function HomePage() {
 
 						{/* Moral Values Footer */}
 						<About />
-						<div className='h-px mx-10 bg-gradient-to-r from-transparent via-cyan-500 to-transparent' />
+						<div className='h-px mx-10 bg-gradient-to-r from-transparent via-green-500 to-transparent' />
 
 						<FeedbackSection sender={appContext.name} />
 
