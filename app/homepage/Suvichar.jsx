@@ -67,7 +67,7 @@ const Suvichar = () => {
 						) : (
 							<>
 								<span className='text-[1.1rem] font-semibold tracking-wide text-[#4A2C2A] drop-shadow-[0_1px_2px_rgba(255,255,255,0.35)]'>
-									आज का विचार
+									स्वास्थ्य को समर्पित - वर्ष 2026
 								</span>
 								<span className='block mt-2 text-sm text-[#5E3B35] opacity-90 animate-vichar'>
 									{suvichar?.vichar}

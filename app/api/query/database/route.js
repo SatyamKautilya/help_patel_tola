@@ -102,16 +102,16 @@ Text:
 			try {
 				const aiResponse = await generateChatResponse(
 					undefined,
-					`Give one motivating hindi suvichar not more then 100 characters in this format JSON {"vichar":"your suvichar"}`,
+					`Give one  line related to health, one desease cause in hindi not more then 100 characters in this format JSON {"vichar":"your suvichar"}`,
 				);
 
 				// Ensure JSON parsing
 				response =
 					typeof aiResponse === 'string' ? JSON.parse(aiResponse) : aiResponse;
 
-				if (!response.vichar) {
-					throw new Error('Invalid AI response');
-				}
+				// if (!response.vichar) {
+				// 	throw new Error('Invalid AI response');
+				// }
 			} catch (error) {
 				response = {
 					slok: 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन',

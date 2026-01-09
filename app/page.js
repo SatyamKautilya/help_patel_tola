@@ -70,7 +70,7 @@ export default function HomePage() {
 			{/* Foreground Layout */}
 			<div className='relative h-full flex flex-col'>
 				{/* 🔒 FIXED HEADER (LOGO) */}
-				<header className=' z-50 top-0 w-full text-center flex flex-col pt-8 items-center justify-center   space-y-2'>
+				<header className=' z-50 top-0 w-full text-center flex flex-col pt-8 items-center justify-center '>
 					<Image
 						src='https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/logotrimmed.png'
 						alt='Help Patel Tola Logo'
@@ -78,6 +78,7 @@ export default function HomePage() {
 						height={50}
 						priority
 					/>
+					<div className='h-px w-full mx-10 bg-gradient-to-r from-transparent via-gold-soft to-transparent' />
 					{/* 
 					<p className='text-sm text-gold pb-2'>
 						ग्रामीण जीवन को आधुनिक एवं सुखद बनाने का अभियान
@@ -100,7 +101,7 @@ export default function HomePage() {
 
 						{/* Moral Values Footer */}
 						<About />
-						<div className='h-1 mx-10 bg-gradient-to-r from-transparent via-white/70 to-transparent' />
+						<div className='h-px mx-10 bg-gradient-to-r from-transparent via-gold-soft to-transparent' />
 
 						<FeedbackSection sender={appContext.name} />
 
