@@ -8,15 +8,16 @@ const Employment = () => {
 	return (
 		<section
 			className='rounded-2xl bg-[linear-gradient(to_right,#e6f0ff_0%,#bfdbfe_40%,#f7e7b4_75%,#e6c46b_100%)]
- p-5 space-y-4
+ p-5 
  backdrop-blur-md
   shadow-[0_10px_20px_rgba(0,0,0,0.40)]
   hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]
   hover:-translate-y-1
   transition-all duration-300 ease-out'>
-			<h2 className='text-lg font-bold text-lime-700  text-center'>
+			<h2 className='text-lg font-bold text-lime-700 mb-0 text-center'>
 				आजीविका एवं विकास
 			</h2>
+			<div className='w-full mt-2 h-px mb-8 bg-gradient-to-r from-transparent via-lime-700 to-transparent' />
 
 			<div className='grid grid-cols-2 gap-4'>
 				<div className='rounded-xl bg-blue-700/10 pt-4 shadow'>

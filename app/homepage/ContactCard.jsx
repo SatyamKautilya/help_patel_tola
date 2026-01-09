@@ -22,6 +22,11 @@ const ContactCard = () => {
         w-10 h-10 rounded-full
         bg-[#e6ddcc]
         shadow-[inset_0_1px_2px_rgba(255,255,255,0.7)]
+        backdrop-blur-md
+ 
+  hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]
+  hover:-translate-y-1
+  transition-all duration-300 ease-out
       '>
 					📞
 				</div>

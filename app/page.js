@@ -97,11 +97,12 @@ export default function HomePage() {
 						<Employment />
 						{/* Contacts / Community */}
 						<ContactCard />
-						<FeedbackSection sender={appContext.name} />
+
 						{/* Moral Values Footer */}
 						<About />
+						<div className='h-1 mx-10 bg-gradient-to-r from-transparent via-white/70 to-transparent' />
 
-						<div className='h-px mx-10 bg-gradient-to-r from-transparent via-white/40 to-transparent' />
+						<FeedbackSection sender={appContext.name} />
 
 						<footer
 							className='
@@ -119,7 +120,7 @@ export default function HomePage() {
     '>
 								Conceptualised & crafted by
 								<span className='ml-1 font-semibold text-[#374151]'>
-									Satyam Kautilya
+									Satyam Kautilya {`${appContext?.appVersion || ''}`}
 								</span>
 							</div>
 						</footer>
