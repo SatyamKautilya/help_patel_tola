@@ -25,4 +25,4 @@ export function getInjectedAppVersion() {
 	}
 }
 
-export const hideBackButton = () => getInjectedAppVersion() === '1.0.4';
+export const hideBackButton = () => getInjectedAppVersion() === '1.0.3';
