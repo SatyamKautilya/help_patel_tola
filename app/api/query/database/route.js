@@ -4,6 +4,7 @@ import { connectToDatabase } from '@/lib/mongodb';
 import Titleandtexts from '@/lib/models/Titleandtexts';
 import { generateChatResponse } from '@/lib/openai';
 import GovtSchemes from '@/lib/models/GovtSchemes';
+import Feedback from '@/lib/models/Feedback';
 // Helper function to get path segments
 function getPathSegments(request) {
 	const url = new URL(request.url);
@@ -116,6 +117,23 @@ Text:
 			});
 
 			return NextResponse.json(govtSchemes);
+		}
+		if (name === 'feedback') {
+			const { form: content } = body;
+
+			if (!content?.sender) {
+				return NextResponse.json(
+					{ error: 'content name is required' },
+					{ status: 400 },
+				);
+			}
+
+			const feedback = await Feedback.create({
+				sender: content.sender,
+				message: content.message,
+			});
+
+			return NextResponse.json(feedback);
 		}
 
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });

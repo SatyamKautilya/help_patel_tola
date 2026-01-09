@@ -52,7 +52,7 @@ export default function TamoharHindiMissionPage() {
 
 					<p>
 						गाँव में बड़ी संख्या में लोग ऐसी बीमारियों से मर रहे हैं, जिनका इलाज
-						संभव है। इसके मुख्य कारण निम्नलिखित हैं:
+						संभव है। इसके मुख्य कारण हैं:
 					</p>
 
 					<ol className='list-decimal pl-5 space-y-4'>

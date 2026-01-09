@@ -78,3 +78,17 @@
 		text-shadow: 0 0 26px rgba(255, 215, 130, 0.7);
 	}
 }
+
+@keyframes float {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-6px);
+	}
+}
+
+.animate-float {
+	animation: float 4s ease-in-out infinite;
+}

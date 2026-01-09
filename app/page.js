@@ -2,8 +2,48 @@
 import { Button } from '@heroui/react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import FeedbackSection from './about/FeedbackSection';
+import { useEffect, useState } from 'react';
+import { setAppContext } from './store/appSlice';
 
 export default function HomePage() {
+	const appContext = useSelector((state) => state.appContext.appContext);
+	const dispatch = useDispatch();
+	const [user, setUser] = useState(null);
+
+	useEffect(() => {
+		if (typeof window !== 'undefined' && window.APP_CONTEXT) {
+			const context = window.APP_CONTEXT;
+
+			setUser(context); // local state
+			dispatch(setAppContext({ ...context })); // redux state
+		}
+	}, []);
+
+	useEffect(() => {
+		if (!appContext?.name) return;
+
+		const hasVisited = sessionStorage.getItem('user_last_seen_sent');
+
+		if (hasVisited) return;
+
+		sessionStorage.setItem('user_last_seen_sent', 'true');
+
+		const now = new Date().toISOString();
+
+		fetch('/api/subcategory/hospitals?name=users', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				form: {
+					...appContext,
+					lastSeen: now,
+				},
+			}),
+		}).catch(console.error);
+	}, [appContext]);
+
 	const router = useRouter();
 	return (
 		<main className='min-h-screen '>
@@ -161,6 +201,7 @@ export default function HomePage() {
 					<h2 className='text-lg font-semibold text-[#5b4a2f]'>संपर्क सूत्र</h2>
 					<p className='text-sm mt-2'>डॉक्टर, स्वयंसेवक, अधिकारी</p>
 				</section>
+				<FeedbackSection sender={appContext.name} />
 				{/* Moral Values Footer */}
 				<footer
 					onClick={() => {
