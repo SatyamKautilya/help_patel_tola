@@ -187,46 +187,6 @@ export async function POST(request) {
 			return NextResponse.json({ response: aiResponse });
 		}
 
-		// POST /api/categories - Create category
-		if (segments[0] === 'categories' && segments.length === 1) {
-			const { name, icon, description } = body;
-			if (!name) {
-				return NextResponse.json(
-					{ error: 'name is required' },
-					{ status: 400 },
-				);
-			}
-
-			const category = await Category.create({
-				id: uuidv4(),
-				name,
-				icon: icon || '📋',
-				description: description || '',
-			});
-
-			return NextResponse.json({ category }, { status: 201 });
-		}
-
-		// POST /api/subcategories - Create subcategory
-		if (segments[0] === 'subcategories' && segments.length === 1) {
-			const { categoryId, name, description } = body;
-			if (!categoryId || !name) {
-				return NextResponse.json(
-					{ error: 'categoryId and name are required' },
-					{ status: 400 },
-				);
-			}
-
-			const subcategory = await Subcategory.create({
-				id: uuidv4(),
-				categoryId,
-				name,
-				description: description || '',
-			});
-
-			return NextResponse.json({ subcategory }, { status: 201 });
-		}
-
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });
 	} catch (error) {
 		console.error('API POST Error:', error);

@@ -37,7 +37,6 @@ const HospitalDetails = (props) => {
 		});
 
 		return NextResponse.json({ updateExp });
-		console.log('Submitted experience:', form);
 		// TODO: call API here
 	};
 

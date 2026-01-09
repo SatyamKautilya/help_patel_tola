@@ -92,3 +92,69 @@
 .animate-float {
 	animation: float 4s ease-in-out infinite;
 }
+
+.lotus-bg {
+	background: linear-gradient(
+		135deg,
+		rgba(210, 225, 245, 0.95),
+		rgba(235, 242, 255, 0.95)
+	);
+	background-blend-mode: hard-light;
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+}
+@keyframes cloudMove {
+	from {
+		transform: translateX(-10px);
+	}
+	to {
+		transform: translateX(10px);
+	}
+}
+
+@keyframes shimmerMove {
+	to {
+		transform: translateX(100%);
+	}
+}
+@keyframes vicharFade {
+	from {
+		opacity: 0;
+		transform: translateY(6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.animate-vichar {
+	animation: vicharFade 0.6s ease-out;
+}
+
+.shimmer {
+	position: relative;
+	overflow: hidden;
+}
+
+.shimmer::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		120deg,
+		transparent,
+		rgba(255, 255, 255, 0.8),
+		transparent
+	);
+	transform: translateX(-100%);
+	animation: shimmerMove 1.8s infinite;
+}
+.cloud-float {
+	background: radial-gradient(
+		circle at 30% 20%,
+		rgba(255, 255, 255, 0.5),
+		transparent 60%
+	);
+	animation: cloudMove 12s ease-in-out infinite alternate;
+}

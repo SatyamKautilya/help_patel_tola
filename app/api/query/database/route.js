@@ -97,6 +97,31 @@ Text:
 			return NextResponse.json({ response });
 		}
 
+		if (name === 'suvichar') {
+			let response;
+			try {
+				const aiResponse = await generateChatResponse(
+					undefined,
+					`Give one motivating hindi suvichar not more then 100 characters in this format JSON {"vichar":"your suvichar"}`,
+				);
+
+				// Ensure JSON parsing
+				response =
+					typeof aiResponse === 'string' ? JSON.parse(aiResponse) : aiResponse;
+
+				if (!response.vichar) {
+					throw new Error('Invalid AI response');
+				}
+			} catch (error) {
+				response = {
+					slok: 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन',
+					meaning: 'मनुष्य का अधिकार केवल कर्म करने में है, फल में नहीं।',
+				};
+			}
+
+			return NextResponse.json({ response });
+		}
+
 		if (name === 'setgovtschemes') {
 			const { form: content } = body;
 

@@ -34,13 +34,13 @@ export default function FeedbackSection({ sender }) {
 			<Card
 				className='
           w-full max-w-md
-          bg-gold-soft/20 backdrop-blur-xl
+          bg-teal-900/10 backdrop-blur-xl
           shadow-xl
           rounded-2xl
           animate-float
         '>
 				<CardBody className='gap-4'>
-					<h2 className='text-lg font-semibold text-center text-teal-600'>
+					<h2 className='text-lg font-semibold text-center text-gray-600'>
 						💬 सत्यम के लिए संदेश
 					</h2>
 
@@ -61,20 +61,25 @@ export default function FeedbackSection({ sender }) {
 						}}
 					/>
 
-					<Button
-						color={sent ? 'success' : 'warning'}
-						radius='lg'
-						size='lg'
-						onPress={handleSend}
-						className='
+					<div className='flex flex-row justify-center'>
+						{' '}
+						<Button
+							radius='lg'
+							size='lg'
+							onPress={handleSend}
+							className='
+							bg-gradient-to-r from-[#f2d28b] to-[#e8b85c] text-lg text-gray-800
+						w-max
               font-semibold
               transition-all
               hover:-translate-y-0.5
               hover:shadow-lg
               active:translate-y-0
+			  
             '>
-						{sent ? '✓ भेजा गया' : 'भेजें'}
-					</Button>
+							{sent ? '✓ भेजा गया' : 'सेंड करें'}
+						</Button>
+					</div>
 				</CardBody>
 			</Card>
 		</section>
