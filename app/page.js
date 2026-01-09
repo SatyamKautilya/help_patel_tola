@@ -72,10 +72,10 @@ export default function HomePage() {
 						height={50}
 						priority
 					/>
-
+					{/* 
 					<p className='text-sm text-gold pb-2'>
 						ग्रामीण जीवन को आधुनिक एवं सुखद बनाने का अभियान
-					</p>
+					</p> */}
 				</header>
 
 				{/* 📜 SCROLLABLE CONTENT */}
