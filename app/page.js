@@ -65,7 +65,7 @@ export default function HomePage() {
 			/>
 
 			{/* Dark overlay for logo contrast */}
-			<div className='absolute inset-0 ' />
+			<div className='absolute inset-0 bg-black/25 ' />
 
 			{/* Foreground Layout */}
 			<div className='relative h-full flex flex-col'>
@@ -116,7 +116,7 @@ export default function HomePage() {
 								className='
       px-4 py-2
       rounded-full
-      bg-white/20 backdrop-blur-md
+      bg-white/40 backdrop-blur-none
       shadow-[0_2px_8px_rgba(0,0,0,0.12)]
     '>
 								Conceptualised & crafted by
