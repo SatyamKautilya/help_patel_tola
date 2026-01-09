@@ -17,7 +17,7 @@ const Employment = () => {
 			<h2 className='text-lg font-bold text-lime-700 mb-0 text-center'>
 				आजीविका एवं विकास
 			</h2>
-			<div className='w-full mt-2 h-px mb-8 bg-gradient-to-r from-transparent via-lime-700 to-transparent' />
+			<div className='w-full mt- h-px mb-8 bg-gradient-to-r from-transparent via-lime-700 to-transparent' />
 
 			<div className='grid grid-cols-2 gap-4'>
 				<div className='rounded-xl bg-blue-700/10 pt-4 shadow'>

@@ -96,12 +96,12 @@
 .lotus-bg {
 	background: linear-gradient(
 		135deg,
-		rgba(210, 225, 245, 0.95),
-		rgba(235, 242, 255, 0.95)
+		rgba(210, 225, 245, 0.65),
+		rgba(235, 242, 255, 0.65)
 	);
 	background-blend-mode: hard-light;
-	backdrop-filter: blur(12px);
-	-webkit-backdrop-filter: blur(12px);
+	backdrop-filter: blur(0px);
+	/* -webkit-backdrop-filter: blur(12px); */
 }
 @keyframes cloudMove {
 	from {

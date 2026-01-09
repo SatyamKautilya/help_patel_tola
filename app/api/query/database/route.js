@@ -102,19 +102,31 @@ Text:
 			try {
 				const aiResponse = await generateChatResponse(
 					undefined,
-					`Give one  line related to health, one desease cause in hindi not more then 100 characters in this format JSON {"vichar":"your suvichar"}`,
+					`Give one short educational line in simple Hindi about
+1) a disease symptom OR
+2) a disease cause.
+
+Rules:
+- Max 100 characters
+- Awareness focused
+- Output ONLY valid JSON in this format:
+{"vichar":"<text>"}
+Example:{"vichar":"लगातार बुखार, कमजोरी और पेट दर्द टाइफाइड के आम लक्षण हैं।"}
+{"vichar":"गंदा पानी या दूषित खाना खाने से टाइफाइड बीमारी होती है।"}
+1) `,
+					'5',
 				);
 
 				// Ensure JSON parsing
 				response =
 					typeof aiResponse === 'string' ? JSON.parse(aiResponse) : aiResponse;
 
-				// if (!response.vichar) {
-				// 	throw new Error('Invalid AI response');
-				// }
+				if (!response.vichar) {
+					throw new Error('Invalid AI response');
+				}
 			} catch (error) {
 				response = {
-					slok: 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन',
+					vichar: 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन',
 					meaning: 'मनुष्य का अधिकार केवल कर्म करने में है, फल में नहीं।',
 				};
 			}

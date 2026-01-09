@@ -39,7 +39,7 @@ const Suvichar = () => {
 
 	return (
 		<section
-			className='relative overflow-hidden rounded-2xl py-4 pr-4 pl-3 bg-opacity-35 lotus-bg
+			className='relative overflow-hidden  rounded-2xl py-4 pr-4 pl-3  lotus-bg
 		backdrop-blur-md
   shadow-[0_10px_20px_rgba(0,0,0,0.40)]
   hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]
@@ -66,10 +66,10 @@ const Suvichar = () => {
 							</div>
 						) : (
 							<>
-								<span className='text-[1.1rem] font-semibold tracking-wide text-[#4A2C2A] drop-shadow-[0_1px_2px_rgba(255,255,255,0.35)]'>
-									स्वास्थ्य को समर्पित - वर्ष 2026
+								<span className='text-[1.1rem] font-medium tracking-wide text-[#4A2C2A] drop-shadow-[0_1px_2px_rgba(255,255,255,0.35)]'>
+									<b>स्वास्थ्य</b> को समर्पित - वर्ष <b>2026</b>
 								</span>
-								<span className='block mt-2 text-sm text-[#5E3B35] opacity-90 animate-vichar'>
+								<span className='block mt-2 text-sm text-[#242423] opacity-90 animate-vichar'>
 									{suvichar?.vichar}
 								</span>
 							</>
