@@ -59,7 +59,7 @@ export default function HomePage() {
 			/>
 
 			{/* Dark overlay for logo contrast */}
-			<div className='absolute inset-0 bg-black/30' />
+			<div className='absolute inset-0 ' />
 
 			{/* Foreground Layout */}
 			<div className='relative h-full flex flex-col'>
@@ -82,7 +82,7 @@ export default function HomePage() {
 				<main className='flex-1 overflow-y-auto px-4 pb-24'>
 					{/* Header / Moral Anchor */}
 
-					<div className='  py-6 space-y-6'>
+					<div className='  pt-3 pb-6 space-y-6'>
 						{/* Moral / Light Section */}
 						<section className='rounded-2xl bg-gradient-to-r from-[#cfa44a] to-[#8f6b2f] p-5 text-white'>
 							<h2 className='text-xl font-semibold'>तत्त्वबोध</h2>
