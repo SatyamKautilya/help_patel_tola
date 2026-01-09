@@ -86,7 +86,7 @@ export default function HomePage() {
 				</header>
 
 				{/* 📜 SCROLLABLE CONTENT */}
-				<main className='flex-1 overflow-y-auto px-4 pb-24'>
+				<main className='flex-1 overflow-y-auto px-4 pb-10'>
 					{/* Header / Moral Anchor */}
 
 					<div className='  pt-3 pb-6 space-y-6'>
@@ -101,7 +101,7 @@ export default function HomePage() {
 
 						{/* Moral Values Footer */}
 						<About />
-						<div className='h-px mx-10 bg-gradient-to-r from-transparent via-gold-soft to-transparent' />
+						<div className='h-px mx-10 bg-gradient-to-r from-transparent via-cyan-500 to-transparent' />
 
 						<FeedbackSection sender={appContext.name} />
 
@@ -121,7 +121,10 @@ export default function HomePage() {
     '>
 								Conceptualised & crafted by
 								<span className='ml-1 font-semibold text-[#374151]'>
-									Satyam Kautilya {`${appContext?.appVersion || ''}`}
+									Satyam Kautilya{' '}
+									{`${
+										appContext?.appVersion ? `V-${appContext?.appVersion}` : ''
+									}`}
 								</span>
 							</div>
 						</footer>

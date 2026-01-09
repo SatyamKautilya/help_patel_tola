@@ -30,7 +30,7 @@ export default function FeedbackSection({ sender }) {
 	};
 
 	return (
-		<section className='flex justify-center py-5'>
+		<section className='flex justify-center py-1'>
 			<Card
 				className='
           w-full max-w-md
