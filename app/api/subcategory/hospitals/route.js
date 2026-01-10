@@ -15,6 +15,7 @@ function getPathSegments(request) {
 	return path ? path.split('/').filter(Boolean) : [];
 }
 
+export const revalidate = 300;
 // GET handler
 export async function GET(request) {
 	try {
