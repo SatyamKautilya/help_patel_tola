@@ -107,18 +107,18 @@ export default function HomePage() {
 
 						<footer
 							className='
-    relative mt-3 mb-4
-    flex justify-center
-    text-sm
-    text-[#4b5563]
-  '>
+									relative mt-3 mb-4
+									flex justify-center
+									text-sm
+									text-[#4b5563]
+								'>
 							<div
 								className='
-      px-4 py-2
-      rounded-full
-      bg-white/40 backdrop-blur-none
-      shadow-[0_2px_8px_rgba(0,0,0,0.12)]
-    '>
+										px-4 py-2
+										rounded-full
+										bg-white/40 backdrop-blur-none
+										shadow-[0_2px_8px_rgba(0,0,0,0.12)]
+										'>
 								Conceptualised & crafted by
 								<span className='ml-1 font-semibold text-[#374151]'>
 									Satyam Kautilya{' '}

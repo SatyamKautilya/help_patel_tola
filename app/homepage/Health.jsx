@@ -7,6 +7,7 @@ const Health = () => {
 	const router = useRouter();
 	return (
 		<section
+			onClick={() => router.push('/subcategory/health')}
 			className='rounded-2xl overflow-hidden h-50 bg-[#dfeee3] flex flex-row  space-y-3 bg-cover bg-center  relative 
              bg-black/80 backdrop-blur-md
   shadow-[0_10px_20px_rgba(0,0,0,0.40)]
