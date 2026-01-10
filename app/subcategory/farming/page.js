@@ -1,8 +1,10 @@
 'use client';
 
+import { setLoader } from '@/app/store/appSlice';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function AgriculturePage() {
 	const [search, setSearch] = useState('');
@@ -11,7 +13,9 @@ export default function AgriculturePage() {
 
 	const filteredCrops = cropList.filter((crop) => crop.name.includes(search));
 
+	const dispatch = useDispatch();
 	const initializeApp = async () => {
+		dispatch(setLoader(true));
 		try {
 			const response = await fetch(`/api/subcategory/crops`);
 			if (response.ok) {
@@ -20,14 +24,14 @@ export default function AgriculturePage() {
 			}
 		} catch (error) {
 			console.error('Failed to initialize app:', error);
+		} finally {
+			dispatch(setLoader(false));
 		}
 	};
 
 	useEffect(() => {
 		initializeApp();
 	}, []);
-
-	console.log(filteredCrops, 'filteredCrops');
 
 	const handleClick = (cropId) => {
 		router.push(`/subcategory/farming/crop?name=${cropId}`);

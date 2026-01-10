@@ -4,12 +4,16 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { setLoader } from '@/app/store/appSlice';
 
 const Page = () => {
 	const [topics, setTopics] = useState([]);
 	const router = useRouter();
+	const dispatch = useDispatch();
 
 	const initializeApp = async () => {
+		dispatch(setLoader(true));
 		try {
 			const response = await fetch('/api/subcategory/hospitals');
 			if (response.ok) {
@@ -18,6 +22,8 @@ const Page = () => {
 			}
 		} catch (error) {
 			console.error('Failed to initialize app:', error);
+		} finally {
+			dispatch(setLoader(false));
 		}
 	};
 
@@ -50,12 +56,12 @@ const Page = () => {
 							key={topic.id}
 							isPressable
 							className='
-                group rounded-3xl 
-                bg-white/80 backdrop-blur
-                shadow-md hover:shadow-2xl
-                transition-all duration-300
-                hover:-translate-y-1
-              '>
+									group rounded-3xl 
+									bg-white/80 backdrop-blur
+									shadow-md hover:shadow-2xl
+									transition-all duration-300
+									hover:-translate-y-1
+								'>
 							<CardBody className='flex flex-col justify-between h-64 p-6 text-center'>
 								{/* Owner */}
 								{topic.owner && (

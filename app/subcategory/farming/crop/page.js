@@ -1,9 +1,11 @@
 'use client';
 
+import { setLoader } from '@/app/store/appSlice';
 import { Button, Chip } from '@heroui/react';
 import Image from 'next/image';
 // import { useSearchParams } from 'next/navigation';
 import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 const InfoBox = ({ label, value, danger }) => (
 	<div
@@ -22,6 +24,7 @@ const InfoBox = ({ label, value, danger }) => (
 
 export default function CropsPage() {
 	const [cropDetails, setCropDetails] = React.useState({});
+	const dispatch = useDispatch();
 	// const searchParams = useSearchParams();
 	// const name = searchParams.get('name');
 	const name = 'tomato';
@@ -34,14 +37,22 @@ export default function CropsPage() {
 		additionalInfo = [],
 		url,
 	} = cropDetails;
-	useEffect(() => {
-		const fetchCropDetails = async () => {
+	const fetchCropDetails = async () => {
+		dispatch(setLoader(true));
+		try {
 			const response = await fetch(`/api/subcategory/crops?name=${name}`);
 			if (response.ok) {
 				const data = await response.json();
 				setCropDetails(data?.crops[0] || {});
 			}
-		};
+		} catch (error) {
+			console.error('Failed to fetch crop details:', error);
+			setCropDetails({});
+		} finally {
+			dispatch(setLoader(false));
+		}
+	};
+	useEffect(() => {
 		fetchCropDetails();
 	}, [name]);
 

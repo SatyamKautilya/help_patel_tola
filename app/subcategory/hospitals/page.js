@@ -7,17 +7,17 @@ import HospitalDetails from './HospitalDetails';
 import { filterhospitals, hideBackButton } from '@/hooks/utils';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import { setLoader } from '@/app/store/appSlice';
+import { useDispatch } from 'react-redux';
 
 export default function App() {
-	const router = useRouter();
-	const [topics, setTopics] = useState([]);
-	const [selectedTopic, setSelectedTopic] = useState(null);
 	const [topicData, setTopicData] = useState(null);
 	const [message, setMessage] = useState('');
 	const [selectedCity, setSelectedCity] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [boatResp, setBoatResp] = useState({});
 	const [filteredHsp, setFilteredHsp] = useState({});
+	const dispatch = useDispatch();
 	useEffect(() => {
 		setFilteredHsp(topicData?.hospitallists);
 	}, [topicData]);
@@ -28,36 +28,25 @@ export default function App() {
 		);
 	}, [boatResp]);
 
-	useEffect(() => {
-		const fetchTopicDetails = async () => {
-			try {
-				const response = await fetch(
-					`/api/subcategory/hospitals?name=hospitals`,
-				);
-				// const response = await fetch(`/api/crop/schedule/${selectedCrop}`, {
-				// 	method: 'POST',
-				// 	headers: { 'Content-Type': 'application/json' },
-				// 	body: JSON.stringify({ cropId: selectedCrop }),
-				// });
+	const fetchTopicDetails = async () => {
+		dispatch(setLoader(true));
+		try {
+			const response = await fetch(`/api/subcategory/hospitals?name=hospitals`);
 
-				// const data = await response.json();
+			if (response.ok) {
+				const data = await response.json();
 
-				if (response.ok) {
-					const data = await response.json();
-
-					setTopicData(data);
-				}
-			} catch (error) {
-				console.error('Failed to fetch crop details:', error);
+				setTopicData(data);
 			}
-		};
-
-		fetchTopicDetails();
-	}, [selectedTopic]);
-
-	const handleBack = () => {
-		router.back();
+		} catch (error) {
+			console.error('Failed to fetch crop details:', error);
+		} finally {
+			dispatch(setLoader(false));
+		}
 	};
+	useEffect(() => {
+		fetchTopicDetails();
+	}, []);
 
 	const cities = [
 		{ id: 'jabalpur', name: 'जबलपुर' },

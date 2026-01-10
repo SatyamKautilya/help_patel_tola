@@ -50,7 +50,6 @@ export default function HomePage() {
 		}).catch(console.error);
 	}, [appContext]);
 
-	const router = useRouter();
 	return (
 		<div className='relative h-screen overflow-hidden'>
 			{/* Fixed Background */}
@@ -68,9 +67,9 @@ export default function HomePage() {
 			<div className='absolute inset-0 bg-black/25 ' />
 
 			{/* Foreground Layout */}
-			<div className='relative h-full flex flex-col'>
+			<div className='relative h-full  flex flex-col'>
 				{/* 🔒 FIXED HEADER (LOGO) */}
-				<header className=' z-50 top-0 w-full text-center flex flex-col pt-8 items-center justify-center '>
+				<header className=' z-50 top-0 w-full text-center flex flex-col pt-3 items-center justify-center '>
 					<Image
 						src='https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/logotrimmed.png'
 						alt='Help Patel Tola Logo'
@@ -86,7 +85,7 @@ export default function HomePage() {
 				</header>
 
 				{/* 📜 SCROLLABLE CONTENT */}
-				<main className='flex-1 overflow-y-auto px-4 pb-10'>
+				<main className='flex-1 bg-blue-600/30 overflow-y-auto px-4 pb-10'>
 					{/* Header / Moral Anchor */}
 
 					<div className='  pt-3 pb-6 space-y-6'>
