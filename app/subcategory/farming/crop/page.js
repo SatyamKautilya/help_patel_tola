@@ -2,7 +2,7 @@
 
 import { Button, Chip } from '@heroui/react';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
+// import { useSearchParams } from 'next/navigation';
 import React, { useEffect } from 'react';
 
 const InfoBox = ({ label, value, danger }) => (
@@ -22,8 +22,9 @@ const InfoBox = ({ label, value, danger }) => (
 
 export default function CropsPage() {
 	const [cropDetails, setCropDetails] = React.useState({});
-	const searchParams = useSearchParams();
-	const name = searchParams.get('name');
+	// const searchParams = useSearchParams();
+	// const name = searchParams.get('name');
+	const name = 'tomato';
 
 	const {
 		name: cropName,
