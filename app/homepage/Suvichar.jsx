@@ -8,10 +8,12 @@ const Suvichar = () => {
 	const [loading, setLoading] = useState(true);
 	const dispatch = useDispatch();
 	const quote = useSelector((state) => state.appContext.quote);
+	console.log(quote, 'queto');
 	useEffect(() => {
 		const controller = new AbortController();
 
 		const getVichar = async () => {
+			console.log(quote, 'aaa');
 			if (quote?.length) {
 				setSuvichar({ vichar: quote });
 				setLoading(false);
