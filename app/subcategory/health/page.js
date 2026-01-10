@@ -53,8 +53,11 @@ const Page = () => {
 				<section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
 					{topics.map((topic) => (
 						<Card
-							key={topic.id}
 							isPressable
+							onPress={() => {
+								router.push(topic.route);
+							}}
+							key={topic.id}
 							className='
 									group rounded-3xl 
 									bg-white/80 backdrop-blur
@@ -62,29 +65,27 @@ const Page = () => {
 									transition-all duration-300
 									hover:-translate-y-1
 								'>
-							<CardBody className='flex flex-col justify-between h-64 p-6 text-center'>
+							<CardBody className='flex shrink-0 flex-row justify-center  p-6 text-center'>
 								{/* Owner */}
-								{topic.owner && (
-									<div className='flex justify-center'>
-										<Chip
-											color='success'
-											variant='flat'
-											className='text-sm font-semibold tracking-wide'>
-											{topic.owner}
-										</Chip>
-									</div>
-								)}
-
-								{/* Title */}
-								<h2 className='mt-4 text-xl font-bold text-gray-800 leading-snug'>
-									{topic.topicName}
-								</h2>
-
-								{/* Divider */}
-								<div className='pr-10 w-full my-2 h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent' />
-
+								<div className=' flex flex-col items-center  justify-center pr-4 w-full'>
+									{topic.owner && (
+										<div className='flex justify-center w-full'>
+											<Chip
+												color='success'
+												variant='flat'
+												className='text-sm font-semibold tracking-wide'>
+												{topic.owner}
+											</Chip>
+										</div>
+									)}
+									{/* Title */}
+									<h2 className='mt-4 text-xl font-bold text-gray-800 leading-snug'>
+										{topic.topicName}
+									</h2>
+									{/* Divider */}
+								</div>
 								{/* CTA */}
-								<div className='flex flex-row w-full  justify-center  '>
+								<div className='flex flex-row w-1/6   justify-center h-full items-center '>
 									<Button
 										onPress={() => {
 											router.push(topic.route);
