@@ -1,10 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button, Card, CardBody, Chip, Input } from '@heroui/react';
 import HospitalDetails from './HospitalDetails';
 import { filterhospitals, hideBackButton } from '@/hooks/utils';
+import Image from 'next/image';
+import { ArrowRight } from 'lucide-react';
 
 export default function App() {
 	const router = useRouter();
@@ -27,58 +29,31 @@ export default function App() {
 	}, [boatResp]);
 
 	useEffect(() => {
-		initializeApp();
-	}, []);
-
-	useEffect(() => {
-		if (!selectedTopic) return;
-		if (selectedTopic === 'sop') {
-			router.push('/subcategory/hospitals/treatment');
-			return;
-		}
-		if (selectedTopic === 'successStory') {
-			router.push('/subcategory/hospitals/casestory');
-			return;
-		}
 		const fetchTopicDetails = async () => {
-			if (selectedTopic === 'hospitals')
-				try {
-					const response = await fetch(
-						`/api/subcategory/hospitals?name=${selectedTopic}`,
-					);
-					// const response = await fetch(`/api/crop/schedule/${selectedCrop}`, {
-					// 	method: 'POST',
-					// 	headers: { 'Content-Type': 'application/json' },
-					// 	body: JSON.stringify({ cropId: selectedCrop }),
-					// });
+			try {
+				const response = await fetch(
+					`/api/subcategory/hospitals?name=hospitals`,
+				);
+				// const response = await fetch(`/api/crop/schedule/${selectedCrop}`, {
+				// 	method: 'POST',
+				// 	headers: { 'Content-Type': 'application/json' },
+				// 	body: JSON.stringify({ cropId: selectedCrop }),
+				// });
 
-					// const data = await response.json();
+				// const data = await response.json();
 
-					if (response.ok) {
-						const data = await response.json();
+				if (response.ok) {
+					const data = await response.json();
 
-						setTopicData(data);
-					}
-				} catch (error) {
-					console.error('Failed to fetch crop details:', error);
+					setTopicData(data);
 				}
+			} catch (error) {
+				console.error('Failed to fetch crop details:', error);
+			}
 		};
 
 		fetchTopicDetails();
 	}, [selectedTopic]);
-
-	const initializeApp = async () => {
-		try {
-			const response = await fetch('/api/subcategory/hospitals');
-			if (response.ok) {
-				const data = await response.json();
-				setTopics(data.healthtopics || []);
-			}
-		} catch (error) {
-			console.error('Failed to initialize app:', error);
-		} finally {
-		}
-	};
 
 	const handleBack = () => {
 		router.back();
@@ -120,145 +95,162 @@ export default function App() {
 		}
 	};
 
-	return loading ? (
-		<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
-			<div className='bg-white rounded-2xl px-8 py-6 shadow-xl text-center animate-fadeScale'>
-				<p className='text-lg font-semibold text-gray-800'>
-					आपके इनपुट के आधार पर अस्पताल ढूंढ रहा हूँ
-				</p>
-				<p className='text-sm text-gray-500 mt-1'>कृपया प्रतीक्षा करें...</p>
+	const handleChange = React.useCallback((e) => {
+		setMessage(e.target.value);
+	}, []);
 
-				{/* Spinner */}
-				<div className='mt-4 flex justify-center'>
-					<div className='h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin' />
-				</div>
-			</div>
-		</div>
-	) : (
-		<div className=''>
-			<div
-				className={` ${
-					hideBackButton() ? 'hidden' : ''
-				} fixed top-0  left-0 right-0 z-50 flex flex-row pb-4 pt-12 border-b-2 bg-slate-100 items-center`}>
-				<Button
-					color='primary'
-					size='lg'
-					className='ml-6 text-xl font-bold'
-					onPress={selectedTopic ? () => setSelectedTopic(null) : handleBack}>
-					← Back
-				</Button>
-			</div>
-			{!selectedTopic && (
-				<div className=' pt-[84px] p-6 grid grid-cols-2 gap-6	'>
-					{topics.map((topic) => (
-						<Card
-							key={topic.id}
-							isPressable
-							onPress={() => setSelectedTopic(topic.id)}
-							className='
-      h-64 
-      rounded-2xl 
-      shadow-xl 
-      bg-gradient-to-br from-indigo-600 via-purple-600 to-purple-300
-      hover:scale-[1.02] transition-transform
-    '>
-							<CardBody className='flex flex-col justify-between items-center p-6'>
-								{/* Title */}
-								{topic.owner && <Chip color='primary'>{topic.owner}</Chip>}
-
-								<h2 className='text-2xl text-white font-bold text-center'>
-									{topic.topicName}
-								</h2>
-
-								{/* Button */}
-								<Button
-									color='success'
-									variant='shadow'
-									size='lg'
-									onPress={() => setSelectedTopic(topic.id)}
-									className='mt-4 bg-green-400'>
-									देखें
-								</Button>
-							</CardBody>
-						</Card>
-					))}
-				</div>
-			)}
-			{selectedTopic === 'hospitals' ? (
-				<>
-					<div className='pt-[84px] px-4 py-3 flex flex-row flex-wrap gap-3'>
-						{cities?.map((city) => {
-							return (
-								<Chip
-									onClick={() => {
-										setSelectedCity(city.id);
-									}}
-									color={selectedCity === city.id ? 'warning' : 'primary'}
-									size='lg'>
-									{city.name}
-								</Chip>
-							);
-						})}
-					</div>
-					<HospitalDetails
-						hospitals={
-							selectedCity
-								? filteredHsp?.filter((hosp) => hosp.cityId === selectedCity)
-								: filteredHsp
-						}
+	return (
+		<div className='relative min-h-screen pb-10 bg-gradient-to-b from-emerald-50 via-teal-50 to-sky-100'>
+			{/* 🔹 Fixed Header */}
+			<header className='fixed h-10 top-0 z-20 w-full bg-black/50 backdrop-blur-md border-b border-white/40'></header>
+			<header className='fixed top-0 z-20 w-full bg-white/70 backdrop-blur-md border-b border-white/40'>
+				<div className='flex flex-col items-center pt-7'>
+					<Image
+						src='https://8dxblayock8syelc.public.blob.vercel-storage.com/healthtoplogo.png'
+						alt='Health Topics'
+						width={250}
+						height={56}
+						priority
 					/>
-					<div className='fixed bottom-10 left-0 right-0 z-50 bg-white border-t border-gray-200'>
-						{!boatResp?.msg ? (
-							<div className='max-w-3xl mx-auto p-4 flex gap-3 items-end'>
-								<Input
-									size='lg'
-									label='अपनी समस्या लिखें'
-									placeholder='जैसे: सीने में दर्द और सांस की तकलीफ'
-									value={message}
-									onChange={(e) => setMessage(e.target.value)}
-									//isDisabled={loading}
-									className='flex-1'
-								/>
+					<div className='mt-3 h-[2px] w-4/5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent' />
+				</div>
+			</header>
 
-								<Button
-									color='primary'
-									size='lg'
-									//	isLoading={loading}
-									onPress={() => handleSend()}
-									className='shrink-0'>
-									अस्पताल ढूँढे
-								</Button>
+			{/* 🔹 Content */}
+			<main className='pt-[110px] pb-10 px-4  max-w-7xl mx-auto'>
+				<section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+					{loading ? (
+						<div className='fixed  inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm'>
+							<div className='bg-white mx-10 rounded-2xl px-8 py-6 shadow-xl text-center animate-fadeScale'>
+								<p className='text-lg font-semibold text-gray-800'>
+									आपके इनपुट के आधार पर अस्पताल ढूंढ रहा हूँ
+								</p>
+								<p className='text-sm text-gray-500 mt-1'>
+									कृपया प्रतीक्षा करें...
+								</p>
+
+								{/* Spinner */}
+								<div className='mt-4 flex justify-center'>
+									<div className='h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin' />
+								</div>
 							</div>
-						) : (
-							<>
-								<div className='mx-4 mt-4 bg-yellow-500 p-3 rounded-lg'>
-									<div>{boatResp?.msg}</div>
-								</div>
-								<div className='mx-4 mt-4 bg-pink-300 p-3 rounded-lg'>
-									<div>ऊपर संबन्धित अस्पतालो की सूची है</div>
-								</div>
-								<div className='flex flex-row justify-center py-3'>
-									<Button
-										onPress={() => {
-											setBoatResp({});
+						</div>
+					) : (
+						<>
+							<div className=' py-3 flex flex-row flex-wrap gap-3'>
+								<span className='block  text-center text-lg pl-2 font-semibold'>
+									शहर चुनें :
+								</span>
+								{cities?.map((city) => {
+									return (
+										<>
+											<Chip
+												onClick={() => {
+													setSelectedCity(city.id);
+												}}
+												color={selectedCity === city.id ? 'warning' : 'success'}
+												size='lg'
+												className=' hover:opacity-100 transition-opacity'>
+												{city.name}
+											</Chip>
+										</>
+									);
+								})}
+							</div>
+							<HospitalDetails
+								hospitals={
+									selectedCity
+										? filteredHsp?.filter(
+												(hosp) => hosp.cityId === selectedCity,
+										  )
+										: filteredHsp
+								}
+							/>
+						</>
+					)}
+					<div
+						className='
+									fixed bottom-10 left-0 right-0 z-50
+									px-3
+								'>
+						<div
+							className='
+								max-w-3xl mx-auto
+								bg-white/90 backdrop-blur-md
+								border border-slate-200
+								shadow-xl
+								rounded-3xl
+								'>
+							{!boatResp?.msg ? (
+								<div className='p-4 flex gap-3 items-center'>
+									{/* Input */}
+									<Input
+										size='lg'
+										label='अपनी समस्या लिखें'
+										placeholder='जैसे: सीने में दर्द, सांस की तकलीफ'
+										value={message}
+										onChange={handleChange}
+										className='flex-1'
+										classNames={{
+											inputWrapper:
+												'rounded-2xl bg-slate-50 border border-slate-200',
+											label: 'text-sm font-semibold',
 										}}
-										color='primary'
-										className=' font-bold'>
-										फिर से ढूँढे
+									/>
+
+									{/* CTA Button */}
+									<Button
+										isIconOnly
+										aria-label='अस्पताल ढूँढे'
+										onPress={() => handleSend()}
+										className='
+												h-14 w-14 rounded-full
+												bg-gradient-to-br from-emerald-500 to-teal-500
+												text-white
+												shadow-lg shadow-emerald-500/40
+												transition-all duration-300
+												hover:scale-110
+											'>
+										<ArrowRight
+											className='
+                                                    w-6 h-6
+                                                    transition-transform duration-300
+                                                    group-hover:translate-x-1
+                                                    '
+										/>
 									</Button>
 								</div>
-							</>
-						)}
+							) : (
+								<div className='p-4 space-y-3'>
+									{/* AI / System Message */}
+									<div className='bg-amber-50 border border-amber-200 p-3 rounded-2xl text-sm text-amber-900'>
+										{boatResp?.msg}
+									</div>
+
+									{/* Guidance */}
+									<div className='bg-emerald-50 border border-emerald-200 p-3 rounded-2xl text-sm text-emerald-900'>
+										👆 ऊपर संबंधित अस्पतालों की सूची दिखाई गई है
+									</div>
+
+									{/* Reset */}
+									<div className='flex justify-center pt-2'>
+										<Button
+											onPress={() => setBoatResp({})}
+											className='
+													rounded-full px-6
+													bg-slate-800 text-white
+													hover:bg-slate-900
+													'>
+											🔄 फिर से खोजें
+										</Button>
+									</div>
+								</div>
+							)}
+						</div>
 					</div>
-				</>
-			) : (
-				selectedTopic !== null && (
-					<div className=' px-6 h-screen bg-[radial-gradient(circle_at_top,_#1e293b,_#020617)] flex flex-row justify-center items-center text-white text-3xl'>
-						हम कुछ विशेष और सार्थक तैयार कर रहे हैं। जल्द ही जानकारी जोड़ी जाएगी
-						!!
-					</div>
-				)
-			)}
+				</section>
+			</main>
+			<header className='fixed h-10 bottom-0 z-20 w-full bg-black/20 backdrop-blur-md border-b border-white/40'></header>
 		</div>
 	);
 }

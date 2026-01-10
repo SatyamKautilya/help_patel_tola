@@ -1,3 +1,5 @@
+'use client';
+
 import {
 	Accordion,
 	AccordionItem,
@@ -7,27 +9,24 @@ import {
 	Textarea,
 	Chip,
 } from '@heroui/react';
-
-import { NextResponse } from 'next/server';
-
 import React from 'react';
 
-const HospitalDetails = (props) => {
-	const { hospitals } = props;
+const HospitalDetails = ({ hospitals }) => {
 	const [isOpen, setIsOpen] = React.useState(false);
 	const [isOpen2, setIsOpen2] = React.useState(false);
+	const [hideAccord, setHideAccord] = React.useState(false);
+
 	const [form, setForm] = React.useState({
 		name: '',
 		feedback: '',
 		rating: '',
 	});
-	const [hideAccord, setHideAccord] = React.useState(false);
 
 	const handleSubmit = async (hospId) => {
 		setHideAccord(true);
 		if (!form.name || !form.feedback || !form.rating) return;
 
-		const updateExp = await fetch('/api/subcategory/hospitals?name=feedback', {
+		await fetch('/api/subcategory/hospitals?name=feedback', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
@@ -35,147 +34,138 @@ const HospitalDetails = (props) => {
 				form,
 			}),
 		});
-
-		return NextResponse.json({ updateExp });
-		// TODO: call API here
 	};
 
-	return Array.isArray(hospitals)
-		? hospitals?.map((hospital) => {
-				return (
-					<div key={hospital.id}>
-						<Card className='m-4 p-6 bg-gradient-to-br from-indigo-600 via-purple-600 to-purple-300 rounded-2xl shadow-lg'>
-							{hospital.experiences?.length ? (
-								<div className='mb-2'>
-									<Chip
-										color='warning'
-										className='text-black text-lg font-semibold'>
-										परिचित
-									</Chip>
-								</div>
-							) : null}
-							<h2 className='text-2xl text-white font-bold mb-4'>
-								{hospital.name}
-							</h2>
-							<p className='text-lg text-white'>{`पता: ${hospital.address}`}</p>
-							<p className='text-lg text-white py-1'>
-								{`संपर्क: ${hospital.contact}`}{' '}
-							</p>
-							<p className='text-lg text-white font-extrabold'>{`विशेषग्यता: ${hospital.speciality} `}</p>
-							{hospital.experiences?.length ? (
-								<Accordion
-									selectionMode='single'
-									onSelectionChange={(keys) => {
-										setIsOpen(keys.size > 0);
-									}}
-									className='max-w-3xl mt-2 mx-0 px-0'
-									itemClasses={{
-										base: 'rounded-2xl px-3 bg-white/70  shadow-lg border border-pink-100',
-										title: 'text-sm font-semibold text-slate-800',
-										content: 'px-4 pb-4',
-									}}>
-									<AccordionItem
-										key='experience'
-										className='text-lg'
-										title={!isOpen ? '⬇ अनुभव देखें' : '⬆ अनुभव'}>
-										<ul className='space-y-3'>
-											{hospital?.experiences?.map((exp) => (
-												<li
-													key={exp.id}
-													className='rounded-xl bg-pink-50 border border-pink-100 p-4'>
-													<div className='flex justify-between items-center mb-1'>
-														<span className='font-medium text-slate-900'>
-															{exp.name}
-														</span>
-														<span className='text-sm text-pink-600'>
-															⭐ {exp.rating}/5
-														</span>
-													</div>
-													<p className='text-sm text-slate-700'>
-														{exp.feedback}
-													</p>
-												</li>
-											))}
-										</ul>
-									</AccordionItem>
-								</Accordion>
-							) : null}
-							{!hideAccord && (
-								<Accordion
-									selectionMode='single'
-									onSelectionChange={(keys) => setIsOpen2(true)}
-									className='max-w-3xl mx-auto mt-6 px-0 mx-0'
-									itemClasses={{
-										base: 'rounded-2xl px-3 bg-white/70 shadow-lg border border-pink-100',
-										title: 'text-sm font-semibold text-slate-800',
-										content: 'px-4 pb-5',
-									}}>
-									<AccordionItem
-										key='add-exp'
-										title={
-											!isOpen2 ? '➕ अनुभव साझा करें' : '✍️ आपका अनुभव लिखें'
-										}>
-										<div className='space-y-4'>
-											<Input
-												label='आपका नाम'
-												placeholder='नाम दर्ज करें'
-												value={form.name}
-												onChange={(e) =>
-													setForm({ ...form, name: e.target.value })
-												}
-												classNames={{
-													inputWrapper: 'bg-white',
-													input: 'text-lg font-semibold',
-													label: 'text-lg font-semibold',
-												}}
-											/>
+	if (!Array.isArray(hospitals)) return null;
 
-											<Textarea
-												label='आपका अनुभव'
-												placeholder='इलाज, स्टाफ या सुविधाओं के बारे में लिखें'
-												value={form.feedback}
-												onChange={(e) =>
-													setForm({ ...form, feedback: e.target.value })
-												}
-												classNames={{
-													inputWrapper: 'bg-white',
-													input: 'text-lg font-semibold bg-gray-500',
-													label: 'text-lg font-semibold',
-												}}
-											/>
+	return hospitals.map((hospital) => (
+		<div key={hospital.id} className=''>
+			<Card
+				className='
+						 p-6 rounded-3xl
+						bg-white/80 backdrop-blur
+						shadow-md hover:shadow-xl
+						transition-all
+     			   '>
+				{/* 🔹 Header */}
+				<div className='flex flex-col gap-2'>
+					{hospital.experiences?.length > 0 && (
+						<Chip color='success' variant='flat' className='w-fit'>
+							✔ परिचित अस्पताल
+						</Chip>
+					)}
 
-											<Input
-												type='number'
-												min={1}
-												max={5}
-												label='रेटिंग (1 से 5)'
-												placeholder='5'
-												value={form.rating}
-												onChange={(e) =>
-													setForm({ ...form, rating: e.target.value })
-												}
-												classNames={{
-													inputWrapper: 'bg-white',
-													input: 'text-lg font-semibold',
-													label: 'text-lg font-semibold',
-												}}
-											/>
+					<h2 className='text-xl font-bold text-slate-800'>{hospital.name}</h2>
 
-											<Button
-												color='primary'
-												className='w-full bg-pink-500 text-white font-semibold'
-												onPress={() => handleSubmit(hospital.id)}>
-												अनुभव सबमिट करें
-											</Button>
-										</div>
-									</AccordionItem>
-								</Accordion>
-							)}
-						</Card>
+					<div className='text-sm text-slate-600 space-y-1'>
+						<p>
+							📍 <span className='font-medium'>पता:</span> {hospital.address}
+						</p>
+						<p>
+							📞 <span className='font-medium'>संपर्क:</span> {hospital.contact}
+						</p>
+						<p>
+							🏥 <span className='font-medium'>विशेषज्ञता:</span>{' '}
+							{hospital.speciality}
+						</p>
 					</div>
-				);
-		  })
-		: null;
+				</div>
+
+				{/* 🔹 Experiences */}
+				{hospital.experiences?.length > 0 && (
+					<Accordion
+						selectionMode='single'
+						onSelectionChange={(keys) => setIsOpen(keys.size > 0)}
+						className='mt-3'
+						itemClasses={{
+							base: 'rounded-2xl bg-emerald-50 border border-emerald-100',
+							title: 'text-sm font-semibold text-emerald-800',
+							content: 'px-4 pb-4',
+						}}>
+						<AccordionItem
+							key='experience'
+							title={!isOpen ? '⬇ मरीजों के अनुभव देखें' : '⬆ अनुभव छुपाएँ'}>
+							<ul className='space-y-3'>
+								{hospital.experiences.map((exp) => (
+									<li
+										key={exp.id}
+										className='rounded-xl bg-white border border-slate-200 p-4'>
+										<div className='flex justify-between items-center mb-1'>
+											<span className='font-semibold text-slate-800'>
+												{exp.name}
+											</span>
+											<span className='text-sm text-amber-600'>
+												⭐ {exp.rating}/5
+											</span>
+										</div>
+										<p className='text-sm text-slate-700 leading-relaxed'>
+											{exp.feedback}
+										</p>
+									</li>
+								))}
+							</ul>
+						</AccordionItem>
+					</Accordion>
+				)}
+
+				{/* 🔹 Add Experience */}
+				{!hideAccord && (
+					<Accordion
+						selectionMode='single'
+						onSelectionChange={() => setIsOpen2(true)}
+						className='mt-6'
+						itemClasses={{
+							base: 'rounded-2xl bg-sky-50 border border-sky-100',
+							title: 'text-sm font-semibold text-sky-800',
+							content: 'px-4 pb-5',
+						}}>
+						<AccordionItem
+							key='add-exp'
+							title={!isOpen2 ? '➕ अपना अनुभव साझा करें' : '✍️ अनुभव लिखें'}>
+							<div className='space-y-4'>
+								<Input
+									label='आपका नाम'
+									placeholder='नाम लिखें'
+									value={form.name}
+									onChange={(e) => setForm({ ...form, name: e.target.value })}
+								/>
+
+								<Textarea
+									label='आपका अनुभव'
+									placeholder='इलाज, सुविधा या स्टाफ के बारे में लिखें'
+									value={form.feedback}
+									onChange={(e) =>
+										setForm({ ...form, feedback: e.target.value })
+									}
+								/>
+
+								<Input
+									type='number'
+									min={1}
+									max={5}
+									label='रेटिंग (1 से 5)'
+									placeholder='5'
+									value={form.rating}
+									onChange={(e) => setForm({ ...form, rating: e.target.value })}
+								/>
+
+								<Button
+									className='
+                    w-full h-12
+                    bg-gradient-to-r from-emerald-500 to-teal-500
+                    text-white font-semibold
+                    shadow-lg shadow-emerald-500/30
+                  '
+									onPress={() => handleSubmit(hospital.id)}>
+									अनुभव सबमिट करें
+								</Button>
+							</div>
+						</AccordionItem>
+					</Accordion>
+				)}
+			</Card>
+		</div>
+	));
 };
 
 export default HospitalDetails;
