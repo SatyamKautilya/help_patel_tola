@@ -5,7 +5,22 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect } from 'react';
 
-export default function Crops() {
+const InfoBox = ({ label, value, danger }) => (
+	<div
+		className={`
+      rounded-xl p-3 border
+      ${
+				danger
+					? 'bg-red-50 border-red-200 text-red-800'
+					: 'bg-slate-50 border-slate-200 text-slate-700'
+			}
+    `}>
+		<p className='text-sm font-semibold'>{label}</p>
+		<p className='font-bold'>{value}</p>
+	</div>
+);
+
+export default function CropsPage() {
 	const [cropDetails, setCropDetails] = React.useState({});
 	const searchParams = useSearchParams();
 	const name = searchParams.get('name');
@@ -160,19 +175,3 @@ export default function Crops() {
 		</div>
 	);
 }
-
-/* 🔹 Small reusable info box */
-const InfoBox = ({ label, value, danger }) => (
-	<div
-		className={`
-      rounded-xl p-3 border
-      ${
-				danger
-					? 'bg-red-50 border-red-200 text-red-800'
-					: 'bg-slate-50 border-slate-200 text-slate-700'
-			}
-    `}>
-		<p className='text-sm font-semibold'>{label}</p>
-		<p className='font-bold'>{value}</p>
-	</div>
-);
