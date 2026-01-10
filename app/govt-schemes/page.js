@@ -48,11 +48,8 @@ export default function SchemesPage() {
 			<div className='pt-24'>
 				<div className='rounded-b-3xl bg-gradient-to-br from-[#e7f5f3] to-[#f8fafc] px-4 py-6 shadow-sm'>
 					<h1 className='text-center text-xl font-bold text-gray-800'>
-						उपलब्ध योजनाएं
-					</h1>
-					<p className='mt-1 text-center text-sm text-gray-600'>
 						गांव के विकास हेतु उपयोगी सरकारी योजनाओं की जानकारी
-					</p>
+					</h1>
 
 					{/* Tabs */}
 					<div className='mt-4 flex gap-2 overflow-x-auto rounded-full bg-white p-2 shadow'>
