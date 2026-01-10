@@ -14,10 +14,10 @@ const Employment = () => {
   			hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]
   			hover:-translate-y-1
   			transition-all duration-300 ease-out'>
-			{/* <h2 className='text-lg font-bold text-lime-700 mb-0 text-center'>
-				आजीविका एवं विकास
+			<h2 className='text-lg font-bold text-lime-700 mb-0 text-center'>
+				शिक्षा, कौशल एवं रोजगार
 			</h2>
-			<div className='w-full mt- h-px mb-8 bg-gradient-to-r from-transparent via-lime-700 to-transparent' /> */}
+			<div className='w-full mt- h-px mb-8 bg-gradient-to-r from-transparent via-lime-700 to-transparent' />
 
 			<div className='grid grid-cols-2 gap-4'>
 				<div className='rounded-xl bg-blue-700/10 pt-4 shadow'>
