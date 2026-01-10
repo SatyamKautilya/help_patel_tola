@@ -85,7 +85,7 @@ export default function HomePage() {
 				</header>
 
 				{/* 📜 SCROLLABLE CONTENT */}
-				<main className='flex-1 bg-blue-600/30 overflow-y-auto px-4 pb-10'>
+				<main className='flex-1 overflow-y-auto px-4 pb-10'>
 					{/* Header / Moral Anchor */}
 
 					<div className='  pt-3 pb-6 space-y-6'>
