@@ -93,7 +93,20 @@ export default function HomePage() {
 						{/* Moral / Light Section */}
 						<Suvichar />
 						<Health />
+						<div className='bg-gradient-to-r from-transparent via-white to-transparent'>
+							<h2 className='text-lg font-bold text-lime-700 mb-0 text-center'>
+								आजीविका एवं विकास
+							</h2>
+							<div className='w-full mt- h-px mb-8 bg-gradient-to-r from-transparent via-lime-700 to-transparent' />
+						</div>
+
 						<Kheti />
+						<div className='bg-gradient-to-r from-transparent via-white to-transparent'>
+							<h2 className='text-lg font-bold text-lime-700 mb-0 text-center'>
+								आजीविका एवं विकास
+							</h2>
+							<div className='w-full mt- h-px mb-8 bg-gradient-to-r from-transparent via-lime-700 to-transparent' />
+						</div>
 						{/* Livelihood & Growth */}
 						<Employment />
 						{/* Contacts / Community */}
