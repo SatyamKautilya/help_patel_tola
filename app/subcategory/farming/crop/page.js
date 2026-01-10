@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect } from 'react';
 
-const Crops = () => {
+export default function Crops() {
 	const [cropDetails, setCropDetails] = React.useState({});
 	const searchParams = useSearchParams();
 	const name = searchParams.get('name');
@@ -159,7 +159,7 @@ const Crops = () => {
 			</div>
 		</div>
 	);
-};
+}
 
 /* 🔹 Small reusable info box */
 const InfoBox = ({ label, value, danger }) => (
@@ -176,5 +176,3 @@ const InfoBox = ({ label, value, danger }) => (
 		<p className='font-bold'>{value}</p>
 	</div>
 );
-
-export default Crops;
