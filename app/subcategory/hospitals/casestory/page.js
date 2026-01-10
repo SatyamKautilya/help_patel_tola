@@ -1,20 +1,16 @@
 'use client';
-
-import { Button, Card, CardBody, Input } from '@heroui/react';
 import { useEffect, useState } from 'react';
-import AddContentModal from './AddContentModal';
-import { useRouter } from 'next/navigation';
 import CaseStoryPage from './CaseStoryPage';
-import { hideBackButton } from '@/hooks/utils';
+import Image from 'next/image';
+import { useDispatch } from 'react-redux';
+import { setLoader } from '@/app/store/appSlice';
 
 export default function Page() {
-	const [open, setOpen] = useState(false);
-	const router = useRouter();
 	const [stories, setStories] = useState([]);
-	const [pass, setPass] = useState('');
-	const [openPass, setOpenPass] = useState(false);
 
+	const dispatch = useDispatch();
 	const getStory = async () => {
+		dispatch(setLoader(true));
 		try {
 			const res = await fetch('/api/subcategory/hospitals?name=content');
 
@@ -29,80 +25,32 @@ export default function Page() {
 		} catch (error) {
 			console.error(error);
 			return [];
+		} finally {
+			dispatch(setLoader(false));
 		}
 	};
 
 	useEffect(() => {
 		getStory();
 	}, []);
-	useEffect(() => {
-		if (pass === 'abdc') {
-			setOpen(true);
-		} else setOpen(false);
-	}, [pass]);
 
 	return (
 		<>
-			<div
-				className={` ${
-					hideBackButton() ? 'hidden' : ''
-				} fixed top-0  left-0 right-0 z-50 flex flex-row pb-4 pt-12 border-b-2 bg-slate-100 items-center`}>
-				<Button
-					color='primary'
-					size='lg'
-					className='ml-6 text-xl font-bold'
-					onPress={() => router.back()}>
-					← Back
-				</Button>
-			</div>
-			<div className='min-h-screen mt-20 justify-center'>
-				<div className='flex flex-row justify-center'>
-					<Button
-						color='primary'
-						size='lg'
-						variant='flat'
-						onPress={() => setOpenPass(true)}>
-						+ स्टोरी एड करें
-					</Button>
+			<header className='fixed h-10 top-0 z-20 w-full bg-black/50 backdrop-blur-md border-b border-white/40'></header>
+			<header className='fixed top-0 z-20 w-full bg-white/70 backdrop-blur-md border-b border-white/40'>
+				<div className='flex flex-col items-center pt-7'>
+					<Image
+						src='https://8dxblayock8syelc.public.blob.vercel-storage.com/healthtoplogo.png'
+						alt='Health Topics'
+						width={250}
+						height={56}
+						priority
+					/>
+					<div className='mt-3 h-[2px] w-4/5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent' />
 				</div>
-				{openPass && (
-					<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm'>
-						<Card
-							className='
-					  h-64
-					  w-96
-					  rounded-2xl
-					  shadow-2xl
-					  bg-gradient-to-br from-indigo-600 via-purple-600 to-purple-300
-					  hover:scale-[1.02] transition-transform
-					'>
-							<CardBody className='flex items-center justify-center text-white'>
-								{/* Your content here */}
-								<label className='text-2xl mb-4'>
-									संपादक महोदय, आपका स्वागत है!🌺
-								</label>
-								<div className='mx-20'>
-									<Input
-										value={pass}
-										onChange={(e) => setPass(e.target.value)}
-										classNames={{ input: 'text-lg' }}
-										placeholder='Please Enter The Code'
-									/>
-								</div>
-							</CardBody>
-							<Button
-								size='md'
-								className='w-max mx-auto mb-4'
-								color='danger'
-								onPress={() => setOpenPass(false)}>
-								बंद करें
-							</Button>
-						</Card>
-					</div>
-				)}
-
+			</header>
+			<div className='min-h-screen mt-24 justify-center'>
 				<CaseStoryPage props={stories} />
-				<AddContentModal isOpen={open} onClose={() => setOpen(false)} />
 			</div>
 		</>
 	);

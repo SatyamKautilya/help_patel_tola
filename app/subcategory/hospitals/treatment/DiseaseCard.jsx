@@ -2,7 +2,14 @@
 
 import { useState } from 'react';
 import { Card, CardBody } from '@heroui/react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import {
+	ChevronDown,
+	ChevronUp,
+	AlertCircle,
+	CheckCircle2,
+	XCircle,
+	Stethoscope,
+} from 'lucide-react';
 
 export default function DiseaseCard({ disease }) {
 	const [open, setOpen] = useState(false);
@@ -15,25 +22,21 @@ export default function DiseaseCard({ disease }) {
 				: disease.symptoms,
 	};
 
-	function Section({ title, items, color, titleClass }) {
-		const colorMap = {
-			red: 'bg-red-300',
-			blue: 'bg-blue-300',
-			green: 'bg-green-300',
-			orange: 'bg-orange-300',
-		};
-
+	function Section({ title, items, icon: Icon, bg, text }) {
 		return (
-			<div className='mx-6'>
-				<h3 className={`text-lg font-bold 	 mb-3 ${titleClass}`}>{title}</h3>
+			<div className={`rounded-xl p-4 ${bg}`}>
+				<h3 className='flex items-center gap-2 mb-3 text-lg font-bold ${text}'>
+					<Icon className={text} size={20} />
+					<span className={text}>{title}</span>
+				</h3>
 
 				<ul className='space-y-2'>
 					{items.map((item, index) => (
-						<li key={index} className='flex gap-3 items-start'>
-							<span
-								className={`mt-2 w-2 h-2 rounded-full ${colorMap[color]}`}
-							/>
-							<span className='text-white font-bold'>{item}</span>
+						<li
+							key={index}
+							className='flex gap-3 items-start text-gray-800 text-sm leading-relaxed'>
+							<span className='mt-2 w-2 h-2 rounded-full bg-gray-400' />
+							<span>{item}</span>
 						</li>
 					))}
 				</ul>
@@ -42,30 +45,41 @@ export default function DiseaseCard({ disease }) {
 	}
 
 	return (
-		<Card className='max-w-3xl mx-6 mb-4 rounded-2xl shadow-xl bg-gradient-to-br from-indigo-600 via-purple-600 to-purple-300'>
-			<CardBody className='p-6 space-y-4'>
+		<Card className='max-w-3xl mx-4 mb-4 rounded-2xl border border-gray-200 bg-white shadow-sm'>
+			<CardBody className='p-4'>
 				{/* Header */}
-				<div
-					className='flex justify-between items-center cursor-pointer'
-					onClick={() => setOpen(!open)}>
-					<h2 className='text-2xl font-bold text-white'>{disease.name}</h2>
+				<button
+					onClick={() => setOpen(!open)}
+					className='w-full flex justify-between items-center text-left'>
+					<div className='flex items-center gap-3'>
+						<div className='p-2 rounded-full bg-blue-50'>
+							<Stethoscope className='text-blue-600' size={20} />
+						</div>
+						<h2 className='text-lg font-semibold text-gray-900'>
+							{disease.name}
+						</h2>
+					</div>
 
 					{open ? (
-						<ChevronUp className='text-white' />
+						<ChevronUp className='text-gray-600' />
 					) : (
-						<ChevronDown className='text-white' />
+						<ChevronDown className='text-gray-600' />
 					)}
-				</div>
+				</button>
 
 				{/* Expandable Content */}
-				{open && (
-					<div className='space-y-6 pt-4 border-t border-white/30'>
+				<div
+					className={`transition-all duration-300 ease-in-out overflow-hidden ${
+						open ? 'max-h-[2000px] mt-4' : 'max-h-0'
+					}`}>
+					<div className='space-y-4'>
 						{/* Symptoms */}
-						{normalizedDisease.symptoms && (
+						{normalizedDisease.symptoms?.length > 0 && (
 							<Section
-								titleClass='text-white text-2xl font-bold'
 								title='लक्षण'
-								color='red'
+								icon={AlertCircle}
+								bg='bg-red-50'
+								text='text-red-600'
 								items={normalizedDisease.symptoms}
 							/>
 						)}
@@ -73,9 +87,10 @@ export default function DiseaseCard({ disease }) {
 						{/* Steps */}
 						{disease.steps?.length > 0 && (
 							<Section
-								titleClass='text-white text-2xl font-bold'
 								title='उपचार के चरण'
-								color='blue'
+								icon={Stethoscope}
+								bg='bg-blue-50'
+								text='text-blue-600'
 								items={disease.steps}
 							/>
 						)}
@@ -83,9 +98,10 @@ export default function DiseaseCard({ disease }) {
 						{/* Dos */}
 						{disease.dos?.length > 0 && (
 							<Section
-								titleClass='text-green-300 text-2xl font-bold'
 								title='क्या करें'
-								color='green'
+								icon={CheckCircle2}
+								bg='bg-green-50'
+								text='text-green-600'
 								items={disease.dos}
 							/>
 						)}
@@ -93,14 +109,15 @@ export default function DiseaseCard({ disease }) {
 						{/* Don'ts */}
 						{disease.donts?.length > 0 && (
 							<Section
-								titleClass='text-red-700 text-4xl  font-bold'
 								title='क्या न करें'
-								color='orange'
+								icon={XCircle}
+								bg='bg-orange-50'
+								text='text-orange-600'
 								items={disease.donts}
 							/>
 						)}
 					</div>
-				)}
+				</div>
 			</CardBody>
 		</Card>
 	);
