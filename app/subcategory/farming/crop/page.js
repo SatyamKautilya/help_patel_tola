@@ -2,7 +2,6 @@
 
 import { setLoader } from '@/app/store/appSlice';
 import { Button, Chip } from '@heroui/react';
-import { headers } from 'next/headers';
 import Image from 'next/image';
 // import { useSearchParams } from 'next/navigation';
 import React, { useEffect } from 'react';
@@ -30,8 +29,7 @@ export default function CropsPage() {
 	// const name = searchParams.get('name');
 	// const name = 'tomato';
 
-	const pageurl = headers().get('x-url') || '';
-	const name = new URL(pageurl).searchParams.get('name');
+	const name = 'tomato';
 	const {
 		name: cropName,
 		time,
