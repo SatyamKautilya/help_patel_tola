@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect } from 'react';
 
-const Farming = () => {
+const Crops = () => {
 	const [cropDetails, setCropDetails] = React.useState({});
 	const searchParams = useSearchParams();
 	const name = searchParams.get('name');
@@ -177,4 +177,4 @@ const InfoBox = ({ label, value, danger }) => (
 	</div>
 );
 
-export default Farming;
+export default Crops;
