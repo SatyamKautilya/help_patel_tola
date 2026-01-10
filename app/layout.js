@@ -1,4 +1,5 @@
 import './globals.css';
+import GlobalLoader from './homepage/GlobalLoader';
 
 export const metadata = {
 	title: 'Life Categories App',
@@ -14,6 +15,7 @@ export default function RootLayout({ children }) {
 		<html lang='en'>
 			<body className='app-gradient border-3 h-full min-h-screen flex flex-col'>
 				<ReduxProvider>
+					<GlobalLoader />
 					<Providers>{children}</Providers>
 				</ReduxProvider>
 			</body>

@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 
 export default function GlobalLoader() {
 	const isLoading = useSelector((state) => state.appContext.loader);
-
 	if (!isLoading) return null;
 
 	return (
