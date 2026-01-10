@@ -99,35 +99,47 @@ Text:
 
 		if (name === 'suvichar') {
 			let response;
+
 			try {
 				const aiResponse = await generateChatResponse(
-					undefined,
-					`Give one short educational line in simple Hindi about
-1) a disease symptom OR
-2) a disease cause.
+					[],
+					`Generate ONE short educational line in simple Hindi.
+
+Topic:
+-  a disease symptom
 
 Rules:
 - Max 100 characters
 - Awareness focused
-- Output ONLY valid JSON in this format:
+- Use a DIFFERENT disease every time
+- Do NOT repeat diseases across calls
+- Randomly choose from common diseases
+  (common cold, heart attack, malaria, dengue, typhoid, anemia, cough, asthma, diabetes, scissors)
+
+Output rules:
+
+Format:
 {"vichar":"<text>"}
-Example:{"vichar":"लगातार बुखार, कमजोरी और पेट दर्द टाइफाइड के आम लक्षण हैं।"}
-{"vichar":"गंदा पानी या दूषित खाना खाने से टाइफाइड बीमारी होती है।"}
-1) `,
-					'5',
+
+`,
+					'gpt-5',
 				);
 
-				// Ensure JSON parsing
-				response =
-					typeof aiResponse === 'string' ? JSON.parse(aiResponse) : aiResponse;
+				// ✅ Clean & safe JSON extraction
+				const cleaned = aiResponse.trim().replace(/```json|```/g, '');
 
-				if (!response.vichar) {
-					throw new Error('Invalid AI response');
+				response = JSON.parse(cleaned);
+
+				if (!response?.vichar) {
+					throw new Error('Invalid AI response format');
 				}
 			} catch (error) {
+				console.error('Suvichar AI Error:', error);
+
+				// ✅ Guaranteed fallback (simple, relevant)
 				response = {
-					vichar: 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन',
-					meaning: 'मनुष्य का अधिकार केवल कर्म करने में है, फल में नहीं।',
+					vichar:
+						'लगातार बुखार, कमजोरी और पेट दर्द टाइफाइड के सामान्य लक्षण हैं।',
 				};
 			}
 
