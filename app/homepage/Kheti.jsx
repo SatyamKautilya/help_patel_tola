@@ -29,6 +29,9 @@ const Kheti = () => {
 			</div>
 
 			<div
+				onClick={() => {
+					router.push('/govt-schemes');
+				}}
 				style={{
 					backgroundImage:
 						'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/welfare.png)',

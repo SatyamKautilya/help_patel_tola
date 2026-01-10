@@ -1,14 +1,23 @@
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setQuote } from '../store/appSlice';
 
 const Suvichar = () => {
 	const [suvichar, setSuvichar] = useState(null);
 	const [loading, setLoading] = useState(true);
-
+	const dispatch = useDispatch();
+	const quote = useSelector((state) => state.appContext.quote);
 	useEffect(() => {
 		const controller = new AbortController();
 
 		const getVichar = async () => {
+			if (quote?.length) {
+				setSuvichar({ vichar: quote });
+				setLoading(false);
+				return;
+			}
+
 			setLoading(true);
 			try {
 				const response = await fetch('/api/query/database?name=suvichar', {
@@ -23,6 +32,7 @@ const Suvichar = () => {
 
 				if (data?.response?.vichar) {
 					setSuvichar(data.response);
+					dispatch(setQuote(data.response.vichar));
 				}
 			} catch (error) {
 				if (error.name !== 'AbortError') {

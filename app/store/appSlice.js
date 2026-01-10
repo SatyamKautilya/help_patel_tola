@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
 	appContext: {},
+	quote: '',
 };
 
 const appContextSlice = createSlice({
@@ -14,9 +15,12 @@ const appContextSlice = createSlice({
 				...action.payload,
 			};
 		},
+		setQuote(state, action) {
+			state.quote = action.payload;
+		},
 	},
 });
 
-export const { setAppContext } = appContextSlice.actions;
+export const { setAppContext, setQuote } = appContextSlice.actions;
 
 export default appContextSlice.reducer;
