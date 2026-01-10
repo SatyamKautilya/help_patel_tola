@@ -30,7 +30,7 @@ export default function AgriculturePage() {
 	console.log(filteredCrops, 'filteredCrops');
 
 	const handleClick = (cropId) => {
-		router.push(`/subcategory/farming/crop/${cropId}`);
+		router.push(`/subcategory/farming/crop?name=${cropId}`);
 	};
 	return (
 		<div className='min-h-screen bg-[#f5f7fa]  py-6'>
