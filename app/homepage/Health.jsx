@@ -21,7 +21,7 @@ const Health = () => {
 				backgroundBlendMode: 'color-burn',
 			}}>
 			<div className='flex flex-col justify-end'>
-				<span className='pr-10 pl-4 py-2 text-white text-lg font-semibold bg-gradient-to-r from-teal-900 to-teal-700 rounded-bl-md rounded-r-md'>
+				<span className='pr-10 pl-4 py-2 text-white text-lg font-semibold bg-gradient-to-r from-teal-900 to-teal-700/40 rounded-bl-md rounded-r-md'>
 					स्वास्थ्य
 				</span>
 			</div>

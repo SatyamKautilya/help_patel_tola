@@ -5,6 +5,7 @@ import Titleandtexts from '@/lib/models/Titleandtexts';
 import { generateChatResponse } from '@/lib/openai';
 import GovtSchemes from '@/lib/models/GovtSchemes';
 import Feedback from '@/lib/models/Feedback';
+import Users from '@/lib/models/Users';
 // Helper function to get path segments
 function getPathSegments(request) {
 	const url = new URL(request.url);
@@ -21,6 +22,19 @@ export async function GET(request) {
 		// GET /api/subcategory/farming - Get farming subcategory details
 
 		const name = searchParams.get('name');
+		const check = searchParams.get('check');
+
+		if (check === 'isPatelTolaMember') {
+			const assetId = searchParams.get('assetId');
+
+			const user = await Users.findOne({ id: assetId });
+			if (user && user.userGroups.includes('PatelTola')) {
+				return NextResponse.json({ isPatelTolaMember: true });
+			} else {
+				return NextResponse.json({ isPatelTolaMember: false });
+			}
+		}
+
 		if (name === 'getgovtschemes') {
 			const govtSchemes = await GovtSchemes.find().sort({ createdAt: -1 });
 			return NextResponse.json({ govtSchemes });

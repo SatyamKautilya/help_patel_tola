@@ -1,9 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { is } from 'date-fns/locale';
+import { set } from 'mongoose';
 
 const initialState = {
 	appContext: {},
 	quote: '',
 	loader: false,
+	isPatelTolaMember: false,
 };
 
 const appContextSlice = createSlice({
@@ -22,9 +25,13 @@ const appContextSlice = createSlice({
 		setLoader(state, action) {
 			state.loader = action.payload;
 		},
+		setIsPatelTolaMember(state, action) {
+			state.isPatelTolaMember = action.payload;
+		},
 	},
 });
 
-export const { setAppContext, setQuote, setLoader } = appContextSlice.actions;
+export const { setAppContext, setQuote, setLoader, setIsPatelTolaMember } =
+	appContextSlice.actions;
 
 export default appContextSlice.reducer;
