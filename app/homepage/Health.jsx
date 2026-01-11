@@ -21,17 +21,17 @@ const Health = () => {
 				backgroundBlendMode: 'color-burn',
 			}}>
 			<div className='flex flex-col justify-end'>
-				<span className='pl-4 py-2 text-white text-lg font-semibold bg-gradient-to-r from-teal-900 to-black/0 rounded-bl-md rounded-r-md'>
+				<span className='pr-10 pl-4 py-2 text-white text-lg font-semibold bg-gradient-to-r from-teal-900 to-teal-700 rounded-bl-md rounded-r-md'>
 					स्वास्थ्य
 				</span>
 			</div>
-			<div className=' h-[150px] flex flex-col justify-start items-end space-y-2 p-4'>
+			<div className=' h-[150px] w-full flex flex-col justify-start	 items-end space-y-2 '>
 				<Button
 					onPress={() => {
 						router.push('/subcategory/hospitals');
 					}}
 					size='lg'
-					className='p-1 -mr-2 -mt-4 text-white bg-green-800/60 text-lg  font-bold'
+					className='p-1  mr-2 text-white bg-green-800/60 text-lg  font-bold'
 					variant='flat'
 					endContent={
 						<ArrowRight
