@@ -9,6 +9,7 @@ const Employment = () => {
 		<section
 			className='rounded-2xl bg-[linear-gradient(to_right,#e6f0ff_0%,#bfdbfe_40%,#f7e7b4_75%,#e6c46b_100%)]
  			p-5 
+			
  			backdrop-blur-md
   			shadow-[0_10px_20px_rgba(0,0,0,0.40)]
   			hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]
