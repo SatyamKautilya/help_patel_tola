@@ -12,6 +12,7 @@ import Kheti from './homepage/Kheti';
 import Employment from './homepage/Employment';
 import ContactCard from './homepage/ContactCard';
 import About from './homepage/About';
+import PatelTola from './homepage/PatelTola';
 
 export default function HomePage() {
 	const appContext = useSelector((state) => state.appContext.appContext);
@@ -91,6 +92,7 @@ export default function HomePage() {
 					<div className='  pt-3 pb-6 space-y-6'>
 						{/* Moral / Light Section */}
 						<Suvichar />
+						<PatelTola />
 						<Health />
 						<div className='bg-gradient-to-r from-transparent via-white to-transparent'>
 							<h2 className='text-lg font-bold text-lime-700 mb-0 text-center'>

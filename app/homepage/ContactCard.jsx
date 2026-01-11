@@ -1,8 +1,15 @@
+'use client';
 import React from 'react';
+import { useRouter } from 'next/navigation';
 
 const ContactCard = () => {
+	const router = useRouter();
+
 	return (
 		<section
+			onClick={() => {
+				router.push('subcategory/contacts');
+			}}
 			className='
     relative overflow-hidden
     rounded-2xl p-5

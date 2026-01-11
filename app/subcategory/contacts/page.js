@@ -15,6 +15,7 @@ import {
 	CardBody,
 } from '@heroui/react';
 import { hideBackButton } from '@/hooks/utils';
+import Image from 'next/image';
 
 export default function App() {
 	const router = useRouter();
@@ -23,7 +24,7 @@ export default function App() {
 	const [role, setRole] = useState('');
 	const [mobile, setMobile] = useState('');
 	const { isOpen, onOpen, onOpenChange } = useDisclosure();
-	const [access, setAccess] = useState(undefined);
+	const [access, setAccess] = useState('');
 
 	useEffect(() => {
 		initializeApp();
@@ -39,10 +40,6 @@ export default function App() {
 		} catch (error) {
 			console.error('Failed to initialize app:', error);
 		}
-	};
-
-	const handleBack = () => {
-		router.back();
 	};
 
 	const handleSaveContact = async (onClose) => {
@@ -65,93 +62,112 @@ export default function App() {
 	};
 
 	return (
-		<>
-			<div
-				className={`${
-					hideBackButton() ? 'hidden' : ''
-				} flex flex-row py-4 border-b-2 pb-4 bg-slate-100 items-center`}>
-				<button
-					className='mx-4 px-4 py-2 text-white font-bold text-xl border bg-blue-600 rounded-lg'
-					onClick={handleBack}>
-					← Back
-				</button>
-				
-			</div>
-			{numbers.map((contact) => (
-				<Card key={contact.id} className='max-w-md mx-4 mt-4  bg-blue-200 mb-4'>
-					<CardBody className='flex flex-row items-center gap-4'>
-						<div className='flex-shrink-0 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xl font-semibold'>
-							{contact.name.charAt(0)}
-						</div>
-						<div className='flex-1'>
-							<p className='text-base font-semibold text-black'>
-								{contact.name}
-							</p>
-							<p className='text-sm text-black text-lg'>{contact.role}</p>
-							<p className='text-sm text-gray-700 mt-1'>
-								📞{' '}
+		<div className='min-h-screen bg-gradient-to-b from-[#eef4ff] to-[#f8fafc]'>
+			{/* Header */}
+			<header className='fixed h-10 top-0 z-20 w-full bg-black/50 backdrop-blur-md border-b border-white/40'></header>
+			<header className='fixed top-0 z-20 w-full bg-white/70 backdrop-blur-md border-b border-white/40'>
+				<div className='flex flex-col items-center pt-7'>
+					<Image
+						src='https://8dxblayock8syelc.public.blob.vercel-storage.com/farming/tamoharagr.png'
+						alt='Health Topics'
+						width={200}
+						height={46}
+						priority
+					/>
+					<div className='mt-3 h-[2px] w-4/5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent' />
+				</div>
+			</header>
+			{/* Contact List */}
+			<div className='pt-24'>
+				<div className='px-4 py-4 space-y-4'>
+					{numbers.map((contact) => (
+						<Card
+							key={contact.id}
+							className='rounded-2xl shadow-md border border-blue-100'>
+							<CardBody className='flex flex-row items-center gap-4 p-4'>
+								{/* Avatar */}
+								<div className='flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-xl font-bold text-white shadow'>
+									{contact.name?.charAt(0)}
+								</div>
+
+								{/* Info */}
+								<div className='flex-1'>
+									<p className='text-base font-semibold text-gray-800'>
+										{contact.name}
+									</p>
+									<p className='text-sm text-gray-600'>{contact.role}</p>
+									<a
+										href={`tel:${contact.mobile}`}
+										className='mt-1 inline-flex items-center gap-2 text-blue-600 font-medium'>
+										📞 {contact.mobile}
+									</a>
+								</div>
+
+								{/* Call Button */}
 								<a
 									href={`tel:${contact.mobile}`}
-									className='font-medium text-blue-600'>
-									{contact.mobile}
+									className='rounded-full bg-green-500 px-4 py-2 text-white text-sm font-semibold shadow active:scale-95'>
+									Call
 								</a>
-							</p>
-						</div>
-					</CardBody>
-				</Card>
-			))}
-			<div className='flex justify-center mt-6'>
-				{access !== 'access' ? (
-					<Input
-						label='password'
-						value={access}
-						classNames={{
-							input: 'text-white placeholder:text-white/60',
-							inputWrapper: 'bg-transparent border-white/30',
-						}}
-						onValueChange={(e) => {
-							setAccess(e);
-						}}
-					/>
-				) : (
-					<Button
-						color='primary'
-						className='text-white font-bold'
-						size='lg'
-						onPress={onOpen}>
-						+ Add New Contact
-					</Button>
-				)}
-			</div>
+							</CardBody>
+						</Card>
+					))}
+				</div>
 
-			<Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-				<ModalContent>
-					{(onClose) => (
-						<>
-							<ModalHeader>Add New Contact</ModalHeader>
-							<ModalBody>
-								<Input label='Name' value={name} onValueChange={setName} />
-								<Input label='Role' value={role} onValueChange={setRole} />
-								<Input
-									label='Mobile'
-									value={mobile}
-									onValueChange={setMobile}
-								/>
-							</ModalBody>
-							<ModalFooter>
-								<Button color='danger' variant='light' onPress={onClose}>
-									Cancel
-								</Button>
-								<Button
-									color='primary'
-									onPress={() => handleSaveContact(onClose)}>
-									Save
-								</Button>
-							</ModalFooter>
-						</>
+				{/* Access / FAB */}
+				<div className='fixed bottom-6 right-6'>
+					{access !== 'access' ? (
+						<Input
+							label='Admin Password'
+							value={access}
+							onValueChange={setAccess}
+							classNames={{
+								base: 'max-w-[220px]',
+								inputWrapper: 'bg-white shadow-lg border border-gray-200',
+							}}
+						/>
+					) : (
+						<Button
+							color='primary'
+							className='rounded-full px-6 py-4 text-white font-bold shadow-xl'
+							onPress={onOpen}>
+							+ Add Contact
+						</Button>
 					)}
-				</ModalContent>
-			</Modal>
-		</>
+				</div>
+
+				{/* Modal */}
+				<Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+					<ModalContent>
+						{(onClose) => (
+							<>
+								<ModalHeader className='text-lg font-bold'>
+									Add New Contact
+								</ModalHeader>
+								<ModalBody className='space-y-3'>
+									<Input label='Name' value={name} onValueChange={setName} />
+									<Input label='Role' value={role} onValueChange={setRole} />
+									<Input
+										label='Mobile'
+										value={mobile}
+										onValueChange={setMobile}
+									/>
+								</ModalBody>
+								<ModalFooter>
+									<Button variant='light' onPress={onClose}>
+										Cancel
+									</Button>
+									<Button
+										color='primary'
+										onPress={() => handleSaveContact(onClose)}>
+										Save
+									</Button>
+								</ModalFooter>
+							</>
+						)}
+					</ModalContent>
+				</Modal>
+			</div>
+		</div>
 	);
 }
