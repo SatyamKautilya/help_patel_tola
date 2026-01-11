@@ -16,6 +16,8 @@ import {
 } from '@heroui/react';
 import { hideBackButton } from '@/hooks/utils';
 import Image from 'next/image';
+import { useDispatch } from 'react-redux';
+import { setLoader } from '@/app/store/appSlice';
 
 export default function App() {
 	const router = useRouter();
@@ -25,12 +27,14 @@ export default function App() {
 	const [mobile, setMobile] = useState('');
 	const { isOpen, onOpen, onOpenChange } = useDisclosure();
 	const [access, setAccess] = useState('');
+	const dispatch = useDispatch();
 
 	useEffect(() => {
 		initializeApp();
 	}, []);
 
 	const initializeApp = async () => {
+		dispatch(setLoader(true));
 		try {
 			const response = await fetch('/api/subcategory/contacts');
 			if (response.ok) {
@@ -39,6 +43,8 @@ export default function App() {
 			}
 		} catch (error) {
 			console.error('Failed to initialize app:', error);
+		} finally {
+			dispatch(setLoader(false));
 		}
 	};
 
