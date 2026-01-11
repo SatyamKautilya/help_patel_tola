@@ -1,3 +1,4 @@
+import { ArrowRight } from 'lucide-react';
 import React from 'react';
 
 const PatelTola = () => {
@@ -28,7 +29,8 @@ const PatelTola = () => {
 				</div>
 
 				{/* Arrow */}
-				<div className='text-gray-400 text-xl'>›</div>
+				<ArrowRight className='bg-green-600/70  text-white rounded-full shadow-lg' />
+				{/* <div className='text-gray-400 text-xl'>›</div> */}
 			</div>
 
 			{/* Footer Stats */}

@@ -36,7 +36,7 @@ const Health = () => {
 					endContent={
 						<ArrowRight
 							className='
-							w-6 h-6
+							w-6 h-6 bg-gray-500/40 text-white rounded-full shadow-lg
 							transition-transform duration-300
 							group-hover:translate-x-1
 							'
