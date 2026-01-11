@@ -17,7 +17,7 @@ const Health = () => {
 			style={{
 				backgroundImage:
 					'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/healthbg.png)',
-				backgroundBlendMode: 'darken',
+				backgroundBlendMode: 'color-burn',
 			}}>
 			<div className='flex flex-col justify-end'>
 				<span className='pr-24 pl-4 py-2 text-white text-lg font-semibold bg-gradient-to-r from-teal-900 to-black/0 rounded-bl-md rounded-r-md'>
