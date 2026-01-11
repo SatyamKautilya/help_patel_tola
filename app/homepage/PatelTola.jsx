@@ -1,6 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { setIsPatelTolaMember } from '../store/appSlice';
 
 const PatelTola = () => {
 	const appContext = useSelector((state) => state.appContext.appContext);
@@ -9,15 +10,13 @@ const PatelTola = () => {
 	);
 	const dispatch = useDispatch();
 
-	const setIsPatelTolaMember = (status) => {
-		dispatch(setIsPatelTolaMember(status));
-	};
+	console.log('PatelTola - isPatelTolaMember:', isPatelTolaMember);
 	useEffect(() => {
 		if (appContext?.appInstanceId == undefined) {
 			return;
 		}
 
-		if (isPatelTolaMember !== false) {
+		if (isPatelTolaMember === true) {
 			return;
 		}
 		try {
@@ -27,15 +26,15 @@ const PatelTola = () => {
 					`/api/query/database?check=isPatelTolaMember&assetId=${appInstanceId}`,
 				);
 				const data = await response.json();
-				setIsPatelTolaMember(data.isPatelTolaMember);
+
+				dispatch(setIsPatelTolaMember(data.isPatelTolaMember));
 			};
 
 			fetchMembershipStatus();
 		} catch (error) {
 			console.error('Error fetching membership status:', error);
-			setIsPatelTolaMember(false);
 		}
-	}, [appContext?.appInstanceId]);
+	}, []);
 
 	if (!isPatelTolaMember) {
 		return null;

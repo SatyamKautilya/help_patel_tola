@@ -27,8 +27,12 @@ export async function GET(request) {
 		if (check === 'isPatelTolaMember') {
 			const assetId = searchParams.get('assetId');
 
-			const user = await Users.findOne({ id: assetId });
-			if (user && user.userGroups.includes('PatelTola')) {
+			const userDetails = await Users.findOne({ id: assetId }).lean();
+
+			const belongsToPatelTola =
+				Array.isArray(userDetails?.userGroups) &&
+				userDetails.userGroups.includes('PatelTola');
+			if (userDetails && belongsToPatelTola) {
 				return NextResponse.json({ isPatelTolaMember: true });
 			} else {
 				return NextResponse.json({ isPatelTolaMember: false });
