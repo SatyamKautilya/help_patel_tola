@@ -13,21 +13,16 @@ const PatelTola = () => {
 		dispatch(setIsPatelTolaMember(status));
 	};
 	useEffect(() => {
+		if (appContext?.appInstanceId == undefined) {
+			return;
+		}
+
 		if (isPatelTolaMember !== false) {
 			return;
 		}
 		try {
 			const appInstanceId = appContext?.appInstanceId;
 			const fetchMembershipStatus = async () => {
-				if (appContext?.appInstanceId == undefined) {
-					setIsPatelTolaMember(false);
-					return;
-				}
-
-				if (!appInstanceId) {
-					setIsPatelTolaMember(false);
-					return;
-				}
 				const response = await fetch(
 					`/api/query/database?check=isPatelTolaMember&assetId=${appInstanceId}`,
 				);
@@ -40,7 +35,7 @@ const PatelTola = () => {
 			console.error('Error fetching membership status:', error);
 			setIsPatelTolaMember(false);
 		}
-	}, []);
+	}, [appContext?.appInstanceId]);
 
 	if (!isPatelTolaMember) {
 		return null;
