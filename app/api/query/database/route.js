@@ -65,24 +65,25 @@ export async function POST(request) {
 			// AI fallback
 			if (specialityIds.length === 0) {
 				const specialityPrompt = `
-Identify medical speciality IDs from the text. 
-Return ONLY an object {msg:your one liner suggestion in hindi,specialityId: JSON array from this list:
-MG, SG, MC, MO, SN, SB, SE, SM, ER, MP, ST, IN }
+					Identify medical speciality IDs from the text. 
+					Return ONLY an object {msg:your one liner suggestion in hindi,specialityId: JSON array from this list:
+					MG, SG, MC, MO, SN, SB, SE, SM, ER, MP, ST, IN }
 
-Text:
-"${message}"
-`;
+					Text:
+					"${message}"
+					`;
 
 				const aiResponse = await generateChatResponse(
 					undefined,
 					`
-Identify medical speciality IDs from the text. 
-Return ONLY an object {msg:your one liner suggestion in the same language user used, specialityId: JSON array from this list:
-MG, SG, MC, MO, SN, SB, SE, SM, ER, MP, ST, IN }
-don't provide empty string
-Text:
-"${message}"
-`,
+					Identify medical speciality IDs from the text. 
+					Return ONLY an object {msg:your one liner suggestion in the same language user used, specialityId: JSON array from this list:
+					MG, SG, MC, MO, SN, SB, SE, SM, ER, MP, ST, IN }
+					don't provide empty string
+					Text:
+					"${message}"
+					`,
+					'',
 				);
 
 				try {
@@ -92,55 +93,6 @@ Text:
 				} catch {
 					response = { msg: 'none', specialityId: [] };
 				}
-			}
-
-			return NextResponse.json({ response });
-		}
-
-		if (name === 'suvichar') {
-			let response;
-
-			try {
-				const aiResponse = await generateChatResponse(
-					[],
-					`Generate ONE short educational line in simple Hindi.
-
-Topic:
--  a disease symptom
-
-Rules:
-- Max 100 characters
-- Awareness focused
-- Use a DIFFERENT disease every time
-- Do NOT repeat diseases across calls
-- Randomly choose from common diseases
-  (common cold, heart attack, malaria, dengue, typhoid, anemia, cough, asthma, diabetes, scissors)
-
-Output rules:
-
-Format:
-{"vichar":"<text>"}
-
-`,
-					'gpt-5',
-				);
-
-				// ✅ Clean & safe JSON extraction
-				const cleaned = aiResponse.trim().replace(/```json|```/g, '');
-
-				response = JSON.parse(cleaned);
-
-				if (!response?.vichar) {
-					throw new Error('Invalid AI response format');
-				}
-			} catch (error) {
-				console.error('Suvichar AI Error:', error);
-
-				// ✅ Guaranteed fallback (simple, relevant)
-				response = {
-					vichar:
-						'लगातार बुखार, कमजोरी और पेट दर्द टाइफाइड के सामान्य लक्षण हैं।',
-				};
 			}
 
 			return NextResponse.json({ response });

@@ -169,6 +169,7 @@ export default function App() {
 								border border-slate-200
 								shadow-xl
 								rounded-3xl
+								mb-4 
 								'>
 							{!boatResp?.msg ? (
 								<div className='p-4 flex gap-3 items-center'>

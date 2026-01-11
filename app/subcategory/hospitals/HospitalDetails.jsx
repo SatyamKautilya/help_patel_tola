@@ -39,13 +39,13 @@ const HospitalDetails = ({ hospitals }) => {
 	return (
 		<>
 			{hospitals.map((hospital) => (
-				<div key={hospital.id} className='px-2 py-3'>
+				<div key={hospital.id} className=' py-3'>
 					<Card
 						className='
-              p-6 rounded-3xl
-              bg-white/80
-              shadow-md hover:shadow-xl
-              transition-all
+							p-6 rounded-3xl
+							bg-white/80
+							shadow-md hover:shadow-xl
+							transition-all
             '>
 						{/* 🔹 Header */}
 						<div className='flex flex-col gap-2'>
@@ -87,7 +87,7 @@ const HospitalDetails = ({ hospitals }) => {
 								}}>
 								<AccordionItem
 									key={`experience-${hospital.id}`}
-									title='⬇ मरीजों के अनुभव देखें'>
+									title=' ⬇ मरीजों के अनुभव देखें'>
 									<ul className='space-y-3'>
 										{hospital.experiences.map((exp) => (
 											<li
@@ -154,10 +154,10 @@ const HospitalDetails = ({ hospitals }) => {
 
 										<Button
 											className='
-                        w-full h-12
-                        bg-gradient-to-r from-emerald-500 to-teal-500
-                        text-white font-semibold
-                        shadow-lg shadow-emerald-500/30
+													w-full h-12
+													bg-gradient-to-r from-emerald-500 to-teal-500
+													text-white font-semibold
+													shadow-lg shadow-emerald-500/30
                       '
 											onPress={() => handleSubmit(hospital.id)}>
 											अनुभव सबमिट करें
