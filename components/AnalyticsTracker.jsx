@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 
-const GA_ID = process.env.NEXT_PUBLIC_GA_ID;
+const GA_ID = 'G-D91NZNMNBB';
 
 export default function AnalyticsTracker() {
 	const pathname = usePathname();
