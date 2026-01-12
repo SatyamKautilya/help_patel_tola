@@ -1,6 +1,6 @@
+import Device from '@/lib/models/Device';
+import { connectToDatabase } from '@/lib/mongodb';
 import { NextResponse } from 'next/server';
-import dbConnect from '@/lib/dbConnect';
-import Device from '@/models/Device';
 
 export async function POST(req) {
 	try {
@@ -30,7 +30,7 @@ export async function POST(req) {
 		/* --------------------------------------------------
        3. Connect DB
     -------------------------------------------------- */
-		await dbConnect();
+		await await connectToDatabase();
 
 		/* --------------------------------------------------
        4. Upsert Device (Idempotent)
