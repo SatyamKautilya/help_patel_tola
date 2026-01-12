@@ -1,3 +1,4 @@
+import AnalyticsTracker from '@/components/AnalyticsTracker';
 import './globals.css';
 import GlobalLoader from './homepage/GlobalLoader';
 
