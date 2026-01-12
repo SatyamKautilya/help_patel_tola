@@ -19,6 +19,7 @@
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"date-fns": "^4.1.0",
+		"expo-server-sdk": "^4.0.0",
 		"git-cli": "^0.11.0",
 		"lucide-react": "^0.516.0",
 		"mongoose": "^8.3.0",
