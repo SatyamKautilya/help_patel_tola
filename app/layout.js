@@ -13,9 +13,25 @@ import ReduxProvider from './store/ReduxProvider';
 export default function RootLayout({ children }) {
 	return (
 		<html lang='en'>
+			<head>
+				<script
+					async
+					src='https://www.googletagmanager.com/gtag/js?id=G-D91NZNMNBB'></script>
+				<script>
+					{`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config',  'G-D91NZNMNBB', {
+                  page_path: window.location.pathname,
+                });
+              `}
+				</script>
+			</head>
 			<body className='app-gradient border-3 h-full min-h-screen flex flex-col'>
 				<ReduxProvider>
 					<GlobalLoader />
+					<AnalyticsTracker />
 					<Providers>{children}</Providers>
 				</ReduxProvider>
 			</body>
