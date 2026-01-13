@@ -6,6 +6,7 @@ import { ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { setLoader } from '@/app/store/appSlice';
+import { motion } from 'framer-motion';
 
 const Page = () => {
 	const [topics, setTopics] = useState([]);
@@ -31,9 +32,25 @@ const Page = () => {
 		initializeApp();
 	}, []);
 
+	const containerVariants = {
+		hidden: { opacity: 0 },
+		visible: {
+			opacity: 1,
+			transition: { staggerChildren: 0.1 },
+		},
+	};
+
+	const itemVariants = {
+		hidden: { y: 20, opacity: 0 },
+		visible: {
+			y: 0,
+			opacity: 1,
+			transition: { duration: 0.4 },
+		},
+	};
+
 	return (
 		<div className='relative min-h-screen pb-10 bg-gradient-to-b from-emerald-50 via-teal-50 to-sky-100'>
-			{/* 🔹 Fixed Header */}
 			<header className='fixed h-10 top-0 z-20 w-full bg-black/50 backdrop-blur-md border-b border-white/40'></header>
 			<header className='fixed top-0 z-20 w-full bg-white/70 backdrop-blur-md border-b border-white/40'>
 				<div className='flex flex-col items-center pt-7'>
@@ -48,51 +65,52 @@ const Page = () => {
 				</div>
 			</header>
 
-			{/* 🔹 Content */}
-			<main className='pt-[110px] pb-10 px-4  max-w-7xl mx-auto'>
-				<section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+			<main className='pt-[110px] pb-10 px-4 max-w-7xl mx-auto'>
+				<motion.section
+					variants={containerVariants}
+					initial='hidden'
+					animate='visible'
+					className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
 					{topics.map((topic) => (
-						<Card
-							isPressable
-							onPress={() => {
-								router.push(topic.route);
-							}}
+						<motion.div
 							key={topic.id}
-							className='
-									group rounded-3xl 
-									bg-white/80 backdrop-blur
-									shadow-md hover:shadow-2xl
-									transition-all duration-300
-									hover:-translate-y-1
-								'>
-							<CardBody className='flex shrink-0 flex-row justify-center  p-6 text-center'>
-								{/* Owner */}
-								<div className=' flex flex-col items-center  justify-center pr-4 w-full'>
-									{topic.owner && (
-										<div className='flex justify-center w-full'>
-											<Chip
-												color='success'
-												variant='flat'
-												className='text-sm font-semibold tracking-wide'>
-												{topic.owner}
-											</Chip>
-										</div>
-									)}
-									{/* Title */}
-									<h2 className='mt-4 text-xl font-bold text-gray-800 leading-snug'>
-										{topic.topicName}
-									</h2>
-									{/* Divider */}
-								</div>
-								{/* CTA */}
-								<div className='flex flex-row w-1/6   justify-center h-full items-center '>
-									<Button
-										onPress={() => {
-											router.push(topic.route);
-										}}
-										isIconOnly
-										aria-label='View'
-										className='
+							variants={itemVariants}
+							// 🔹 This ensures the motion wrapper matches the grid cell size
+							className='flex h-full w-full'>
+							<Card
+								isPressable
+								onPress={() => router.push(topic.route)}
+								// 🔹 Added w-full and h-full to the Card
+								className='
+                                    w-full h-full
+                                    group rounded-3xl 
+                                    bg-white/80 backdrop-blur
+                                    shadow-md hover:shadow-2xl
+                                    transition-all duration-300
+                                    hover:-translate-y-1
+                                '>
+								<CardBody className='flex shrink-0 flex-row justify-center p-6 text-center h-full'>
+									<div className='flex flex-col items-center justify-center pr-4 w-full'>
+										{topic.owner && (
+											<div className='flex justify-center w-full'>
+												<Chip
+													color='success'
+													variant='flat'
+													className='text-sm font-semibold tracking-wide'>
+													{topic.owner}
+												</Chip>
+											</div>
+										)}
+										<h2 className='mt-4 text-xl font-bold text-gray-800 leading-snug'>
+											{topic.topicName}
+										</h2>
+									</div>
+									<div className='flex flex-row w-1/6 justify-center h-full items-center '>
+										<Button
+											onPress={() => router.push(topic.route)}
+											isIconOnly
+											aria-label='View'
+											className='
                                                 h-14 w-14 rounded-full
                                                 bg-gradient-to-br from-emerald-500 to-teal-500
                                                 text-white
@@ -101,20 +119,15 @@ const Page = () => {
                                                 group-hover:scale-110
                                                 group-hover:shadow-emerald-500/60
                                                 hover:rotate-0
-                                                        '>
-										<ArrowRight
-											className='
-                                                    w-6 h-6
-                                                    transition-transform duration-300
-                                                    group-hover:translate-x-1
-                                                    '
-										/>
-									</Button>
-								</div>
-							</CardBody>
-						</Card>
+                                            '>
+											<ArrowRight className='w-6 h-6 transition-transform duration-300 group-hover:translate-x-1' />
+										</Button>
+									</div>
+								</CardBody>
+							</Card>
+						</motion.div>
 					))}
-				</section>
+				</motion.section>
 			</main>
 		</div>
 	);
