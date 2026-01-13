@@ -188,9 +188,20 @@ export default function HomePage() {
 										: ''}
 								</span>
 							</div>
-							<p className='mt-4 text-[10px] uppercase tracking-[0.2em] text-white/60 font-bold'>
+							<motion.p
+								initial={{ opacity: 0, letterSpacing: '0.1em' }}
+								animate={{
+									opacity: [0.3, 0.6, 0.3], // Subtle pulsing
+									letterSpacing: ['0.2em', '0.3em', '0.2em'], // Breathing effect
+								}}
+								transition={{
+									duration: 4,
+									repeat: Infinity,
+									ease: 'easeInOut',
+								}}
+								className='mt-4 text-[10px] uppercase text-white/60 font-bold bg-gradient-to-r from-white/20 via-white to-white/20 bg-[length:200%_100%] bg-clip-text text-transparent animate-shimmer-text'>
 								Vision for Progress
-							</p>
+							</motion.p>
 						</footer>
 					</div>
 				</main>

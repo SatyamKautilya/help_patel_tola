@@ -47,7 +47,7 @@ export default function AgriculturePage() {
 				animate={{ y: 0 }}
 				transition={{ type: 'spring', stiffness: 120, duration: 0.5 }}
 				className='fixed top-0 z-20 w-full bg-white/80 backdrop-blur-md border-b border-green-200 shadow-sm'>
-				<div className='flex flex-col items-center py-4'>
+				<div className='flex flex-col items-center pt-4'>
 					<Image
 						src='https://8dxblayock8syelc.public.blob.vercel-storage.com/farming/tamoharagr.png'
 						alt='Farming Logo'

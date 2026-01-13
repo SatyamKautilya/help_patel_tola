@@ -115,7 +115,7 @@ export default function App() {
 				animate={{ y: 0 }}
 				transition={{ duration: 0.6 }}
 				className='fixed top-0 z-20 w-full bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-sm'>
-				<div className='flex flex-col items-center pt-7 pb-4'>
+				<div className='flex flex-col items-center pt-7'>
 					<motion.div
 						whileHover={{ scale: 1.05 }}
 						transition={{ duration: 0.3 }}>
