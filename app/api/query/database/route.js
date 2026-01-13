@@ -47,6 +47,10 @@ export async function GET(request) {
 			const titleandtexts = await Titleandtexts.find().sort({ createdAt: -1 });
 			return NextResponse.json({ titleandtexts });
 		}
+		if (name === 'feedback') {
+			const feedback = await Feedback.find().sort({ createdAt: -1 });
+			return NextResponse.json({ feedback });
+		}
 	} catch (error) {
 		console.error('API GET Error:', error);
 		return NextResponse.json(

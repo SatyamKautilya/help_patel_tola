@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
 	LayoutDashboard,
@@ -12,300 +12,349 @@ import {
 	Plus,
 	Search,
 	Bell,
-	ChevronRight,
+	Check,
+	X,
+	MessageSquare,
+	Sprout,
+	BookOpen,
+	Crown,
+	Menu,
 } from 'lucide-react';
-import { Card, CardBody, Button, Chip, Avatar } from '@heroui/react';
+import {
+	Card,
+	CardBody,
+	Button,
+	Chip,
+	Avatar,
+	Table,
+	TableHeader,
+	TableColumn,
+	TableBody,
+	TableRow,
+	TableCell,
+} from '@heroui/react';
+import { useSelector } from 'react-redux';
 
-export default function AdminDashboard() {
-	const [activeTab, setActiveTab] = useState('overview');
+export default function TamoharAdminPortal() {
+	const [adminUser] = useState({
+		name: 'Satyam Kautilya',
+		role: 'super_admin',
+		avatar: 'https://i.pravatar.cc/150?u=satyam',
+	});
+
+	const appContext = useSelector((state) => state.appContext.appContext);
+	const [view, setView] = useState('dashboard');
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+	const sidebarConfig = useMemo(
+		() => [
+			{
+				id: 'dashboard',
+				label: 'Home',
+				icon: LayoutDashboard,
+				roles: [
+					'super_admin',
+					'health_admin',
+					'farming_admin',
+					'community_admin',
+				],
+			},
+			{
+				id: 'sops',
+				label: 'Health',
+				icon: BookOpen,
+				roles: ['super_admin', 'health_admin'],
+			},
+			{
+				id: 'crops',
+				label: 'Farming',
+				icon: Sprout,
+				roles: ['super_admin', 'farming_admin'],
+			},
+			{
+				id: 'success-stories',
+				label: 'Stories',
+				icon: TrendingUp,
+				roles: ['super_admin', 'community_admin'],
+			},
+			{
+				id: 'requests',
+				label: 'Requests',
+				icon: Check,
+				roles: ['super_admin', 'community_admin'],
+			},
+			{
+				id: 'users',
+				label: 'Users',
+				icon: Users,
+				roles: ['super_admin', 'community_admin'],
+			},
+		],
+		[],
+	);
+
+	const filteredNav = sidebarConfig.filter(
+		(item) => item.roles && item.roles.includes(adminUser.role),
+	);
 
 	return (
-		<div className='relative min-h-screen bg-[#F8FAFC] text-slate-900 font-sans'>
-			{/* 1. VIBRANT AMBIENT BACKGROUND */}
-			<div className='fixed inset-0 z-0 overflow-hidden pointer-events-none'>
-				<div className='absolute top-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-200/40 blur-[120px] rounded-full' />
-				<div className='absolute bottom-[10%] left-[-10%] w-[30%] h-[40%] bg-emerald-200/40 blur-[120px] rounded-full' />
-				<div className='absolute top-[20%] left-[20%] w-[20%] h-[20%] bg-orange-100/30 blur-[100px] rounded-full' />
+		<div className='relative min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-indigo-100 pb-24 md:pb-0'>
+			{/* Ambient Background */}
+			<div className='fixed inset-0 z-0 pointer-events-none'>
+				<div className='absolute top-[-10%] right-[-10%] w-[60%] h-[40%] bg-blue-200/20 blur-[100px] rounded-full' />
+				<div className='absolute bottom-0 left-[-10%] w-[60%] h-[40%] bg-emerald-200/20 blur-[100px] rounded-full' />
 			</div>
 
-			<div className='relative z-10 flex h-screen'>
-				{/* --- SIDEBAR --- */}
-				<aside className='w-20 md:w-72 bg-white/70 backdrop-blur-2xl border-r border-slate-200 flex flex-col p-6'>
-					<div className='flex items-center gap-3 mb-12 px-2'>
-						<div className='bg-gradient-to-br from-indigo-600 to-blue-500 p-2.5 rounded-2xl shadow-lg shadow-indigo-200'>
-							<ShieldCheck size={24} className='text-white' />
+			{/* --- MOBILE TOP BAR --- */}
+			<header className='md:hidden sticky top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-slate-200 px-5 py-3 flex justify-between items-center'>
+				<div className='flex items-center gap-2'>
+					<div className='bg-indigo-600 p-1.5 rounded-lg text-white'>
+						<Crown size={16} />
+					</div>
+					<span className='font-black text-sm tracking-tighter'>
+						TAMOHAR HQ
+					</span>
+				</div>
+				<Avatar size='sm' src={adminUser.avatar} isBordered color='primary' />
+			</header>
+
+			<div className='relative z-10 flex h-full'>
+				{/* --- DESKTOP SIDEBAR --- */}
+				<aside className='hidden md:flex w-64 bg-white/80 backdrop-blur-2xl border-r border-slate-200 flex-col p-4 h-screen sticky top-0'>
+					<div className='flex items-center gap-3 mb-10 px-2 pt-4'>
+						<div className='bg-indigo-600 p-2 rounded-xl shadow-lg text-white'>
+							<Crown size={20} />
 						</div>
-						<div className='hidden md:block'>
-							<p className='font-black text-xl tracking-tighter leading-none'>
-								TAMOHAR
-							</p>
-							<p className='text-[10px] font-bold text-indigo-500 tracking-[0.2em] uppercase mt-1'>
-								Admin Suite
-							</p>
+						<div>
+							<span className='font-black text-sm tracking-tighter block uppercase'>
+								{appContext?.name || 'TAMOHAR HQ'}
+							</span>
+							<span className='text-[10px] font-bold text-indigo-500 uppercase tracking-widest'>
+								{adminUser.role}
+							</span>
 						</div>
 					</div>
-
-					<nav className='flex-1 space-y-2'>
-						<SidebarItem
-							icon={LayoutDashboard}
-							label='Overview'
-							active={activeTab === 'overview'}
-							onClick={() => setActiveTab('overview')}
-							color='indigo'
-						/>
-						<SidebarItem
-							icon={FileText}
-							label='Govt Schemes'
-							active={activeTab === 'schemes'}
-							onClick={() => setActiveTab('schemes')}
-							color='blue'
-						/>
-						<SidebarItem
-							icon={Users}
-							label='Community'
-							active={activeTab === 'users'}
-							onClick={() => setActiveTab('users')}
-							color='emerald'
-						/>
-						<SidebarItem
-							icon={Settings}
-							label='Settings'
-							active={activeTab === 'settings'}
-							onClick={() => setActiveTab('settings')}
-							color='slate'
-						/>
-					</nav>
-
-					<div className='mt-auto bg-slate-100/50 p-4 rounded-[2rem] border border-slate-200/50'>
-						<div className='flex items-center gap-3'>
-							<Avatar
-								size='sm'
-								src='https://i.pravatar.cc/150?u=satyam'
-								className='rounded-xl'
+					<nav className='flex-1 space-y-1'>
+						{filteredNav.map((item) => (
+							<NavItem
+								key={item.id}
+								icon={item.icon}
+								label={item.label}
+								active={view === item.id}
+								onClick={() => setView(item.id)}
 							/>
-							<div className='hidden md:block'>
-								<p className='text-xs font-black'>Satyam K.</p>
-								<p className='text-[10px] text-slate-500 font-medium'>
-									Super Admin
-								</p>
-							</div>
-						</div>
-					</div>
+						))}
+					</nav>
 				</aside>
 
-				{/* --- MAIN CONTENT --- */}
-				<main className='flex-1 overflow-y-auto p-8 md:p-12 custom-scrollbar'>
-					{/* Header Nav */}
-					<div className='flex items-center justify-between mb-12'>
-						<motion.div
-							initial={{ opacity: 0, x: -20 }}
-							animate={{ opacity: 1, x: 0 }}>
-							<h1 className='text-4xl font-black tracking-tight text-slate-900'>
-								Dashboard
-							</h1>
-							<p className='text-slate-500 font-medium mt-1'>
-								Welcome back, let's track the village progress.
-							</p>
-						</motion.div>
-
-						<div className='flex items-center gap-4'>
-							<div className='hidden md:flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-2xl shadow-sm'>
-								<Search size={18} className='text-slate-400' />
-								<input
-									className='bg-transparent border-none outline-none text-sm w-48'
-									placeholder='Search records...'
-								/>
-							</div>
-							<Button
-								isIconOnly
-								variant='flat'
-								className='bg-white border border-slate-200 rounded-2xl'>
-								<Bell size={20} />
-							</Button>
-						</div>
-					</div>
-
-					{/* Stats Bento Grid */}
-					<div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12'>
-						<StatCard
-							title='Active Families'
-							value='842'
-							trend='+4.5%'
-							icon={Users}
-							bg='bg-indigo-50'
-							text='text-indigo-600'
-						/>
-						<StatCard
-							title='Health SOPs'
-							value='12'
-							trend='Updated'
-							icon={ShieldCheck}
-							bg='bg-emerald-50'
-							text='text-emerald-600'
-						/>
-						<StatCard
-							title='Live Schemes'
-							value='34'
-							trend='+2 New'
-							icon={FileText}
-							bg='bg-blue-50'
-							text='text-blue-600'
-						/>
-						<StatCard
-							title='Inquiries'
-							value='18'
-							trend='Unread'
-							icon={Bell}
-							bg='bg-orange-50'
-							text='text-orange-600'
-						/>
-					</div>
-
-					{/* Content Section */}
-					<div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
-						{/* Main Table Card */}
-						<Card className='lg:col-span-2 border-none shadow-xl shadow-slate-200/50 rounded-[3rem] bg-white/80 backdrop-blur-md'>
-							<CardBody className='p-8'>
-								<div className='flex items-center justify-between mb-8'>
-									<h3 className='text-xl font-black'>Recent Content</h3>
-									<Button
-										size='sm'
-										variant='light'
-										className='font-bold text-indigo-600'
-										endContent={<ChevronRight size={16} />}>
-										View All
-									</Button>
-								</div>
-								<div className='space-y-4'>
-									<ListRow
-										name='Ayushman Bharat Update'
-										cat='Scheme'
-										date='2 hours ago'
-										status='active'
-									/>
-									<ListRow
-										name='New Wheat Farming SOP'
-										cat='Kheti'
-										date='5 hours ago'
-										status='active'
-									/>
-									<ListRow
-										name='Admin User Invite'
-										cat='Security'
-										date='Yesterday'
-										status='pending'
-									/>
-									<ListRow
-										name='Dengue Awareness Video'
-										cat='Health'
-										date='2 days ago'
-										status='active'
-									/>
-								</div>
-							</CardBody>
-						</Card>
-
-						{/* Action Card */}
-						<Card className='border-none bg-gradient-to-br from-indigo-600 to-blue-700 rounded-[3rem] shadow-2xl shadow-indigo-200 overflow-hidden'>
-							<CardBody className='p-10 flex flex-col justify-between text-white'>
-								<div>
-									<h3 className='text-2xl font-black leading-tight'>
-										Add New
-										<br />
-										Village Content
-									</h3>
-									<p className='text-indigo-100 text-sm mt-4 font-medium opacity-80'>
-										Upload new schemes, health protocols or farming guides to
-										the portal.
-									</p>
-								</div>
-								<Button className='bg-white text-indigo-600 font-black rounded-2xl py-6 mt-8 shadow-xl'>
-									<Plus size={20} className='mr-2' /> Create Now
-								</Button>
-							</CardBody>
-						</Card>
-					</div>
+				{/* --- MAIN WORKSPACE --- */}
+				<main className='flex-1 p-5 md:p-10'>
+					<AnimatePresence mode='wait'>
+						{view === 'dashboard' && <DashboardOverview setView={setView} />}
+						{view === 'requests' && <RequestInbox />}
+						{view === 'users' && <UserManagement />}
+						{['sops', 'crops', 'success-stories'].includes(view) && (
+							<ContentManager type={view} onBack={() => setView('dashboard')} />
+						)}
+					</AnimatePresence>
 				</main>
+			</div>
+
+			{/* --- MOBILE BOTTOM NAVIGATION --- */}
+			<nav className='md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-2xl border-t border-slate-200 px-2 py-3 z-50 flex justify-around items-center'>
+				{filteredNav.slice(0, 5).map((item) => (
+					<button
+						key={item.id}
+						onClick={() => setView(item.id)}
+						className={`flex flex-col items-center gap-1 transition-all ${
+							view === item.id ? 'text-indigo-600 scale-110' : 'text-slate-400'
+						}`}>
+						<item.icon size={20} strokeWidth={view === item.id ? 2.5 : 2} />
+						<span className='text-[10px] font-bold'>{item.label}</span>
+					</button>
+				))}
+			</nav>
+		</div>
+	);
+}
+
+/* --- MOBILE OPTIMIZED STATS --- */
+function DashboardOverview({ setView }) {
+	const appContext = useSelector((state) => state.appContext.appContext);
+	return (
+		<motion.div
+			initial={{ opacity: 0 }}
+			animate={{ opacity: 1 }}
+			className='space-y-6'>
+			<div>
+				<h1 className='text-2xl font-black'>{`Hello, ${
+					appContext?.name || 'Admin'
+				}!`}</h1>
+				<p className='text-slate-500 text-sm'>
+					Here is what's happening today.
+				</p>
+			</div>
+
+			<div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
+				<StatCard title='Users' value='1.4k' color='indigo' icon={Users} />
+				<StatCard
+					title='Requests'
+					value='07'
+					color='orange'
+					icon={Check}
+					onClick={() => setView('requests')}
+				/>
+				<StatCard
+					title='Feedback'
+					value='12'
+					color='emerald'
+					icon={MessageSquare}
+					className='col-span-2 md:col-span-1'
+				/>
+			</div>
+
+			<div className='space-y-4'>
+				<h3 className='font-black text-lg'>Latest Feedback</h3>
+				{[1, 2, 3].map((i) => (
+					<Card key={i} className='rounded-3xl border-none shadow-sm'>
+						<CardBody className='p-4 flex flex-row gap-4 items-center'>
+							<div className='bg-indigo-100 p-2 rounded-xl text-indigo-600'>
+								<MessageSquare size={18} />
+							</div>
+							<div className='flex-1'>
+								<p className='text-sm font-bold'>User_{i}42</p>
+								<p className='text-xs text-slate-500 line-clamp-1'>
+									"Helpful farming guide for the village..."
+								</p>
+							</div>
+						</CardBody>
+					</Card>
+				))}
+			</div>
+		</motion.div>
+	);
+}
+
+/* --- MOBILE OPTIMIZED REQUESTS (CARD STACK) --- */
+function RequestInbox() {
+	return (
+		<motion.div
+			initial={{ opacity: 0 }}
+			animate={{ opacity: 1 }}
+			className='space-y-6'>
+			<h2 className='text-2xl font-black'>Group Requests</h2>
+			<div className='space-y-4'>
+				{[1, 2].map((i) => (
+					<Card key={i} className='rounded-[2rem] border-none shadow-md'>
+						<CardBody className='p-5'>
+							<div className='flex justify-between items-start mb-4'>
+								<div className='flex items-center gap-3'>
+									<Avatar size='sm' />
+									<div>
+										<p className='font-bold text-sm'>Rohan Sharma</p>
+										<Chip
+											size='sm'
+											variant='flat'
+											color='warning'
+											className='text-[10px] font-black uppercase'>
+											Farming Expert
+										</Chip>
+									</div>
+								</div>
+							</div>
+							<p className='text-xs text-slate-500 italic mb-5'>
+								"I have 10 years experience in organic farming and want to
+								contribute."
+							</p>
+							<div className='flex gap-2'>
+								<Button
+									className='flex-1 rounded-xl font-bold bg-emerald-500 text-white'
+									size='sm'
+									startContent={<Check size={16} />}>
+									Approve
+								</Button>
+								<Button
+									className='flex-1 rounded-xl font-bold bg-slate-100 text-slate-600'
+									size='sm'>
+									Reject
+								</Button>
+							</div>
+						</CardBody>
+					</Card>
+				))}
+			</div>
+		</motion.div>
+	);
+}
+
+/* --- REUSABLE HELPERS --- */
+function NavItem({ icon: Icon, label, active, onClick }) {
+	return (
+		<button
+			onClick={onClick}
+			className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all ${
+				active
+					? 'bg-indigo-50 text-indigo-600 shadow-sm'
+					: 'text-slate-400 hover:bg-slate-50'
+			}`}>
+			<Icon size={20} strokeWidth={active ? 2.5 : 2} />
+			<span className='font-bold text-sm'>{label}</span>
+		</button>
+	);
+}
+
+function StatCard({ title, value, icon: Icon, color, onClick, className }) {
+	const colors = {
+		indigo: 'bg-indigo-50 text-indigo-600',
+		orange: 'bg-orange-50 text-orange-600',
+		emerald: 'bg-emerald-50 text-emerald-600',
+	};
+	return (
+		<Card
+			isPressable={!!onClick}
+			onClick={onClick}
+			className={`border-none shadow-sm rounded-3xl ${className}`}>
+			<CardBody className='p-5 flex flex-col items-center gap-2'>
+				<div className={`p-3 rounded-2xl ${colors[color]}`}>
+					<Icon size={20} />
+				</div>
+				<div className='text-center'>
+					<p className='text-[10px] font-black uppercase text-slate-400 tracking-widest'>
+						{title}
+					</p>
+					<p className='text-xl font-black'>{value}</p>
+				</div>
+			</CardBody>
+		</Card>
+	);
+}
+
+function ContentManager({ type, onBack }) {
+	return (
+		<div className='space-y-6'>
+			<Button variant='light' size='sm' onClick={onBack}>
+				← Back
+			</Button>
+			<div className='flex justify-between items-center'>
+				<h2 className='text-2xl font-black capitalize'>{type}</h2>
+				<Button isIconOnly color='primary' className='rounded-xl'>
+					<Plus />
+				</Button>
+			</div>
+			<div className='p-10 border-2 border-dashed rounded-[2rem] text-center text-slate-400 italic'>
+				Manage {type} content list here.
 			</div>
 		</div>
 	);
 }
 
-/* --- UI HELPERS --- */
-
-function SidebarItem({ icon: Icon, label, active, onClick, color }) {
-	const activeStyles = {
-		indigo: 'bg-indigo-50 text-indigo-600 shadow-sm',
-		blue: 'bg-blue-50 text-blue-600 shadow-sm',
-		emerald: 'bg-emerald-50 text-emerald-600 shadow-sm',
-		slate: 'bg-slate-100 text-slate-900 shadow-sm',
-	};
-
+function UserManagement() {
 	return (
-		<button
-			onClick={onClick}
-			className={`w-full flex items-center gap-4 p-4 rounded-[1.5rem] transition-all duration-300 ${
-				active
-					? activeStyles[color]
-					: 'text-slate-400 hover:bg-slate-50 hover:text-slate-600'
-			}`}>
-			<Icon size={22} strokeWidth={active ? 2.5 : 2} />
-			<span className='hidden md:block font-bold text-sm tracking-tight'>
-				{label}
-			</span>
-		</button>
-	);
-}
-
-function StatCard({ title, value, trend, icon: Icon, bg, text }) {
-	return (
-		<motion.div
-			whileHover={{ y: -5 }}
-			transition={{ type: 'spring', stiffness: 300 }}>
-			<Card
-				className={`border-none shadow-lg shadow-slate-100 rounded-[2.5rem] ${bg}`}>
-				<CardBody className='p-7'>
-					<div className='flex justify-between items-start mb-6'>
-						<div className={`p-3 rounded-2xl bg-white shadow-sm ${text}`}>
-							<Icon size={20} strokeWidth={2.5} />
-						</div>
-						<Chip
-							size='sm'
-							className='bg-white/50 text-[10px] font-black uppercase border-none'>
-							{trend}
-						</Chip>
-					</div>
-					<p className='text-slate-500 text-xs font-bold uppercase tracking-widest'>
-						{title}
-					</p>
-					<h3 className='text-3xl font-black mt-1 text-slate-900'>{value}</h3>
-				</CardBody>
-			</Card>
-		</motion.div>
-	);
-}
-
-function ListRow({ name, cat, date, status }) {
-	return (
-		<div className='group flex items-center justify-between p-4 rounded-3xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100'>
-			<div className='flex items-center gap-4'>
-				<div className='w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-xl shadow-sm'>
-					{cat === 'Scheme' ? '📑' : cat === 'Kheti' ? '🌾' : '🛡️'}
-				</div>
-				<div>
-					<p className='font-bold text-slate-900'>{name}</p>
-					<p className='text-xs text-slate-400 font-medium'>
-						{cat} • {date}
-					</p>
-				</div>
+		<div className='space-y-6'>
+			<h2 className='text-2xl font-black'>Users</h2>
+			<div className='p-10 border-2 border-dashed rounded-[2rem] text-center text-slate-400 italic'>
+				Table converted to stackable cards for mobile.
 			</div>
-			<Chip
-				size='sm'
-				variant='dot'
-				color={status === 'active' ? 'success' : 'warning'}
-				className='border-none font-bold capitalize'>
-				{status}
-			</Chip>
 		</div>
 	);
 }

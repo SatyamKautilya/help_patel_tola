@@ -15,10 +15,13 @@ import ContactCard from './homepage/ContactCard';
 import About from './homepage/About';
 import PatelTola from './homepage/PatelTola';
 import FeedbackSection from './about/FeedbackSection';
+import { Button } from '@heroui/react';
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
 	const appContext = useSelector((state) => state.appContext.appContext);
 	const dispatch = useDispatch();
+	const router = useRouter();
 	const [user, setUser] = useState(null);
 
 	useEffect(() => {
@@ -94,6 +97,7 @@ export default function HomePage() {
 				<main className='flex-1 overflow-y-auto px-4 pb-20 scroll-smooth custom-scrollbar'>
 					<div className='max-w-md mx-auto pt-6 space-y-8'>
 						{/* Moral / Light Section */}
+
 						<motion.div
 							variants={sectionVariant}
 							initial='hidden'
@@ -101,7 +105,24 @@ export default function HomePage() {
 							viewport={{ once: true }}>
 							<Suvichar />
 						</motion.div>
-
+						{true && (
+							<motion.div
+								initial={{ opacity: 0, y: 20, scale: 0.95 }}
+								animate={{ opacity: 1, y: 0, scale: 1 }}
+								transition={{
+									duration: 0.5,
+									ease: 'easeOut',
+									delay: 0.2, // Delay to make it appear after Suvichar
+								}}
+								whileInView='visible'
+								viewport={{ once: true }}>
+								<Button
+									onClick={() => router.push('/admin')} // Assuming 'router' is defined or imported
+									className='w-full rounded-2xl bg-purple-600 text-white font-bold py-3 shadow-lg hover:bg-purple-700 transition-colors duration-300'>
+									Admin Login
+								</Button>
+							</motion.div>
+						)}
 						<motion.div
 							variants={sectionVariant}
 							initial='hidden'
