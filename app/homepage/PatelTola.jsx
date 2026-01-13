@@ -1,16 +1,18 @@
+'use client';
 import { ArrowRight } from 'lucide-react';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsPatelTolaMember } from '../store/appSlice';
+import { useRouter } from 'next/navigation';
 
 const PatelTola = () => {
 	const appContext = useSelector((state) => state.appContext.appContext);
+	const router = useRouter();
 	const isPatelTolaMember = useSelector(
 		(state) => state.appContext.isPatelTolaMember,
 	);
 	const dispatch = useDispatch();
 
-	console.log('PatelTola - isPatelTolaMember:', isPatelTolaMember);
 	useEffect(() => {
 		if (appContext?.appInstanceId == undefined) {
 			return;
@@ -36,14 +38,14 @@ const PatelTola = () => {
 		}
 	}, []);
 
-	if (!isPatelTolaMember) {
-		return null;
-	}
+	// if (!isPatelTolaMember) {
+	// 	return null;
+	// }
 
 	return (
 		<div
 			onClick={() => {
-				// router.push('/village/patel-tola')
+				router.push('village/village-details');
 			}}
 			className='relative  rounded-3xl bg-gradient-to-br from-white/70  to-white/50  p-5 shadow-lg active:scale-95 transition'>
 			{/* Header Strip */}
