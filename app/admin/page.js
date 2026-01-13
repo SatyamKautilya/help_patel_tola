@@ -50,7 +50,7 @@ export default function TamoharAdminPortal() {
 		() => [
 			{
 				id: 'dashboard',
-				label: 'Home',
+				label: 'होम',
 				icon: LayoutDashboard,
 				roles: [
 					'super_admin',
@@ -61,19 +61,19 @@ export default function TamoharAdminPortal() {
 			},
 			{
 				id: 'sops',
-				label: 'Health',
+				label: 'स्वास्थ्य',
 				icon: BookOpen,
 				roles: ['super_admin', 'health_admin'],
 			},
 			{
 				id: 'crops',
-				label: 'Farming',
+				label: 'खेती',
 				icon: Sprout,
 				roles: ['super_admin', 'farming_admin'],
 			},
 			{
 				id: 'success-stories',
-				label: 'Stories',
+				label: 'कहानियाँ',
 				icon: TrendingUp,
 				roles: ['super_admin', 'community_admin'],
 			},
@@ -85,7 +85,7 @@ export default function TamoharAdminPortal() {
 			},
 			{
 				id: 'users',
-				label: 'Users',
+				label: 'उपयोगकर्ता',
 				icon: Users,
 				roles: ['super_admin', 'community_admin'],
 			},
@@ -183,38 +183,48 @@ function DashboardOverview({ setView }) {
 	const appContext = useSelector((state) => state.appContext.appContext);
 	return (
 		<motion.div
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1 }}
+			initial={{ opacity: 0, y: 20 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.5 }}
 			className='space-y-6'>
-			<div>
-				<h1 className='text-2xl font-black'>{`Hello, ${
-					appContext?.name || 'Admin'
+			<motion.div
+				initial={{ opacity: 0, x: -20 }}
+				animate={{ opacity: 1, x: 0 }}
+				transition={{ delay: 0.2, duration: 0.5 }}>
+				<h1 className='text-2xl font-black'>{`नमस्ते, ${
+					appContext?.name || 'एडमिन'
 				}!`}</h1>
-				<p className='text-slate-500 text-sm'>
-					Here is what's happening today.
-				</p>
-			</div>
+				<p className='text-slate-500 text-sm'>आज क्या हो रहा है, यहाँ देखें।</p>
+			</motion.div>
 
-			<div className='grid grid-cols-2 md:grid-cols-3 gap-4'>
-				<StatCard title='Users' value='1.4k' color='indigo' icon={Users} />
+			<motion.div
+				initial={{ opacity: 0, y: 20 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ delay: 0.4, duration: 0.5 }}
+				className='grid grid-cols-2 md:grid-cols-3 gap-4'>
+				<StatCard title='उपयोगकर्ता' value='1.4k' color='indigo' icon={Users} />
 				<StatCard
-					title='Requests'
+					title='अनुरोध'
 					value='07'
 					color='orange'
 					icon={Check}
 					onClick={() => setView('requests')}
 				/>
 				<StatCard
-					title='Feedback'
+					title='प्रतिक्रिया'
 					value='12'
 					color='emerald'
 					icon={MessageSquare}
 					className='col-span-2 md:col-span-1'
 				/>
-			</div>
+			</motion.div>
 
-			<div className='space-y-4'>
-				<h3 className='font-black text-lg'>Latest Feedback</h3>
+			<motion.div
+				initial={{ opacity: 0, y: 20 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ delay: 0.6, duration: 0.5 }}
+				className='space-y-4'>
+				<h3 className='font-black text-lg'>नवीनतम प्रतिक्रिया</h3>
 				{[1, 2, 3].map((i) => (
 					<Card key={i} className='rounded-3xl border-none shadow-sm'>
 						<CardBody className='p-4 flex flex-row gap-4 items-center'>
@@ -224,13 +234,13 @@ function DashboardOverview({ setView }) {
 							<div className='flex-1'>
 								<p className='text-sm font-bold'>User_{i}42</p>
 								<p className='text-xs text-slate-500 line-clamp-1'>
-									"Helpful farming guide for the village..."
+									"गाँव के लिए उपयोगी खेती मार्गदर्शिका..."
 								</p>
 							</div>
 						</CardBody>
 					</Card>
 				))}
-			</div>
+			</motion.div>
 		</motion.div>
 	);
 }
@@ -239,13 +249,25 @@ function DashboardOverview({ setView }) {
 function RequestInbox() {
 	return (
 		<motion.div
-			initial={{ opacity: 0 }}
-			animate={{ opacity: 1 }}
+			initial={{ opacity: 0, y: 20 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.5 }}
 			className='space-y-6'>
-			<h2 className='text-2xl font-black'>Group Requests</h2>
+			<motion.h2
+				initial={{ opacity: 0, x: -20 }}
+				animate={{ opacity: 1, x: 0 }}
+				transition={{ delay: 0.2, duration: 0.5 }}
+				className='text-2xl font-black'>
+				समूह अनुरोध
+			</motion.h2>
 			<div className='space-y-4'>
 				{[1, 2].map((i) => (
-					<Card key={i} className='rounded-[2rem] border-none shadow-md'>
+					<motion.Card
+						key={i}
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
+						className='rounded-[2rem] border-none shadow-md'>
 						<CardBody className='p-5'>
 							<div className='flex justify-between items-start mb-4'>
 								<div className='flex items-center gap-3'>
@@ -255,32 +277,32 @@ function RequestInbox() {
 										<Chip
 											size='sm'
 											variant='flat'
-											color='warning'
+											color='success'
 											className='text-[10px] font-black uppercase'>
-											Farming Expert
+											खेती विशेषज्ञ
 										</Chip>
 									</div>
 								</div>
 							</div>
 							<p className='text-xs text-slate-500 italic mb-5'>
-								"I have 10 years experience in organic farming and want to
-								contribute."
+								"मुझे जैविक खेती में 10 साल का अनुभव है और मैं योगदान देना चाहता
+								हूँ।"
 							</p>
 							<div className='flex gap-2'>
 								<Button
 									className='flex-1 rounded-xl font-bold bg-emerald-500 text-white'
 									size='sm'
 									startContent={<Check size={16} />}>
-									Approve
+									स्वीकृत करें
 								</Button>
 								<Button
 									className='flex-1 rounded-xl font-bold bg-slate-100 text-slate-600'
 									size='sm'>
-									Reject
+									अस्वीकृत करें
 								</Button>
 							</div>
 						</CardBody>
-					</Card>
+					</motion.Card>
 				))}
 			</div>
 		</motion.div>
@@ -331,30 +353,78 @@ function StatCard({ title, value, icon: Icon, color, onClick, className }) {
 
 function ContentManager({ type, onBack }) {
 	return (
-		<div className='space-y-6'>
-			<Button variant='light' size='sm' onClick={onBack}>
-				← Back
-			</Button>
-			<div className='flex justify-between items-center'>
-				<h2 className='text-2xl font-black capitalize'>{type}</h2>
+		<motion.div
+			initial={{ opacity: 0, y: 20 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.5 }}
+			className='space-y-6'>
+			<motion.Button
+				initial={{ opacity: 0, x: -20 }}
+				animate={{ opacity: 1, x: 0 }}
+				transition={{ delay: 0.2, duration: 0.5 }}
+				variant='light'
+				size='sm'
+				onClick={onBack}>
+				← वापस
+			</motion.Button>
+			<motion.div
+				initial={{ opacity: 0, y: 20 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ delay: 0.4, duration: 0.5 }}
+				className='flex justify-between items-center'>
+				<h2 className='text-2xl font-black capitalize'>
+					{type === 'sops'
+						? 'स्वास्थ्य'
+						: type === 'crops'
+						? 'खेती'
+						: type === 'success-stories'
+						? 'सफलता की कहानियाँ'
+						: type}
+				</h2>
 				<Button isIconOnly color='primary' className='rounded-xl'>
 					<Plus />
 				</Button>
-			</div>
-			<div className='p-10 border-2 border-dashed rounded-[2rem] text-center text-slate-400 italic'>
-				Manage {type} content list here.
-			</div>
-		</div>
+			</motion.div>
+			<motion.div
+				initial={{ opacity: 0, y: 20 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ delay: 0.6, duration: 0.5 }}
+				className='p-10 border-2 border-dashed rounded-[2rem] text-center text-slate-400 italic'>
+				यहां{' '}
+				{type === 'sops'
+					? 'स्वास्थ्य'
+					: type === 'crops'
+					? 'खेती'
+					: type === 'success-stories'
+					? 'सफलता की कहानियाँ'
+					: type}{' '}
+				सामग्री सूची प्रबंधित करें।
+			</motion.div>
+		</motion.div>
 	);
 }
 
 function UserManagement() {
 	return (
-		<div className='space-y-6'>
-			<h2 className='text-2xl font-black'>Users</h2>
-			<div className='p-10 border-2 border-dashed rounded-[2rem] text-center text-slate-400 italic'>
-				Table converted to stackable cards for mobile.
-			</div>
-		</div>
+		<motion.div
+			initial={{ opacity: 0, y: 20 }}
+			animate={{ opacity: 1, y: 0 }}
+			transition={{ duration: 0.5 }}
+			className='space-y-6'>
+			<motion.h2
+				initial={{ opacity: 0, x: -20 }}
+				animate={{ opacity: 1, x: 0 }}
+				transition={{ delay: 0.2, duration: 0.5 }}
+				className='text-2xl font-black'>
+				उपयोगकर्ता
+			</motion.h2>
+			<motion.div
+				initial={{ opacity: 0, y: 20 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ delay: 0.4, duration: 0.5 }}
+				className='p-10 border-2 border-dashed rounded-[2rem] text-center text-slate-400 italic'>
+				मोबाइल के लिए तालिका को स्टैकेबल कार्ड में परिवर्तित किया गया।
+			</motion.div>
+		</motion.div>
 	);
 }
