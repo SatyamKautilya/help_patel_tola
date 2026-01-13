@@ -52,11 +52,6 @@ export default function SchemesPage() {
 					</h1>
 
 					{/* Tabs */}
-					<div className='mt-4 flex gap-2 overflow-x-auto rounded-full bg-white p-2 shadow'>
-						<Tab active label='उपलब्ध योजनाएं' />
-						<Tab label='कृषि' />
-						<Tab label='आवास' />
-					</div>
 				</div>
 				{/* Content */}
 				<div className='px-4 py-6'>

@@ -1,6 +1,8 @@
 'use client';
 
 import { setLoader } from '@/app/store/appSlice';
+import { Button } from '@heroui/react';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -37,81 +39,99 @@ export default function AgriculturePage() {
 		router.push(`/subcategory/farming/crop?name=${cropId}`);
 	};
 	return (
-		<div className='min-h-screen bg-[#f5f7fa]  py-6'>
-			<header className='fixed h-10 top-0 z-20 w-full bg-black/50 backdrop-blur-md border-b border-white/40'></header>
-			<header className='fixed top-0 z-20 w-full bg-white/70 backdrop-blur-md border-b border-white/40'>
-				<div className='flex flex-col items-center pt-7'>
+		<div className='min-h-screen bg-gradient-to-br from-green-50 to-emerald-100'>
+			{/* Header */}
+
+			<motion.header
+				initial={{ y: -100 }}
+				animate={{ y: 0 }}
+				transition={{ type: 'spring', stiffness: 120, duration: 0.5 }}
+				className='fixed top-0 z-20 w-full bg-white/80 backdrop-blur-md border-b border-green-200 shadow-sm'>
+				<div className='flex flex-col items-center py-4'>
 					<Image
 						src='https://8dxblayock8syelc.public.blob.vercel-storage.com/farming/tamoharagr.png'
-						alt='Health Topics'
+						alt='Farming Logo'
 						width={200}
 						height={46}
 						priority
 					/>
-					<div className='mt-3 h-[2px] w-4/5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent' />
+					<motion.div
+						initial={{ width: 0 }}
+						animate={{ width: '80%' }}
+						transition={{ delay: 0.3, duration: 0.8 }}
+						className='mt-3 h-[2px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent'
+					/>
 				</div>
-			</header>
+			</motion.header>
 			{/* Search */}
-			<div className='pt-24 px-4'>
-				{' '}
-				<div className='mb-4'>
+			<div className='pt-32 px-4'>
+				<motion.div
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ delay: 0.5, duration: 0.5 }}
+					className='mb-6'>
 					<input
 						type='text'
 						placeholder='फसल खोजें (जैसे – टमाटर)'
 						value={search}
 						onChange={(e) => setSearch(e.target.value)}
-						className='w-full rounded-full border border-gray-300 bg-white px-5 py-3 text-sm outline-none focus:border-green-500'
+						className='w-full rounded-full border border-green-300 bg-white px-5 py-3 text-sm outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 shadow-md transition-all duration-300'
 					/>
-				</div>
+				</motion.div>
 				{/* Tabs */}
-				<div className='mb-6 flex items-center gap-3 overflow-x-auto rounded-full bg-white p-2 shadow-sm'>
-					{['फसल', 'सब्जी', 'बागवानी', 'फूल'].map((tab, i) => (
-						<button
-							key={i}
-							className={`flex items-center gap-1 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium ${
-								tab === 'फसल' ? 'bg-green-100 text-green-700' : 'text-gray-600'
-							}`}>
-							{tab}
-						</button>
-					))}
-				</div>
+
 				{/* Grid */}
-				<div className='grid grid-cols-2 gap-4'>
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ delay: 0.9, duration: 0.5 }}
+					className='grid grid-cols-2 gap-4 pb-20'>
 					{filteredCrops.map((crop) => (
-						<div
+						<motion.div
 							onClick={() => handleClick(crop.id)}
 							key={crop.id}
-							className='rounded-2xl bg-white p-3 shadow-md transition active:scale-95'>
+							whileHover={{
+								scale: 1.03,
+								boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+							}}
+							whileTap={{ scale: 0.98 }}
+							className='rounded-2xl bg-white p-3 shadow-lg cursor-pointer transform transition-all duration-300 ease-in-out'>
 							<div className='relative h-36 w-full overflow-hidden rounded-xl'>
 								<Image
 									src={crop.url}
 									alt={crop.name}
 									fill
-									className='object-cover'
+									className='object-cover transition-transform duration-300 hover:scale-105'
 								/>
 							</div>
 
 							<div className='mt-3 text-center'>
-								<h3 className='text-base font-bold text-gray-800'>
-									{crop.name}
-								</h3>
-								<p className='mt-1 text-xs text-gray-500'>बीज से कटाई तक</p>
+								<h3 className='text-lg font-bold text-gray-800'>{crop.name}</h3>
+								<p className='mt-1 text-sm text-gray-500'>बीज से कटाई तक</p>
 							</div>
 
 							{/* Icons */}
-							<div className='mt-3 flex justify-around text-xs text-gray-600'>
+							<div className='mt-4 flex justify-around text-sm text-green-700 font-medium'>
 								<span>💧 पानी</span>
 								<span>🧪 खाद</span>
 								<span>🐛 कीट</span>
 							</div>
-						</div>
+						</motion.div>
 					))}
-				</div>
+				</motion.div>
 				{/* AI Button */}
-				<button className='fixed bottom-11 right-5 rounded-full bg-green-600 px-5 py-3 text-sm font-semibold text-white shadow-lg'>
+				<motion.button
+					initial={{ opacity: 0, y: 50 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{
+						type: 'spring',
+						stiffness: 120,
+						delay: 1.2,
+						duration: 0.5,
+					}}
+					className='fixed bottom-8 right-5 rounded-full bg-green-600 px-6 py-3 text-base font-semibold text-white shadow-xl hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300'>
 					🤖 विशेषज्ञ से पूछें
-				</button>
-				<header className='fixed h-10 bottom-0 z-20 w-full bg-black/20 backdrop-blur-md border-b border-white/40'></header>
+				</motion.button>
 			</div>
 		</div>
 	);
