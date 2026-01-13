@@ -124,7 +124,7 @@ export default function HomePage() {
 							initial='hidden'
 							whileInView='visible'
 							viewport={{ once: true }}
-							className='relative py-4'>
+							className='relative '>
 							<div className='absolute inset-0 flex items-center'>
 								<div className='w-full border-t border-white/30'></div>
 							</div>
