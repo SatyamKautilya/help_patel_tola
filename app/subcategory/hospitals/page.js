@@ -7,8 +7,6 @@ import HospitalDetails from './HospitalDetails';
 import { filterhospitals } from '@/hooks/utils';
 import Image from 'next/image';
 import { ArrowRight, Sparkles, MapPin } from 'lucide-react';
-import { setLoader } from '@/app/store/appSlice';
-import { useDispatch } from 'react-redux';
 
 const containerVariants = {
 	hidden: { opacity: 0 },
@@ -25,12 +23,12 @@ const itemVariants = {
 
 export default function App() {
 	const [topicData, setTopicData] = useState(null);
+	const [hopitalLoading, setHospitalLoading] = useState(false);
 	const [message, setMessage] = useState('');
 	const [selectedCity, setSelectedCity] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [boatResp, setBoatResp] = useState({});
 	const [filteredHsp, setFilteredHsp] = useState({});
-	const dispatch = useDispatch();
 
 	useEffect(() => {
 		setFilteredHsp(topicData?.hospitallists);
@@ -43,7 +41,7 @@ export default function App() {
 	}, [boatResp]);
 
 	const fetchTopicDetails = async () => {
-		dispatch(setLoader(true));
+		setHospitalLoading(true);
 		try {
 			const response = await fetch(`/api/subcategory/hospitals?name=hospitals`);
 			if (response.ok) {
@@ -53,7 +51,7 @@ export default function App() {
 		} catch (error) {
 			console.error('Failed to fetch crop details:', error);
 		} finally {
-			dispatch(setLoader(false));
+			setHospitalLoading(false);
 		}
 	};
 
@@ -209,17 +207,38 @@ export default function App() {
 							</motion.div>
 
 							{/* Hospital Details */}
-							<motion.div variants={itemVariants}>
-								<HospitalDetails
-									hospitals={
-										selectedCity
-											? filteredHsp?.filter(
-													(hosp) => hosp.cityId === selectedCity,
-											  )
-											: filteredHsp
-									}
-								/>
-							</motion.div>
+							{!hopitalLoading && (
+								<motion.div variants={itemVariants} className='min-h-[500px]'>
+									<HospitalDetails
+										hospitals={
+											selectedCity
+												? filteredHsp?.filter(
+														(hosp) => hosp.cityId === selectedCity,
+												  )
+												: filteredHsp
+										} // Pass the filtered hospitals
+									/>
+								</motion.div>
+							)}
+							{hopitalLoading && ( // Only show loader if hopitalLoading is true
+								<div className='flex flex-col items-center justify-center h-full'>
+									<motion.div
+										animate={{ rotate: 360 }}
+										transition={{
+											duration: 2,
+											repeat: Infinity,
+											ease: 'linear',
+										}}>
+										<Sparkles className='w-16 h-16 text-emerald-500' />
+									</motion.div>
+									<p className='mt-4 text-lg font-semibold text-gray-700'>
+										अस्पताल ढूंढ रहे हैं...
+									</p>
+									<p className='text-sm text-gray-500 mt-1'>
+										कृपया प्रतीक्षा करें
+									</p>
+								</div>
+							)}
 						</motion.section>
 					)}
 				</AnimatePresence>
