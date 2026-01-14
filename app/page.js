@@ -18,6 +18,39 @@ import FeedbackSection from './about/FeedbackSection';
 import { Button } from '@heroui/react';
 import { useRouter } from 'next/navigation';
 
+export async function sendTestNotification() {
+	try {
+		const res = await fetch('/api/send-test-push', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-app-key': 'TAMOHAR_MOBILE_V1',
+			},
+			body: JSON.stringify({
+				title: '📢 टेस्ट नोटिफिकेशन',
+				body: 'यह बटन से भेजा गया नोटिफिकेशन है',
+				priority: 'high',
+				data: {
+					screen: 'Home',
+					type: 'TEST',
+				},
+			}),
+		});
+
+		const result = await res.json();
+
+		if (!res.ok) {
+			throw new Error(result?.error || 'Notification failed');
+		}
+
+		console.log('✅ Notification sent:', result);
+		alert(`Notification sent to ${result.sentTo} devices`);
+	} catch (err) {
+		console.error('❌ Notification error:', err);
+		alert('Failed to send notification');
+	}
+}
+
 export default function HomePage() {
 	const appContext = useSelector((state) => state.appContext.appContext);
 	const dispatch = useDispatch();
@@ -200,7 +233,9 @@ export default function HomePage() {
 
 						{/* 🏆 MODERN FOOTER */}
 						<footer className='mt-10 mb-8 flex flex-col items-center'>
-							<div className='px-5 py-2.5 rounded-2xl bg-white/60 backdrop-blur-md border border-white/80 shadow-sm text-xs text-slate-600 font-medium'>
+							<div
+								onClick={sendTestNotification}
+								className='px-5 py-2.5 rounded-2xl bg-white/60 backdrop-blur-md border border-white/80 shadow-sm text-xs text-slate-600 font-medium'>
 								Conceptualised & crafted by
 								<span className='ml-1 font-bold text-slate-900'>
 									Satyam Kautilya{' '}

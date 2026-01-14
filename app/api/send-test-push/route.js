@@ -10,18 +10,41 @@ export async function POST(req) {
 			return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 		}
 
-		const { title, body } = await req.json();
+		const {
+			title,
+			body,
+			data = {},
+			priority = 'high',
+			sound = 'default',
+		} = await req.json();
 
 		await connectToDatabase();
 
 		// 🧲 Fetch enabled devices
-		const devices = await Device.find({ enabled: true });
+		const devices = await Device.find({
+			enabled: true,
+			pushToken: { $exists: true, $ne: null },
+		});
 
 		const tokens = devices.map((d) => d.pushToken);
+
+		if (!tokens.length) {
+			return NextResponse.json({
+				success: false,
+				message: 'No active devices found',
+			});
+		}
 
 		await sendPushNotifications(tokens, {
 			title: title || '🌞 शुभ प्रभात तमोहर',
 			body: body || 'यह आपकी पहली वास्तविक notification है',
+			sound,
+			priority,
+			data: {
+				type: data.type || 'GENERAL',
+				screen: data.screen || 'Home',
+				...data,
+			},
 		});
 
 		return NextResponse.json({
@@ -29,7 +52,7 @@ export async function POST(req) {
 			sentTo: tokens.length,
 		});
 	} catch (err) {
-		console.error(err);
+		console.error('Notification error:', err);
 		return NextResponse.json({ error: 'Internal error' }, { status: 500 });
 	}
 }
