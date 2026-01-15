@@ -1,11 +1,6 @@
 'use client';
 import { Button } from '@heroui/react';
-import {
-	ArrowRight,
-	ArrowRightIcon,
-	ChevronRight,
-	ChevronRightCircle,
-} from 'lucide-react';
+import { ChevronRightCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
@@ -14,7 +9,7 @@ const Health = () => {
 	return (
 		<section
 			onClick={() => router.push('/subcategory/health')}
-			className='rounded-2xl overflow-hidden h-50 bg-[#dfeee3] flex flex-row  space-y-3 bg-cover bg-center  relative 
+			className='rounded-3xl overflow-hidden h-50 bg-[#dfeee3] flex flex-row  space-y-3 bg-cover bg-center  relative 
 		  bg-black/10 backdrop-blur-md
 			shadow-[0_10px_20px_rgba(0,0,0,0.40)]
 			hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]

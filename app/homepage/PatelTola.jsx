@@ -1,5 +1,5 @@
 'use client';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronRightCircle } from 'lucide-react';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setIsPatelTolaMember } from '../store/appSlice';
@@ -69,7 +69,7 @@ const PatelTola = () => {
 				</div>
 
 				{/* Arrow */}
-				<ArrowRight className='bg-green-600/70 text-white rounded-full shadow-lg hover:animate-bounce' />
+				<ChevronRightCircle className='bg-green-600/70 text-white rounded-full shadow-lg hover:animate-bounce' />
 			</div>
 
 			{/* Footer Stats */}

@@ -104,7 +104,7 @@ export default function HomePage() {
 				}}
 			/>
 			{/* Soft overlay to make content pop */}
-			<div className='absolute inset-0 bg-black/20 backdrop-blur-[2px]' />
+			<div className='absolute inset-0 bg-violet-700/20 backdrop-blur-[3px]' />
 
 			{/* 2. MAIN LAYOUT */}
 			<div className='relative h-full flex flex-col'>

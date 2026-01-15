@@ -52,7 +52,7 @@ const AdminDashboard = () => {
 			<motion.div
 				initial={{ opacity: 0, y: -20 }}
 				animate={{ opacity: 1, y: 0 }}
-				className='mb-8 sm:mb-12 text-center'>
+				className='mb-8 sm:mb-12 pt-4 text-center'>
 				<h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2'>
 					Admin Control Center
 				</h1>
