@@ -129,7 +129,7 @@ export default function HomePage() {
 
 				{/* 📜 SCROLLABLE CONTENT */}
 				<main className='flex-1 overflow-y-auto px-4 pb-20 scroll-smooth custom-scrollbar'>
-					<div className='max-w-md mx-auto pt-6 space-y-8'>
+					<div className='max-w-md mx-auto pt-6 space-y-5'>
 						{/* Moral / Light Section */}
 
 						<motion.div

@@ -1,6 +1,11 @@
 'use client';
 import { Button } from '@heroui/react';
-import { ArrowRight, ArrowRightIcon } from 'lucide-react';
+import {
+	ArrowRight,
+	ArrowRightIcon,
+	ChevronRight,
+	ChevronRightCircle,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
@@ -17,7 +22,7 @@ const Health = () => {
 			transition-all duration-300 ease-out'
 			style={{
 				backgroundImage:
-					'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/healthbg.png)',
+					'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/com_hosp_bg.png)',
 				backgroundBlendMode: 'color-burn',
 			}}>
 			<div className='flex flex-col justify-end'>
@@ -31,10 +36,10 @@ const Health = () => {
 						router.push('/subcategory/hospitals');
 					}}
 					size='lg'
-					className='p-1  mr-2 text-white bg-green-800/60 text-lg  font-bold'
+					className='px-1 -mt-2 pt-0 pb-0 mr-2 text-white bg-green-800/60 text-md  font-bold'
 					variant='flat'
 					endContent={
-						<ArrowRight
+						<ChevronRightCircle
 							className='
 							w-6 h-6 bg-gray-500/40 text-white rounded-full shadow-lg
 							transition-transform duration-300
