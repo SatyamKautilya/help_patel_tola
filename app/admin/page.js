@@ -28,52 +28,79 @@ const AdminDashboard = () => {
 	const userRole = 'super_admin';
 	const [activeTab, setActiveTab] = useState('status');
 
+	const [tabIndex, setTabIndex] = useState(0);
+
+	const tabs = [
+		{ key: 'status', label: 'System Status', permission: 'view_stats' },
+		{ key: 'content', label: 'Content Manager', permission: 'edit_content' },
+		{
+			key: 'notification',
+			label: 'नोटिफ़िकेशन',
+			permission: 'send_notifications',
+		},
+		{ key: 'approval', label: 'अनुरोध', permission: 'manage_approvals' },
+	].filter((tab) => hasAccess(userRole, tab.permission));
+
+	const currentTab = tabs[tabIndex];
+
+	const handlePrevTab = () => {
+		setTabIndex((prev) => Math.max(0, prev - 1));
+	};
+
+	const handleNextTab = () => {
+		setTabIndex((prev) => Math.min(tabs.length - 1, prev + 1));
+	};
+
 	return (
-		<div className='min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-white p-6 md:p-10 flex flex-col items-center'>
+		<div className='min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-white p-4 sm:p-6 md:p-10 flex flex-col items-center'>
 			{/* Header */}
 			<motion.div
 				initial={{ opacity: 0, y: -20 }}
 				animate={{ opacity: 1, y: 0 }}
-				className='mb-12 text-center'>
-				<h1 className='text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2'>
+				className='mb-8 sm:mb-12 text-center'>
+				<h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2'>
 					Admin Control Center
 				</h1>
-				<p className='text-slate-400'>Manage your platform with precision</p>
+				<p className='text-xs sm:text-sm md:text-base text-slate-400'>
+					Manage your platform with precision
+				</p>
 			</motion.div>
 
 			{/* Tab Navigation */}
 			<motion.div
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
-				className='flex gap-3 mb-10 bg-white/5 backdrop-blur-xl p-1 rounded-full w-fit border border-white/10'>
-				{hasAccess(userRole, 'view_stats') && (
+				className='hidden sm:flex flex-wrap gap-2 sm:gap-3 mb-8 sm:mb-10 bg-white/5 backdrop-blur-xl p-1 rounded-full w-fit border border-white/10 justify-center'>
+				{tabs.map((tab) => (
 					<TabBtn
-						active={activeTab === 'status'}
-						onClick={() => setActiveTab('status')}
-						label='System Status'
+						key={tab.key}
+						active={activeTab === tab.key}
+						onClick={() => setActiveTab(tab.key)}
+						label={tab.label}
 					/>
-				)}
-				{hasAccess(userRole, 'edit_content') && (
-					<TabBtn
-						active={activeTab === 'content'}
-						onClick={() => setActiveTab('content')}
-						label='Content Manager'
-					/>
-				)}
-				{hasAccess(userRole, 'send_notifications') && (
-					<TabBtn
-						active={activeTab === 'notification'}
-						onClick={() => setActiveTab('notification')}
-						label='नोटिफ़िकेशन'
-					/>
-				)}
-				{hasAccess(userRole, 'manage_approvals') && (
-					<TabBtn
-						active={activeTab === 'approval'}
-						onClick={() => setActiveTab('approval')}
-						label='अनुरोध'
-					/>
-				)}
+				))}
+			</motion.div>
+
+			{/* Mobile Tab Navigation */}
+			<motion.div
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				className='sm:hidden flex items-center gap-3 mb-8 w-full justify-center'>
+				<button
+					onClick={handlePrevTab}
+					disabled={tabIndex === 0}
+					className='p-2 rounded-lg bg-white/5 border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/10 transition-all'>
+					<ArrowRight size={20} className='rotate-180' />
+				</button>
+				<div className='bg-white/5 backdrop-blur-xl px-4 py-2 rounded-lg border border-white/10 text-center min-w-[150px]'>
+					<p className='text-sm font-semibold'>{currentTab.label}</p>
+				</div>
+				<button
+					onClick={handleNextTab}
+					disabled={tabIndex === tabs.length - 1}
+					className='p-2 rounded-lg bg-white/5 border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/10 transition-all'>
+					<ArrowRight size={20} />
+				</button>
 			</motion.div>
 
 			<motion.div
@@ -82,7 +109,7 @@ const AdminDashboard = () => {
 				animate={{ opacity: 1, y: 0 }}
 				exit={{ opacity: 0, y: -10 }}
 				transition={{ duration: 0.3 }}
-				className='w-full max-w-4xl'>
+				className='w-full max-w-4xl px-2 sm:px-0'>
 				{activeTab === 'status' && <StatusPage />}
 				{activeTab === 'content' && <ContentPage />}
 				{activeTab === 'notification' && <NotificationSender />}
