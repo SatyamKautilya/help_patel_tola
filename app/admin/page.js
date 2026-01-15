@@ -29,12 +29,12 @@ const AdminDashboard = () => {
 	const [activeTab, setActiveTab] = useState('status');
 
 	return (
-		<div className='min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-white p-6 md:p-10'>
+		<div className='min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-white p-6 md:p-10 flex flex-col items-center'>
 			{/* Header */}
 			<motion.div
 				initial={{ opacity: 0, y: -20 }}
 				animate={{ opacity: 1, y: 0 }}
-				className='mb-12'>
+				className='mb-12 text-center'>
 				<h1 className='text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2'>
 					Admin Control Center
 				</h1>
@@ -64,7 +64,7 @@ const AdminDashboard = () => {
 					<TabBtn
 						active={activeTab === 'notification'}
 						onClick={() => setActiveTab('notification')}
-						label='नोटिफ़िकेशन'
+						label='नोटिफ़िकेशन'
 					/>
 				)}
 				{hasAccess(userRole, 'manage_approvals') && (
@@ -81,10 +81,12 @@ const AdminDashboard = () => {
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
 				exit={{ opacity: 0, y: -10 }}
-				transition={{ duration: 0.3 }}>
+				transition={{ duration: 0.3 }}
+				className='w-full max-w-4xl'>
 				{activeTab === 'status' && <StatusPage />}
 				{activeTab === 'content' && <ContentPage />}
 				{activeTab === 'notification' && <NotificationSender />}
+				{activeTab === 'approval' && <RequestList />}
 			</motion.div>
 		</div>
 	);
@@ -277,30 +279,88 @@ const ContentPage = () => {
 
 const NotificationSender = () => {
 	return (
-		<motion.div
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ delay: 0.3 }}
-			className='bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-8'>
-			<h3 className='text-2xl font-bold mb-4'>Send Notification</h3>
-			<div className='space-y-4'>
-				<input
-					type='text'
-					placeholder='Notification Title'
-					className='w-full p-2 rounded border border-white/20 bg-transparent text-white focus:outline-none'
-				/>
-				<textarea
-					placeholder='Notification Message'
-					className='w-full p-2 rounded border border-white/20 bg-transparent text-white focus:outline-none'
-					rows='4'
-				/>
-				<button className='w-full p-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded transition-all duration-300 hover:shadow-lg'>
-					Send Notification
-				</button>
-			</div>
-		</motion.div>
+		<div className='flex justify-center'>
+			<motion.div
+				initial={{ opacity: 0, y: 20 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ delay: 0.3 }}
+				className='bg-gradient-to-br max-w-xl from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-8'>
+				<h3 className='text-2xl font-bold mb-4'>Send Notification</h3>
+				<div className='space-y-4'>
+					<input
+						type='text'
+						placeholder='Notification Title'
+						className='w-full p-2 rounded border border-white/20 bg-transparent text-white focus:outline-none'
+					/>
+					<textarea
+						placeholder='Notification Message'
+						className='w-full p-2 rounded border border-white/20 bg-transparent text-white focus:outline-none'
+						rows='4'
+					/>
+					<button className='w-full p-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded transition-all duration-300 hover:shadow-lg'>
+						Send Notification
+					</button>
+				</div>
+			</motion.div>
+		</div>
 	);
 };
+
+const RequestList = () => {
+	const [requests, setRequests] = useState([
+		{ id: 1, village: 'Patel Tola', name: 'Ram' },
+		{ id: 2, village: 'Kumar Nagar', name: 'Kala prasad' },
+		{ id: 3, village: 'Singh Vihar', name: 'Daku' },
+	]);
+
+	const handleApprove = (id) => {
+		setRequests(
+			requests.map((r) => (r.id === id ? { ...r, status: 'approved' } : r)),
+		);
+	};
+
+	const handleReject = (id) => {
+		setRequests(
+			requests.map((r) => (r.id === id ? { ...r, status: 'rejected' } : r)),
+		);
+	};
+
+	return (
+		<div className='flex justify-center'>
+			<motion.div
+				initial={{ opacity: 0, y: 20 }}
+				animate={{ opacity: 1, y: 0 }}
+				className='bg-gradient-to-br w-full lg:w-[70%] from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-8'>
+				<h3 className='text-2xl font-bold mb-6'>Pending Requests</h3>
+				<div className='space-y-3'>
+					{requests.map((req) => (
+						<motion.div
+							key={req.id}
+							initial={{ opacity: 0, x: -10 }}
+							animate={{ opacity: 1, x: 0 }}
+							className='p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-white/20 rounded-xl flex items-center justify-between'>
+							<span className='font-semibold text-white'>{req.village}</span>
+							<span className='font-semibold text-white'>{req.name}</span>
+							<div className='flex gap-2'>
+								<button
+									onClick={() => handleApprove(req.id)}
+									className='px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-500/30 rounded-lg text-emerald-400 text-sm font-semibold transition-all'>
+									Approve
+								</button>
+								<button
+									onClick={() => handleReject(req.id)}
+									className='px-4 py-2 bg-red-500/20 hover:bg-red-500/40 border border-red-500/30 rounded-lg text-red-400 text-sm font-semibold transition-all'>
+									Reject
+								</button>
+							</div>
+						</motion.div>
+					))}
+				</div>
+			</motion.div>
+		</div>
+	);
+};
+
 const TabBtn = ({ active, onClick, label }) => (
 	<motion.button
 		whileHover={{ scale: 1.05 }}
