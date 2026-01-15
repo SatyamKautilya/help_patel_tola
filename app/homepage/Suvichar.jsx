@@ -455,9 +455,9 @@ const Suvichar = () => {
 			<div className='relative flex flex-row'>
 				<div className='flex flex-row justify-start items-start gap-2'>
 					<Image
-						src='https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/lotusbig.png'
-						width={40}
-						height={40}
+						src='https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/pngwing.com.png'
+						width={60}
+						height={60}
 						alt='Lotus'
 						className='drop-shadow-[0_0_6px_rgba(255,255,255,0.6)]'
 					/>
