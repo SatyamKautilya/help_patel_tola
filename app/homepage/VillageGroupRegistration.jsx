@@ -20,15 +20,18 @@ export default function VillageGroupRegistration() {
 		setIsError(false);
 
 		try {
-			const response = await fetch(`query/database?name=register-for-village`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					villageCode,
-					assetId: appContext?.appInstanceId,
-					userName: appContext?.name,
-				}),
-			});
+			const response = await fetch(
+				`/api/query/database?name=register-for-village`,
+				{
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						villageCode,
+						assetId: appContext?.appInstanceId,
+						userName: appContext?.name,
+					}),
+				},
+			);
 
 			const data = await response.json();
 			setMessage(data.message || 'पंजीकरण सफल!');

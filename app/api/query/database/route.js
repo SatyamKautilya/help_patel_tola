@@ -39,7 +39,10 @@ export async function GET(request) {
 				return NextResponse.json({ isPatelTolaMember: false });
 			}
 		}
-
+		if (name === 'join-request') {
+			const joinRequests = await JoinRequest.find().sort({ createdAt: -1 });
+			return NextResponse.json({ joinRequests });
+		}
 		if (name === 'getgovtschemes') {
 			const govtSchemes = await GovtSchemes.find().sort({ createdAt: -1 });
 			return NextResponse.json({ govtSchemes });
@@ -161,7 +164,7 @@ export async function POST(request) {
 		}
 		if (name === 'register-for-village') {
 			const { villageCode, assetId, userName } = body;
-
+			console.log(body, 'body');
 			if (!villageCode) {
 				return NextResponse.json(
 					{ error: 'villageCode is required' },
@@ -170,12 +173,16 @@ export async function POST(request) {
 			}
 
 			// Add your village registration logic here
-			const register = await JoinRequest.create({
-				villageId: villageCode,
-				assetId: assetId,
-				name: userName,
-				createdAt: new Date(),
-			});
+			const existingRequest = await JoinRequest.findOne({ assetId: assetId });
+			if (!existingRequest) {
+				const register = await JoinRequest.create({
+					id: assetId,
+					assetId, // use assetId as id
+					villageId: villageCode,
+					name: userName,
+					createdAt: new Date(),
+				});
+			}
 			// For example, update user document or create a registration record
 
 			return NextResponse.json({ message: 'पंजीकरण सफल!' });
