@@ -17,6 +17,7 @@ import PatelTola from './homepage/PatelTola';
 import FeedbackSection from './about/FeedbackSection';
 import { Button } from '@heroui/react';
 import { useRouter } from 'next/navigation';
+import VillageGroupRegistration from './homepage/VillageGroupRegistration';
 
 export async function sendTestNotification() {
 	try {
@@ -220,8 +221,16 @@ export default function HomePage() {
 							viewport={{ once: true }}>
 							<About />
 						</motion.div>
+						<motion.div
+							variants={sectionVariant}
+							initial='hidden'
+							whileInView='visible'
+							viewport={{ once: true }}
+							className='mt-8 w-full max-w-md mx-auto'>
+							<VillageGroupRegistration />
+						</motion.div>
 
-						<div className='h-px mx-16 bg-gradient-to-r from-transparent via-green-400 to-transparent opacity-50' />
+						<div className='h-[3px]  bg-gradient-to-r from-transparent via-white to-transparent opacity-50' />
 
 						<motion.div
 							variants={sectionVariant}
@@ -235,7 +244,7 @@ export default function HomePage() {
 						<footer className='mt-10 mb-8 flex flex-col items-center'>
 							<div
 								onClick={sendTestNotification}
-								className='px-5 py-2.5 rounded-2xl bg-white/60 backdrop-blur-md border border-white/80 shadow-sm text-xs text-slate-600 font-medium'>
+								className='px-5 py-2.5 rounded-2xl bg-white/40 backdrop-blur-md border border-white/80 shadow-sm text-xs text-slate-600 font-medium'>
 								Conceptualised & crafted by
 								<span className='ml-1 font-bold text-slate-900'>
 									Satyam Kautilya{' '}

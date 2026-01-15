@@ -1,430 +1,291 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import {
-	LayoutDashboard,
-	ShieldCheck,
-	FileText,
 	Users,
-	Settings,
-	TrendingUp,
-	Plus,
-	Search,
-	Bell,
-	Check,
-	X,
 	MessageSquare,
-	Sprout,
-	BookOpen,
-	Crown,
-	Menu,
+	Globe,
+	Plus,
+	Layout,
+	FileText,
+	Type,
+	Image as LucideImage,
+	TrendingUp,
+	ArrowRight,
 } from 'lucide-react';
-import {
-	Card,
-	CardBody,
-	Button,
-	Chip,
-	Avatar,
-	Table,
-	TableHeader,
-	TableColumn,
-	TableBody,
-	TableRow,
-	TableCell,
-} from '@heroui/react';
-import { useSelector } from 'react-redux';
 
-export default function TamoharAdminPortal() {
-	const [adminUser] = useState({
-		name: 'Satyam Kautilya',
-		role: 'super_admin',
-		avatar: 'https://i.pravatar.cc/150?u=satyam',
-	});
+const PERMISSIONS = {
+	view_stats: ['super_admin'],
+	manage_approvals: ['super_admin', 'approver'],
+	edit_content: ['super_admin', 'content_editor'],
+	send_notifications: ['super_admin', 'notification_sender'],
+};
 
-	const appContext = useSelector((state) => state.appContext.appContext);
-	const [view, setView] = useState('dashboard');
-	const [isMenuOpen, setIsMenuOpen] = useState(false);
+const hasAccess = (role, action) => PERMISSIONS[action]?.includes(role);
 
-	const sidebarConfig = useMemo(
-		() => [
-			{
-				id: 'dashboard',
-				label: 'होम',
-				icon: LayoutDashboard,
-				roles: [
-					'super_admin',
-					'health_admin',
-					'farming_admin',
-					'community_admin',
-				],
-			},
-			{
-				id: 'sops',
-				label: 'स्वास्थ्य',
-				icon: BookOpen,
-				roles: ['super_admin', 'health_admin'],
-			},
-			{
-				id: 'crops',
-				label: 'खेती',
-				icon: Sprout,
-				roles: ['super_admin', 'farming_admin'],
-			},
-			{
-				id: 'success-stories',
-				label: 'कहानियाँ',
-				icon: TrendingUp,
-				roles: ['super_admin', 'community_admin'],
-			},
-			{
-				id: 'requests',
-				label: 'Requests',
-				icon: Check,
-				roles: ['super_admin', 'community_admin'],
-			},
-			{
-				id: 'users',
-				label: 'उपयोगकर्ता',
-				icon: Users,
-				roles: ['super_admin', 'community_admin'],
-			},
-		],
-		[],
-	);
-
-	const filteredNav = sidebarConfig.filter(
-		(item) => item.roles && item.roles.includes(adminUser.role),
-	);
+const AdminDashboard = () => {
+	const userRole = 'super_admin';
+	const [activeTab, setActiveTab] = useState('status');
 
 	return (
-		<div className='relative min-h-screen bg-[#F8FAFC] text-slate-900 font-sans selection:bg-indigo-100 pb-24 md:pb-0'>
-			{/* Ambient Background */}
-			<div className='fixed inset-0 z-0 pointer-events-none'>
-				<div className='absolute top-[-10%] right-[-10%] w-[60%] h-[40%] bg-blue-200/20 blur-[100px] rounded-full' />
-				<div className='absolute bottom-0 left-[-10%] w-[60%] h-[40%] bg-emerald-200/20 blur-[100px] rounded-full' />
-			</div>
+		<div className='min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-white p-6 md:p-10'>
+			{/* Header */}
+			<motion.div
+				initial={{ opacity: 0, y: -20 }}
+				animate={{ opacity: 1, y: 0 }}
+				className='mb-12'>
+				<h1 className='text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2'>
+					Admin Control Center
+				</h1>
+				<p className='text-slate-400'>Manage your platform with precision</p>
+			</motion.div>
 
-			{/* --- MOBILE TOP BAR --- */}
-			<header className='md:hidden sticky top-0 z-50 w-full bg-white/80 backdrop-blur-xl border-b border-slate-200 px-5 py-3 flex justify-between items-center'>
-				<div className='flex items-center gap-2'>
-					<div className='bg-indigo-600 p-1.5 rounded-lg text-white'>
-						<Crown size={16} />
-					</div>
-					<span className='font-black text-sm tracking-tighter'>
-						TAMOHAR HQ
-					</span>
-				</div>
-				<Avatar size='sm' src={adminUser.avatar} isBordered color='primary' />
-			</header>
+			{/* Tab Navigation */}
+			<motion.div
+				initial={{ opacity: 0 }}
+				animate={{ opacity: 1 }}
+				className='flex gap-3 mb-10 bg-white/5 backdrop-blur-xl p-1 rounded-full w-fit border border-white/10'>
+				{hasAccess(userRole, 'view_stats') && (
+					<TabBtn
+						active={activeTab === 'status'}
+						onClick={() => setActiveTab('status')}
+						label='System Status'
+					/>
+				)}
+				{hasAccess(userRole, 'edit_content') && (
+					<TabBtn
+						active={activeTab === 'content'}
+						onClick={() => setActiveTab('content')}
+						label='Content Manager'
+					/>
+				)}
+				{hasAccess(userRole, 'send_notifications') && (
+					<TabBtn
+						active={activeTab === 'notification'}
+						onClick={() => setActiveTab('notification')}
+						label='नोटिफ़िकेशन'
+					/>
+				)}
+				{hasAccess(userRole, 'manage_approvals') && (
+					<TabBtn
+						active={activeTab === 'approval'}
+						onClick={() => setActiveTab('approval')}
+						label='अनुरोध'
+					/>
+				)}
+			</motion.div>
 
-			<div className='relative z-10 flex h-full'>
-				{/* --- DESKTOP SIDEBAR --- */}
-				<aside className='hidden md:flex w-64 bg-white/80 backdrop-blur-2xl border-r border-slate-200 flex-col p-4 h-screen sticky top-0'>
-					<div className='flex items-center gap-3 mb-10 px-2 pt-4'>
-						<div className='bg-indigo-600 p-2 rounded-xl shadow-lg text-white'>
-							<Crown size={20} />
-						</div>
-						<div>
-							<span className='font-black text-sm tracking-tighter block uppercase'>
-								{appContext?.name || 'TAMOHAR HQ'}
-							</span>
-							<span className='text-[10px] font-bold text-indigo-500 uppercase tracking-widest'>
-								{adminUser.role}
-							</span>
-						</div>
-					</div>
-					<nav className='flex-1 space-y-1'>
-						{filteredNav.map((item) => (
-							<NavItem
-								key={item.id}
-								icon={item.icon}
-								label={item.label}
-								active={view === item.id}
-								onClick={() => setView(item.id)}
-							/>
-						))}
-					</nav>
-				</aside>
-
-				{/* --- MAIN WORKSPACE --- */}
-				<main className='flex-1 p-5 md:p-10'>
-					<AnimatePresence mode='wait'>
-						{view === 'dashboard' && <DashboardOverview setView={setView} />}
-						{view === 'requests' && <RequestInbox />}
-						{view === 'users' && <UserManagement />}
-						{['sops', 'crops', 'success-stories'].includes(view) && (
-							<ContentManager type={view} onBack={() => setView('dashboard')} />
-						)}
-					</AnimatePresence>
-				</main>
-			</div>
-
-			{/* --- MOBILE BOTTOM NAVIGATION --- */}
-			<nav className='md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-2xl border-t border-slate-200 px-2 py-3 z-50 flex justify-around items-center'>
-				{filteredNav.slice(0, 5).map((item) => (
-					<button
-						key={item.id}
-						onClick={() => setView(item.id)}
-						className={`flex flex-col items-center gap-1 transition-all ${
-							view === item.id ? 'text-indigo-600 scale-110' : 'text-slate-400'
-						}`}>
-						<item.icon size={20} strokeWidth={view === item.id ? 2.5 : 2} />
-						<span className='text-[10px] font-bold'>{item.label}</span>
-					</button>
-				))}
-			</nav>
+			<motion.div
+				key={activeTab}
+				initial={{ opacity: 0, y: 10 }}
+				animate={{ opacity: 1, y: 0 }}
+				exit={{ opacity: 0, y: -10 }}
+				transition={{ duration: 0.3 }}>
+				{activeTab === 'status' && <StatusPage />}
+				{activeTab === 'content' && <ContentPage />}
+			</motion.div>
 		</div>
 	);
-}
+};
 
-/* --- MOBILE OPTIMIZED STATS --- */
-function DashboardOverview({ setView }) {
-	const appContext = useSelector((state) => state.appContext.appContext);
+const StatusPage = () => {
+	const stats = [
+		{
+			label: 'Total Users',
+			value: '24,502',
+			icon: <Globe />,
+			gradient: 'from-blue-500 to-cyan-500',
+			trend: '+12.5%',
+		},
+		{
+			label: 'Logged In Today',
+			value: '1,840',
+			icon: <Users />,
+			gradient: 'from-emerald-500 to-teal-500',
+			trend: '+8.2%',
+		},
+		{
+			label: 'User Feedbacks',
+			value: '128',
+			icon: <MessageSquare />,
+			gradient: 'from-purple-500 to-pink-500',
+			trend: '+23.1%',
+		},
+	];
+
 	return (
-		<motion.div
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.5 }}
-			className='space-y-6'>
-			<motion.div
-				initial={{ opacity: 0, x: -20 }}
-				animate={{ opacity: 1, x: 0 }}
-				transition={{ delay: 0.2, duration: 0.5 }}>
-				<h1 className='text-2xl font-black'>{`नमस्ते, ${
-					appContext?.name || 'एडमिन'
-				}!`}</h1>
-				<p className='text-slate-500 text-sm'>आज क्या हो रहा है, यहाँ देखें।</p>
-			</motion.div>
-
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ delay: 0.4, duration: 0.5 }}
-				className='grid grid-cols-2 md:grid-cols-3 gap-4'>
-				<StatCard title='उपयोगकर्ता' value='1.4k' color='indigo' icon={Users} />
-				<StatCard
-					title='अनुरोध'
-					value='07'
-					color='orange'
-					icon={Check}
-					onClick={() => setView('requests')}
-				/>
-				<StatCard
-					title='प्रतिक्रिया'
-					value='12'
-					color='emerald'
-					icon={MessageSquare}
-					className='col-span-2 md:col-span-1'
-				/>
-			</motion.div>
-
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ delay: 0.6, duration: 0.5 }}
-				className='space-y-4'>
-				<h3 className='font-black text-lg'>नवीनतम प्रतिक्रिया</h3>
-				{[1, 2, 3].map((i) => (
-					<Card key={i} className='rounded-3xl border-none shadow-sm'>
-						<CardBody className='p-4 flex flex-row gap-4 items-center'>
-							<div className='bg-indigo-100 p-2 rounded-xl text-indigo-600'>
-								<MessageSquare size={18} />
-							</div>
-							<div className='flex-1'>
-								<p className='text-sm font-bold'>User_{i}42</p>
-								<p className='text-xs text-slate-500 line-clamp-1'>
-									"गाँव के लिए उपयोगी खेती मार्गदर्शिका..."
-								</p>
-							</div>
-						</CardBody>
-					</Card>
-				))}
-			</motion.div>
-		</motion.div>
-	);
-}
-
-/* --- MOBILE OPTIMIZED REQUESTS (CARD STACK) --- */
-function RequestInbox() {
-	return (
-		<motion.div
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.5 }}
-			className='space-y-6'>
-			<motion.h2
-				initial={{ opacity: 0, x: -20 }}
-				animate={{ opacity: 1, x: 0 }}
-				transition={{ delay: 0.2, duration: 0.5 }}
-				className='text-2xl font-black'>
-				समूह अनुरोध
-			</motion.h2>
-			<div className='space-y-4'>
-				{[1, 2].map((i) => (
-					<motion.Card
+		<div className='space-y-8'>
+			{/* Stats Grid */}
+			<div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+				{stats.map((s, i) => (
+					<motion.div
 						key={i}
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
-						className='rounded-[2rem] border-none shadow-md'>
-						<CardBody className='p-5'>
+						transition={{ delay: i * 0.1 }}
+						className='group relative overflow-hidden bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 p-6 rounded-2xl hover:border-white/40 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10'>
+						{/* Gradient Background */}
+						<div
+							className={`absolute inset-0 bg-gradient-to-br ${s.gradient} opacity-0 group-hover:opacity-5 transition-opacity`}
+						/>
+
+						<div className='relative z-10'>
 							<div className='flex justify-between items-start mb-4'>
-								<div className='flex items-center gap-3'>
-									<Avatar size='sm' />
-									<div>
-										<p className='font-bold text-sm'>Rohan Sharma</p>
-										<Chip
-											size='sm'
-											variant='flat'
-											color='success'
-											className='text-[10px] font-black uppercase'>
-											खेती विशेषज्ञ
-										</Chip>
-									</div>
+								<div
+									className={`p-3 bg-gradient-to-br ${s.gradient} rounded-xl text-white shadow-lg`}>
+									{s.icon}
+								</div>
+								<div className='flex items-center gap-1 text-emerald-400 text-sm font-semibold'>
+									<TrendingUp size={14} />
+									{s.trend}
 								</div>
 							</div>
-							<p className='text-xs text-slate-500 italic mb-5'>
-								"मुझे जैविक खेती में 10 साल का अनुभव है और मैं योगदान देना चाहता
-								हूँ।"
-							</p>
-							<div className='flex gap-2'>
-								<Button
-									className='flex-1 rounded-xl font-bold bg-emerald-500 text-white'
-									size='sm'
-									startContent={<Check size={16} />}>
-									स्वीकृत करें
-								</Button>
-								<Button
-									className='flex-1 rounded-xl font-bold bg-slate-100 text-slate-600'
-									size='sm'>
-									अस्वीकृत करें
-								</Button>
-							</div>
-						</CardBody>
-					</motion.Card>
+							<p className='text-slate-400 text-sm mb-1'>{s.label}</p>
+							<h2 className='text-4xl font-bold'>{s.value}</h2>
+						</div>
+					</motion.div>
 				))}
 			</div>
-		</motion.div>
-	);
-}
 
-/* --- REUSABLE HELPERS --- */
-function NavItem({ icon: Icon, label, active, onClick }) {
-	return (
-		<button
-			onClick={onClick}
-			className={`w-full flex items-center gap-4 p-4 rounded-2xl transition-all ${
-				active
-					? 'bg-indigo-50 text-indigo-600 shadow-sm'
-					: 'text-slate-400 hover:bg-slate-50'
-			}`}>
-			<Icon size={20} strokeWidth={active ? 2.5 : 2} />
-			<span className='font-bold text-sm'>{label}</span>
-		</button>
+			{/* Recent Feedback */}
+			<motion.div
+				initial={{ opacity: 0, y: 20 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ delay: 0.3 }}
+				className='bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-8'>
+				<div className='flex items-center gap-2 mb-6'>
+					<MessageSquare className='text-purple-400' size={24} />
+					<h3 className='text-2xl font-bold'>Recent Feedback</h3>
+				</div>
+				<div className='space-y-3'>
+					{[1, 2].map((i) => (
+						<motion.div
+							key={i}
+							initial={{ opacity: 0, x: -10 }}
+							animate={{ opacity: 1, x: 0 }}
+							transition={{ delay: 0.3 + i * 0.1 }}
+							className='p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-xl text-sm text-slate-300 hover:border-purple-500/40 transition-all group cursor-pointer'>
+							<p className='group-hover:text-white transition-colors'>
+								"The new Tamohar interface is very smooth, but I'd like more
+								dark mode options."
+							</p>
+							<p className='text-blue-400 mt-3 text-xs font-mono flex items-center gap-2'>
+								<span className='w-2 h-2 bg-blue-400 rounded-full' />
+								User_9281
+							</p>
+						</motion.div>
+					))}
+				</div>
+			</motion.div>
+		</div>
 	);
-}
+};
 
-function StatCard({ title, value, icon: Icon, color, onClick, className }) {
-	const colors = {
-		indigo: 'bg-indigo-50 text-indigo-600',
-		orange: 'bg-orange-50 text-orange-600',
-		emerald: 'bg-emerald-50 text-emerald-600',
+const ContentPage = () => {
+	const sections = [
+		{
+			id: 'hero',
+			title: 'Hero Section',
+			icon: <Layout />,
+			desc: 'Main landing page text and banners',
+			gradient: 'from-blue-500 to-cyan-500',
+		},
+		{
+			id: 'about',
+			title: 'About Us',
+			icon: <FileText />,
+			desc: 'Company mission and vision content',
+			gradient: 'from-emerald-500 to-teal-500',
+		},
+		{
+			id: 'features',
+			title: 'Features List',
+			icon: <Type />,
+			desc: 'Add or edit service offerings',
+			gradient: 'from-purple-500 to-pink-500',
+		},
+		{
+			id: 'gallery',
+			title: 'Media Gallery',
+			icon: <LucideImage />,
+			desc: 'Upload images for the showcase',
+			gradient: 'from-orange-500 to-red-500',
+		},
+	];
+
+	const handleAddContent = (id) => {
+		alert(`Opening Editor for: ${id}`);
 	};
-	return (
-		<Card
-			isPressable={!!onClick}
-			onClick={onClick}
-			className={`border-none shadow-sm rounded-3xl ${className}`}>
-			<CardBody className='p-5 flex flex-col items-center gap-2'>
-				<div className={`p-3 rounded-2xl ${colors[color]}`}>
-					<Icon size={20} />
-				</div>
-				<div className='text-center'>
-					<p className='text-[10px] font-black uppercase text-slate-400 tracking-widest'>
-						{title}
-					</p>
-					<p className='text-xl font-black'>{value}</p>
-				</div>
-			</CardBody>
-		</Card>
-	);
-}
 
-function ContentManager({ type, onBack }) {
 	return (
-		<motion.div
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.5 }}
-			className='space-y-6'>
-			<motion.Button
-				initial={{ opacity: 0, x: -20 }}
-				animate={{ opacity: 1, x: 0 }}
-				transition={{ delay: 0.2, duration: 0.5 }}
-				variant='light'
-				size='sm'
-				onClick={onBack}>
-				← वापस
-			</motion.Button>
+		<div className='space-y-8'>
 			<motion.div
-				initial={{ opacity: 0, y: 20 }}
+				initial={{ opacity: 0, y: -10 }}
 				animate={{ opacity: 1, y: 0 }}
-				transition={{ delay: 0.4, duration: 0.5 }}
-				className='flex justify-between items-center'>
-				<h2 className='text-2xl font-black capitalize'>
-					{type === 'sops'
-						? 'स्वास्थ्य'
-						: type === 'crops'
-						? 'खेती'
-						: type === 'success-stories'
-						? 'सफलता की कहानियाँ'
-						: type}
-				</h2>
-				<Button isIconOnly color='primary' className='rounded-xl'>
-					<Plus />
-				</Button>
+				className='mb-8'>
+				<h1 className='text-4xl font-bold mb-2'>Content Canvas</h1>
+				<p className='text-slate-400 text-lg'>
+					Select a section to modify Tamohar live content.
+				</p>
 			</motion.div>
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ delay: 0.6, duration: 0.5 }}
-				className='p-10 border-2 border-dashed rounded-[2rem] text-center text-slate-400 italic'>
-				यहां{' '}
-				{type === 'sops'
-					? 'स्वास्थ्य'
-					: type === 'crops'
-					? 'खेती'
-					: type === 'success-stories'
-					? 'सफलता की कहानियाँ'
-					: type}{' '}
-				सामग्री सूची प्रबंधित करें।
-			</motion.div>
-		</motion.div>
-	);
-}
 
-function UserManagement() {
-	return (
-		<motion.div
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.5 }}
-			className='space-y-6'>
-			<motion.h2
-				initial={{ opacity: 0, x: -20 }}
-				animate={{ opacity: 1, x: 0 }}
-				transition={{ delay: 0.2, duration: 0.5 }}
-				className='text-2xl font-black'>
-				उपयोगकर्ता
-			</motion.h2>
-			<motion.div
-				initial={{ opacity: 0, y: 20 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ delay: 0.4, duration: 0.5 }}
-				className='p-10 border-2 border-dashed rounded-[2rem] text-center text-slate-400 italic'>
-				मोबाइल के लिए तालिका को स्टैकेबल कार्ड में परिवर्तित किया गया।
-			</motion.div>
-		</motion.div>
+			<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+				{sections.map((section, idx) => (
+					<motion.div
+						key={section.id}
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ delay: idx * 0.1 }}
+						className='group relative overflow-hidden bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 p-6 rounded-2xl hover:border-white/40 transition-all duration-300 cursor-pointer'>
+						{/* Gradient overlay */}
+						<div
+							className={`absolute inset-0 bg-gradient-to-br ${section.gradient} opacity-0 group-hover:opacity-5 transition-opacity`}
+						/>
+
+						<div className='relative z-10 flex items-center justify-between'>
+							<div className='flex items-center gap-4'>
+								<motion.div
+									whileHover={{ scale: 1.1, rotate: 5 }}
+									className={`p-4 bg-gradient-to-br ${section.gradient} rounded-xl text-white shadow-lg`}>
+									{section.icon}
+								</motion.div>
+								<div>
+									<h4 className='font-bold text-lg group-hover:text-white transition-colors'>
+										{section.title}
+									</h4>
+									<p className='text-xs text-slate-500 group-hover:text-slate-400 transition-colors'>
+										{section.desc}
+									</p>
+								</div>
+							</div>
+							<motion.button
+								whileHover={{ scale: 1.1, rotate: 90 }}
+								whileTap={{ scale: 0.95 }}
+								onClick={() => handleAddContent(section.id)}
+								className='p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 hover:from-blue-500/40 hover:to-purple-500/40 border border-white/10 rounded-xl transition-all duration-300 text-white'>
+								<Plus size={20} />
+							</motion.button>
+						</div>
+					</motion.div>
+				))}
+			</div>
+		</div>
 	);
-}
+};
+
+const TabBtn = ({ active, onClick, label }) => (
+	<motion.button
+		whileHover={{ scale: 1.05 }}
+		whileTap={{ scale: 0.95 }}
+		onClick={onClick}
+		className={`px-6 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap ${
+			active
+				? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/30'
+				: 'text-slate-400 hover:text-white hover:bg-white/5'
+		}`}>
+		{label}
+	</motion.button>
+);
+
+export default AdminDashboard;

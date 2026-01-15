@@ -6,6 +6,7 @@ import { generateChatResponse } from '@/lib/openai';
 import GovtSchemes from '@/lib/models/GovtSchemes';
 import Feedback from '@/lib/models/Feedback';
 import Users from '@/lib/models/Users';
+import JoinRequest from '@/lib/models/JoinRequest';
 // Helper function to get path segments
 function getPathSegments(request) {
 	const url = new URL(request.url);
@@ -158,7 +159,27 @@ export async function POST(request) {
 
 			return NextResponse.json(feedback);
 		}
+		if (name === 'register-for-village') {
+			const { villageCode, assetId, userName } = body;
 
+			if (!villageCode) {
+				return NextResponse.json(
+					{ error: 'villageCode is required' },
+					{ status: 400 },
+				);
+			}
+
+			// Add your village registration logic here
+			const register = await JoinRequest.create({
+				villageId: villageCode,
+				assetId: assetId,
+				name: userName,
+				createdAt: new Date(),
+			});
+			// For example, update user document or create a registration record
+
+			return NextResponse.json({ message: 'पंजीकरण सफल!' });
+		}
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });
 	} catch (error) {
 		console.error('API POST Error:', error);
