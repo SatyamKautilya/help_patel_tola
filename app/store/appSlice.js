@@ -1,5 +1,5 @@
+import { user } from '@heroui/react';
 import { createSlice } from '@reduxjs/toolkit';
-import { is } from 'date-fns/locale';
 import { set } from 'mongoose';
 
 const initialState = {
@@ -7,6 +7,7 @@ const initialState = {
 	quote: '',
 	loader: false,
 	isPatelTolaMember: false,
+	user: null,
 };
 
 const appContextSlice = createSlice({
@@ -28,10 +29,18 @@ const appContextSlice = createSlice({
 		setIsPatelTolaMember(state, action) {
 			state.isPatelTolaMember = action.payload;
 		},
+		setUser(state, action) {
+			state.user = action.payload;
+		},
 	},
 });
 
-export const { setAppContext, setQuote, setLoader, setIsPatelTolaMember } =
-	appContextSlice.actions;
+export const {
+	setAppContext,
+	setQuote,
+	setLoader,
+	setIsPatelTolaMember,
+	setUser,
+} = appContextSlice.actions;
 
 export default appContextSlice.reducer;

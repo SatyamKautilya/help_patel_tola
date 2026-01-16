@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Your Components
-import { setAppContext } from './store/appSlice';
+import { setAppContext, setUser } from './store/appSlice';
 import Suvichar from './homepage/Suvichar';
 import Health from './homepage/Health';
 import Kheti from './homepage/Kheti';
@@ -56,31 +56,43 @@ export default function HomePage() {
 	const appContext = useSelector((state) => state.appContext.appContext);
 	const dispatch = useDispatch();
 	const router = useRouter();
-	const [user, setUser] = useState(null);
 
+	const thisUser = useSelector((state) => state.appContext.user);
+	console.log(thisUser, 'this user');
 	useEffect(() => {
-		if (typeof window !== 'undefined' && window.APP_CONTEXT) {
-			const context = window.APP_CONTEXT;
-			setUser(context);
-			dispatch(setAppContext({ ...context }));
+		if (!appContext?.name) {
+			if (typeof window !== 'undefined' && window.APP_CONTEXT) {
+				const context = window.APP_CONTEXT;
+				dispatch(setAppContext({ ...context }));
+			}
 		}
-	}, [dispatch]);
+	}, []);
 
 	useEffect(() => {
-		if (!appContext?.name) return;
-		const hasVisited = sessionStorage.getItem('user_last_seen_sent');
-		if (hasVisited) return;
-		sessionStorage.setItem('user_last_seen_sent', 'true');
-		const now = new Date().toISOString();
+		const fetchUserData = async () => {
+			if (!appContext?.name) return;
+			const hasVisited = sessionStorage.getItem('user_details_sent');
+			if (hasVisited) return;
+			sessionStorage.setItem('user_details_sent', 'true');
+			const now = new Date().toISOString();
 
-		fetch('/api/subcategory/hospitals?name=users', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				form: { ...appContext, lastSeen: now },
-			}),
-		}).catch(console.error);
-	}, [appContext]);
+			try {
+				const res = await fetch('/api/subcategory/hospitals?name=users', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						form: { ...appContext, lastSeen: now },
+					}),
+				});
+				const response = await res.json();
+				dispatch(setUser(response));
+			} catch (err) {
+				console.error(err);
+			}
+		};
+
+		fetchUserData();
+	}, [appContext, dispatch]);
 
 	// Animation variant for smooth section entry
 	const sectionVariant = {
@@ -131,7 +143,6 @@ export default function HomePage() {
 				<main className='flex-1 overflow-y-auto px-4 pb-20 scroll-smooth custom-scrollbar'>
 					<div className='max-w-md mx-auto pt-6 space-y-5'>
 						{/* Moral / Light Section */}
-
 						<motion.div
 							variants={sectionVariant}
 							initial='hidden'
@@ -139,31 +150,37 @@ export default function HomePage() {
 							viewport={{ once: true }}>
 							<Suvichar />
 						</motion.div>
-						{true && (
+						{thisUser?.isAdmin && (
 							<motion.div
 								initial={{ opacity: 0, y: 20, scale: 0.95 }}
 								animate={{ opacity: 1, y: 0, scale: 1 }}
 								transition={{
 									duration: 0.5,
 									ease: 'easeOut',
-									delay: 0.2, // Delay to make it appear after Suvichar
+									delay: 0.2,
 								}}
 								whileInView='visible'
 								viewport={{ once: true }}>
-								<Button
-									onClick={() => router.push('/admin')} // Assuming 'router' is defined or imported
-									className='w-full rounded-2xl bg-purple-600 text-white font-bold py-3 shadow-lg hover:bg-purple-700 transition-colors duration-300'>
-									Admin Login
-								</Button>
+								<motion.div
+									whileHover={{ scale: 1.02 }}
+									whileTap={{ scale: 0.98 }}
+									onClickCapture={() => router.push('/admin')}
+									className='w-full p-4 rounded-2xl bg-white/10 backdrop-blur-md text-white font-bold shadow-lg hover:shadow-xl hover:bg-white/20 transition-all duration-300 cursor-pointer border border-white/30'>
+									<div className='text-center'>
+										<p className='text-lg font-bold mb-1'>🔐 Admin Login</p>
+									</div>
+								</motion.div>
 							</motion.div>
 						)}
-						<motion.div
-							variants={sectionVariant}
-							initial='hidden'
-							whileInView='visible'
-							viewport={{ once: true }}>
-							<PatelTola />
-						</motion.div>
+						{thisUser?.userGroups?.includes('PatelTola') && (
+							<motion.div
+								variants={sectionVariant}
+								initial='hidden'
+								whileInView='visible'
+								viewport={{ once: true }}>
+								<PatelTola />
+							</motion.div>
+						)}
 
 						<motion.div
 							variants={sectionVariant}
@@ -189,7 +206,6 @@ export default function HomePage() {
 								</span>
 							</div>
 						</motion.div>
-
 						<motion.div
 							variants={sectionVariant}
 							initial='hidden'
@@ -197,7 +213,6 @@ export default function HomePage() {
 							viewport={{ once: true }}>
 							<Kheti />
 						</motion.div>
-
 						<motion.div
 							variants={sectionVariant}
 							initial='hidden'
@@ -205,7 +220,6 @@ export default function HomePage() {
 							viewport={{ once: true }}>
 							<Employment />
 						</motion.div>
-
 						<motion.div
 							variants={sectionVariant}
 							initial='hidden'
@@ -213,7 +227,6 @@ export default function HomePage() {
 							viewport={{ once: true }}>
 							<ContactCard />
 						</motion.div>
-
 						<motion.div
 							variants={sectionVariant}
 							initial='hidden'
@@ -229,9 +242,7 @@ export default function HomePage() {
 							className='mt-8 w-full max-w-md mx-auto'>
 							<VillageGroupRegistration />
 						</motion.div>
-
 						<div className='h-[3px]  bg-gradient-to-r from-transparent via-white to-transparent opacity-50' />
-
 						<motion.div
 							variants={sectionVariant}
 							initial='hidden'
@@ -239,7 +250,6 @@ export default function HomePage() {
 							viewport={{ once: true }}>
 							<FeedbackSection sender={appContext.name} />
 						</motion.div>
-
 						{/* 🏆 MODERN FOOTER */}
 						<footer className='mt-10 mb-8 flex flex-col items-center'>
 							<div

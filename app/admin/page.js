@@ -31,7 +31,7 @@ const AdminDashboard = () => {
 			label: 'नोटिफ़िकेशन',
 			permission: 'send_notifications',
 		},
-		{ key: 'approval', label: 'अनुरोध', permission: 'manage_approvals' },
+		{ key: 'approval', label: 'Requests', permission: 'manage_approvals' },
 	].filter((tab) => hasAccess(userRole, tab.permission));
 
 	const currentTab = tabs[tabIndex];

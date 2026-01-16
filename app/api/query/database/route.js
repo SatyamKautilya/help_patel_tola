@@ -40,7 +40,9 @@ export async function GET(request) {
 			}
 		}
 		if (name === 'join-request') {
-			const joinRequests = await JoinRequest.find().sort({ createdAt: -1 });
+			const joinRequests = await JoinRequest.find({ status: 'pending' }).sort({
+				createdAt: -1,
+			});
 			return NextResponse.json({ joinRequests });
 		}
 		if (name === 'getgovtschemes') {
@@ -180,12 +182,47 @@ export async function POST(request) {
 					assetId, // use assetId as id
 					villageId: villageCode,
 					name: userName,
+					status: 'pending',
 					createdAt: new Date(),
 				});
 			}
 			// For example, update user document or create a registration record
 
 			return NextResponse.json({ message: 'पंजीकरण सफल!' });
+		}
+		if (name === 'update-join-request-status') {
+			const { assetId, status } = body;
+			if (!assetId || !status) {
+				return NextResponse.json(
+					{ error: 'assetId and status are required' },
+					{ status: 400 },
+				);
+			}
+			const updatedRequest = await JoinRequest.findOneAndUpdate(
+				{ assetId: assetId },
+				{ status: status },
+				{ new: true },
+			);
+			if (status === 'approved') {
+				const updatedUser = await Users.findOneAndUpdate(
+					{ id: assetId },
+					{ $push: { userGroups: 'PatelTola' }, isTaggedToVillage: true },
+					{ new: true },
+				);
+			}
+
+			return NextResponse.json(updatedRequest);
+		}
+		if (name === 'user-by-assetId') {
+			const { assetId } = body;
+			if (!assetId) {
+				return NextResponse.json(
+					{ error: 'assetId is required' },
+					{ status: 400 },
+				);
+			}
+			const user = await Users.findOne({ id: assetId }).lean();
+			return NextResponse.json({ user });
 		}
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });
 	} catch (error) {
