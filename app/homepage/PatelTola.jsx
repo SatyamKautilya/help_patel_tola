@@ -1,46 +1,11 @@
 'use client';
-import { ArrowRight, ChevronRightCircle } from 'lucide-react';
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { setIsPatelTolaMember } from '../store/appSlice';
+import { ChevronRightCircle } from 'lucide-react';
+import React from 'react';
+
 import { useRouter } from 'next/navigation';
 
 const PatelTola = () => {
-	const appContext = useSelector((state) => state.appContext.appContext);
 	const router = useRouter();
-	const isPatelTolaMember = useSelector(
-		(state) => state.appContext.isPatelTolaMember,
-	);
-	const dispatch = useDispatch();
-
-	useEffect(() => {
-		if (appContext?.appInstanceId == undefined) {
-			return;
-		}
-
-		if (isPatelTolaMember === true) {
-			return;
-		}
-		try {
-			const appInstanceId = appContext?.appInstanceId;
-			const fetchMembershipStatus = async () => {
-				const response = await fetch(
-					`/api/query/database?check=isPatelTolaMember&assetId=${appInstanceId}`,
-				);
-				const data = await response.json();
-
-				dispatch(setIsPatelTolaMember(data.isPatelTolaMember));
-			};
-
-			fetchMembershipStatus();
-		} catch (error) {
-			console.error('Error fetching membership status:', error);
-		}
-	}, []);
-
-	// if (!isPatelTolaMember) {
-	// 	return null;
-	// }
 
 	return (
 		<div
