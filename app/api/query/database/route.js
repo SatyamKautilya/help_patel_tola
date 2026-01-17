@@ -64,10 +64,22 @@ export async function GET(request) {
 			return NextResponse.json({ totalUsers });
 		}
 		if (name === 'today-users') {
+			const today = new Date();
+			const startOfDay = new Date(
+				today.getFullYear(),
+				today.getMonth(),
+				today.getDate(),
+			);
+			const endOfDay = new Date(
+				today.getFullYear(),
+				today.getMonth(),
+				today.getDate() + 1,
+			);
+
 			const todayUser = await Users.countDocuments({
 				lastSeen: {
-					$gte: new Date(new Date().setHours(0, 0, 0, 0)),
-					$lt: new Date(new Date().setHours(23, 59, 59, 999)),
+					$gte: startOfDay,
+					$lt: endOfDay,
 				},
 			});
 			return NextResponse.json({ todayUser });
