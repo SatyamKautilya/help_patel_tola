@@ -7,6 +7,8 @@ import GovtSchemes from '@/lib/models/GovtSchemes';
 import Feedback from '@/lib/models/Feedback';
 import Users from '@/lib/models/Users';
 import JoinRequest from '@/lib/models/JoinRequest';
+import Device from '@/lib/models/Device';
+import { sendPushNotifications } from '@/lib/sendPush';
 // Helper function to get path segments
 function getPathSegments(request) {
 	const url = new URL(request.url);
@@ -209,6 +211,13 @@ export async function POST(request) {
 					{ $push: { userGroups: 'PatelTola' }, isTaggedToVillage: true },
 					{ new: true },
 				);
+				const updatedDevice = await Device.findOneAndUpdate(
+					{ assetId: assetId },
+					{ $push: { groups: 'PatelTola' } },
+					{ new: true },
+				);
+				``;
+				console.log(updatedDevice, 'updatedUser');
 			}
 
 			return NextResponse.json(updatedRequest);
@@ -224,6 +233,43 @@ export async function POST(request) {
 			const user = await Users.findOne({ id: assetId }).lean();
 			return NextResponse.json({ user });
 		}
+
+		if (name === 'send-notification') {
+			const { title, message, village } = body;
+			if (!title || !message) {
+				return NextResponse.json(
+					{ error: 'title and message are required' },
+					{ status: 400 },
+				);
+			}
+			const devices = await Device.find({
+				enabled: true,
+				groups: village,
+				pushToken: { $exists: true, $ne: null },
+			});
+
+			const tokens = devices.map((d) => d.pushToken);
+
+			if (tokens.length === 0) {
+				return NextResponse.json(
+					{ error: 'No devices found for the specified village' },
+					{ status: 404 },
+				);
+			}
+			// Send notifications
+			await sendPushNotifications(tokens, {
+				title: title,
+				body: message,
+				sound: 'default',
+				priority: 'high',
+				data: {
+					type: 'VILLAGE_NOTIFICATION',
+					screen: 'Notifications',
+				},
+			});
+			return NextResponse.json({ success: true, sentTo: tokens.length });
+		}
+
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });
 	} catch (error) {
 		console.error('API POST Error:', error);

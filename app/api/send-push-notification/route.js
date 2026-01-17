@@ -21,12 +21,6 @@ export async function POST(req) {
 		await connectToDatabase();
 
 		// 🧲 Fetch enabled devices
-		const devices = await Device.find({
-			enabled: true,
-			pushToken: { $exists: true, $ne: null },
-		});
-
-		const tokens = devices.map((d) => d.pushToken);
 
 		if (!tokens.length) {
 			return NextResponse.json({

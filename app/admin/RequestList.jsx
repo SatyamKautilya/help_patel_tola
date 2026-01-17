@@ -22,7 +22,6 @@ const RequestList = () => {
 	useEffect(() => {
 		init();
 	}, []);
-	console.table(requests?.filter((req) => req.status === 'pending'));
 
 	const handleApprove = async (id) => {
 		setRequests(requests.filter((r) => r.assetId !== id));
