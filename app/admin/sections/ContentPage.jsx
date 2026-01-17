@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import React from 'react';
 import { FileText, Type, Plus, Contact } from 'lucide-react';
-import AddContactModal from './content_editors/AddContactModal';
-import CaseStory from './content_editors/CaseStory';
-import TreatmentProcessModal from './content_editors/TreatmentProcessModal';
+import AddContactModal from '../content_editors/AddContactModal';
+import CaseStory from '../content_editors/CaseStory';
+import TreatmentProcessModal from '../content_editors/TreatmentProcessModal';
 
 const sectionModals = {
 	contact: AddContactModal,

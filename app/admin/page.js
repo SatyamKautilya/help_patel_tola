@@ -3,11 +3,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import RequestList from './RequestList';
-import NotificationSender from './NotificationSender';
-import StatusPage from './StatusPage';
-import ContentPage from './ContentPage';
 import { useSelector } from 'react-redux';
+import StatusPage from './sections/StatusPage';
+import ContentPage from './sections/ContentPage';
+import NotificationSender from './sections/NotificationSender';
+import RequestList from './sections/RequestList';
 
 const PERMISSIONS = {
 	view_stats: ['super_admin'],
@@ -89,7 +89,7 @@ const AdminDashboard = () => {
 			<motion.div
 				initial={{ opacity: 0, y: -20 }}
 				animate={{ opacity: 1, y: 0 }}
-				className='mb-4 sm:mb-12 pt-4 text-center'>
+				className='mb-12 lg:mb-2 pt-4 text-center'>
 				<h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2'>
 					Tamohar Control Center
 				</h1>
