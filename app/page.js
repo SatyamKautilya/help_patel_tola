@@ -74,7 +74,7 @@ export default function HomePage() {
 			const hasVisited = sessionStorage.getItem('user_details_sent');
 			if (hasVisited) return;
 			sessionStorage.setItem('user_details_sent', 'true');
-			const now = new Date().toISOString();
+			const now = new Date();
 
 			try {
 				const res = await fetch('/api/subcategory/hospitals?name=users', {

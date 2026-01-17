@@ -64,26 +64,45 @@ export async function GET(request) {
 			return NextResponse.json({ totalUsers });
 		}
 		if (name === 'today-users') {
-			const today = new Date();
-			const startOfDay = new Date(
-				today.getFullYear(),
-				today.getMonth(),
-				today.getDate(),
+			// IST offset in minutes
+			const IST_OFFSET = 5.5 * 60;
+
+			// Current UTC time
+			const nowUTC = new Date();
+
+			// Convert to IST
+			const nowIST = new Date(nowUTC.getTime() + IST_OFFSET * 60 * 1000);
+
+			// Start of IST day
+			const startOfISTDay = new Date(
+				nowIST.getFullYear(),
+				nowIST.getMonth(),
+				nowIST.getDate(),
 			);
-			const endOfDay = new Date(
-				today.getFullYear(),
-				today.getMonth(),
-				today.getDate() + 1,
+
+			// End of IST day
+			const endOfISTDay = new Date(
+				nowIST.getFullYear(),
+				nowIST.getMonth(),
+				nowIST.getDate() + 1,
 			);
+
+			// Convert IST boundaries back to UTC
+			const startUTC = new Date(
+				startOfISTDay.getTime() - IST_OFFSET * 60 * 1000,
+			);
+			const endUTC = new Date(endOfISTDay.getTime() - IST_OFFSET * 60 * 1000);
 
 			const todayUser = await Users.countDocuments({
 				lastSeen: {
-					$gte: startOfDay,
-					$lt: endOfDay,
+					$gte: startUTC,
+					$lt: endUTC,
 				},
 			});
+			console.log(todayUser, 'today user');
 			return NextResponse.json({ todayUser });
 		}
+
 		if (name === 'total-feedbacks') {
 			const totalFeedbacks = await Feedback.countDocuments();
 			return NextResponse.json({ totalFeedbacks });
