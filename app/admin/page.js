@@ -24,21 +24,40 @@ const hasAccess = (userGroups, action) => {
 const AdminDashboard = () => {
 	const thisUser = useSelector((state) => state.appContext.user);
 	const userGroups = thisUser?.userGroups || [];
-	const tabs = [
-		{ key: 'status', label: 'System Status', permission: 'view_stats' },
-		{ key: 'content', label: 'Content Manager', permission: 'edit_content' },
-		{
-			key: 'notification',
-			label: 'नोटिफ़िकेशन',
-			permission: 'send_notifications',
-		},
-		{ key: 'approval', label: 'Requests', permission: 'manage_approvals' },
-	].filter((tab) => hasAccess(userGroups, tab.permission));
+	const [tabs, setTabs] = useState([]);
+	const calcualteTabs = () => {
+		return [
+			{ key: 'status', label: 'System Status', permission: 'view_stats' },
+			{ key: 'content', label: 'Content Manager', permission: 'edit_content' },
+			{
+				key: 'notification',
+				label: 'नोटिफ़िकेशन',
+				permission: 'send_notifications',
+			},
+			{ key: 'approval', label: 'Requests', permission: 'manage_approvals' },
+		].filter((tab) => hasAccess(userGroups, tab.permission));
+	};
+
+	React.useEffect(() => {
+		setTabs(calcualteTabs());
+	}, [userGroups]);
 
 	const [activeTab, setActiveTab] = useState(
 		tabs.length > 0 ? tabs[0].key : 'status',
 	);
 	const [tabIndex, setTabIndex] = useState(0);
+
+	const currentTab = tabs[tabIndex];
+
+	const handlePrevTab = () => {
+		setTabIndex((prev) => Math.max(0, prev - 1));
+		setActiveTab(tabs[Math.max(0, tabIndex - 1)].key);
+	};
+
+	const handleNextTab = () => {
+		setTabIndex((prev) => Math.min(tabs.length - 1, prev + 1));
+		setActiveTab(tabs[Math.min(tabs.length - 1, tabIndex + 1)].key);
+	};
 
 	if (tabs.length === 0) {
 		return (
@@ -55,18 +74,6 @@ const AdminDashboard = () => {
 			</div>
 		);
 	}
-
-	const currentTab = tabs[tabIndex];
-
-	const handlePrevTab = () => {
-		setTabIndex((prev) => Math.max(0, prev - 1));
-		setActiveTab(tabs[Math.max(0, tabIndex - 1)].key);
-	};
-
-	const handleNextTab = () => {
-		setTabIndex((prev) => Math.min(tabs.length - 1, prev + 1));
-		setActiveTab(tabs[Math.min(tabs.length - 1, tabIndex + 1)].key);
-	};
 
 	return (
 		<div className='min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-white p-4 sm:p-6 md:p-10 flex flex-col items-center'>
