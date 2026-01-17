@@ -24,8 +24,6 @@ const hasAccess = (userGroups, action) => {
 const AdminDashboard = () => {
 	const thisUser = useSelector((state) => state.appContext.user);
 	const userGroups = thisUser?.userGroups || [];
-	const [activeTab, setActiveTab] = useState('status');
-	const [tabIndex, setTabIndex] = useState(0);
 
 	const tabs = [
 		{ key: 'status', label: 'System Status', permission: 'view_stats' },
@@ -37,6 +35,11 @@ const AdminDashboard = () => {
 		},
 		{ key: 'approval', label: 'Requests', permission: 'manage_approvals' },
 	].filter((tab) => hasAccess(userGroups, tab.permission));
+
+	const [activeTab, setActiveTab] = useState(
+		tabs.length > 0 ? tabs[0].key : 'status',
+	);
+	const [tabIndex, setTabIndex] = useState(0);
 
 	if (tabs.length === 0) {
 		return (
@@ -90,7 +93,10 @@ const AdminDashboard = () => {
 					<TabBtn
 						key={tab.key}
 						active={activeTab === tab.key}
-						onClick={() => setActiveTab(tab.key)}
+						onClick={() => {
+							setActiveTab(tab.key);
+							setTabIndex(tabs.findIndex((t) => t.key === tab.key));
+						}}
 						label={tab.label}
 					/>
 				))}
