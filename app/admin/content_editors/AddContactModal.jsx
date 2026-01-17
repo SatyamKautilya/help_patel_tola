@@ -51,7 +51,7 @@ const AddContactModal = ({ isOpen, onOpenChange, onSuccess }) => {
 			onOpenChange={onOpenChange}
 			backdrop='blur' // Modern blurred background
 			classNames={{
-				base: 'border-[#292929] bg-[#121212] dark text-[#f4f4f5]',
+				base: 'border-[#292929]  bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-[#f4f4f5]',
 				header: 'border-b-[1px] border-[#292929]',
 				footer: 'border-t-[1px] border-[#292929] mb-20',
 				closeButton: 'hover:bg-white/5 active:bg-white/10',
@@ -65,18 +65,18 @@ const AddContactModal = ({ isOpen, onOpenChange, onSuccess }) => {
 									<UserPlus className='text-primary' size={20} />
 								</div>
 								<span className='text-xl font-semibold tracking-tight'>
-									New Contact
+									नया संपर्क
 								</span>
 							</div>
 							<p className='text-tiny text-default-500 font-normal'>
-								Fill in the details to add a new person to your directory.
+								अपनी निर्देशिका में एक नया व्यक्ति जोड़ने के लिए विवरण भरें।
 							</p>
 						</ModalHeader>
 
 						<ModalBody className='py-6 gap-4'>
 							<Input
-								label='Full Name'
-								placeholder='Enter name'
+								label='पूरा नाम'
+								placeholder='नाम दर्ज करें'
 								labelPlacement='outside'
 								startContent={<User size={18} className='text-default-400' />}
 								variant='bordered'
@@ -89,8 +89,8 @@ const AddContactModal = ({ isOpen, onOpenChange, onSuccess }) => {
 							/>
 
 							<Input
-								label='Job Role'
-								placeholder='e.g. Project Manager'
+								label='कार्य भूमिका'
+								placeholder='जैसे पटवारी / प्राचार्य'
 								labelPlacement='outside'
 								startContent={
 									<Briefcase size={18} className='text-default-400' />
@@ -105,8 +105,8 @@ const AddContactModal = ({ isOpen, onOpenChange, onSuccess }) => {
 							/>
 
 							<Input
-								label='Mobile Number'
-								placeholder='+1 (555) 000-0000'
+								label='मोबाइल नंबर'
+								placeholder='94790000000'
 								labelPlacement='outside'
 								startContent={<Phone size={18} className='text-default-400' />}
 								variant='bordered'
@@ -125,8 +125,8 @@ const AddContactModal = ({ isOpen, onOpenChange, onSuccess }) => {
 								variant='ghost'
 								color='default'
 								onPress={onClose}
-								className='border-default-200 hover:!bg-default-100'>
-								Cancel
+								className='border-default-200 text-white hover:text-black hover:!bg-default-100'>
+								रद्द करें
 							</Button>
 							<Button
 								color='primary'
@@ -135,7 +135,7 @@ const AddContactModal = ({ isOpen, onOpenChange, onSuccess }) => {
 								onPress={() => handleSaveContact(onClose)}
 								startContent={!loading && <Save size={18} />}
 								className='font-medium shadow-lg shadow-primary/20'>
-								Save Contact
+								संपर्क सहेजें
 							</Button>
 						</ModalFooter>
 					</>
