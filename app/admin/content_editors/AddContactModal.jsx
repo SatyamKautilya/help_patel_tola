@@ -12,11 +12,22 @@ import {
 // Importing an icon library (like Lucide) adds a premium feel
 import { UserPlus, User, Briefcase, Phone, Save, X } from 'lucide-react';
 
+const VisibilityGroups = [
+	{
+		id: 'Garhi',
+		name: 'गढ़ी',
+	},
+	{ id: 'PatelTola', name: 'पटेल टोला' },
+
+	// Add more groups as needed
+];
+
 const AddContactModal = ({ isOpen, onOpenChange, onSuccess }) => {
 	const [name, setName] = useState('');
 	const [role, setRole] = useState('');
 	const [mobile, setMobile] = useState('');
 	const [loading, setLoading] = useState(false);
+	const [selectedGroups, setSelectedGroups] = useState([]);
 
 	const handleSaveContact = async (onClose) => {
 		if (mobile.length < 10) {
@@ -29,7 +40,12 @@ const AddContactModal = ({ isOpen, onOpenChange, onSuccess }) => {
 			const response = await fetch('/api/subcategory/contacts/add', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name, role, mobile }),
+				body: JSON.stringify({
+					name,
+					role,
+					mobile,
+					VisibilityGroups: selectedGroups,
+				}),
 			});
 			if (response.ok) {
 				setName('');
@@ -118,6 +134,34 @@ const AddContactModal = ({ isOpen, onOpenChange, onSuccess }) => {
 										'h-12 border-default-200 focus-within:!border-primary',
 								}}
 							/>
+							<Divider />
+							<div className='flex flex-col gap-2'>
+								<p className='font-medium text-default-400'>
+									दृश्यता समूह चुनें
+								</p>
+								<div className='flex flex-wrap gap-2'>
+									{VisibilityGroups.map((group) => (
+										<Button
+											key={group.id}
+											variant={
+												selectedGroups.includes(group.id) ? 'solid' : 'outline'
+											}
+											color='primary'
+											size='sm'
+											onPress={() => {
+												if (selectedGroups.includes(group.id)) {
+													setSelectedGroups(
+														selectedGroups.filter((id) => id !== group.id),
+													);
+												} else {
+													setSelectedGroups([...selectedGroups, group.id]);
+												}
+											}}>
+											{group.name}
+										</Button>
+									))}
+								</div>
+							</div>
 						</ModalBody>
 
 						<ModalFooter>

@@ -9,6 +9,7 @@ import Users from '@/lib/models/Users';
 import JoinRequest from '@/lib/models/JoinRequest';
 import Device from '@/lib/models/Device';
 import { sendPushNotifications } from '@/lib/sendPush';
+import Contacts from '@/lib/models/Contacts';
 // Helper function to get path segments
 function getPathSegments(request) {
 	const url = new URL(request.url);
@@ -287,7 +288,19 @@ export async function POST(request) {
 			const user = await Users.findOne({ id: assetId }).lean();
 			return NextResponse.json({ user });
 		}
-
+		if (name === 'get-contacts') {
+			const { visibilityGroups } = body;
+			if (!visibilityGroups || !Array.isArray(visibilityGroups)) {
+				return NextResponse.json(
+					{ error: 'visibilityGroups array is required' },
+					{ status: 400 },
+				);
+			}
+			const contacts = await Contacts.find({
+				visibilityGroups: { $in: [...visibilityGroups, 'general'] },
+			});
+			return NextResponse.json({ contacts });
+		}
 		if (name === 'send-notification') {
 			const { title, message, village } = body;
 			if (!title || !message) {

@@ -3,10 +3,12 @@
 import { useEffect, useState } from 'react';
 import { Card, CardBody } from '@heroui/react';
 import Image from 'next/image';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setLoader } from '@/app/store/appSlice';
 
 export default function App() {
+	const thisUser = useSelector((state) => state.appContext.user);
+	const userGroups = thisUser.userGroups || [];
 	const [numbers, setNumbers] = useState([]);
 	const dispatch = useDispatch();
 
@@ -17,7 +19,12 @@ export default function App() {
 	const initializeApp = async () => {
 		dispatch(setLoader(true));
 		try {
-			const response = await fetch('/api/subcategory/contacts');
+			const response = await fetch('/api/query/database?name=get-contacts', {
+				method: 'post',
+				body: {
+					visibilityGroups: userGroups,
+				},
+			});
 			if (response.ok) {
 				const data = await response.json();
 				setNumbers(data.contacts || []);
@@ -48,7 +55,7 @@ export default function App() {
 			{/* Contact List */}
 			<div className='pt-24'>
 				<div className='px-4 py-4 space-y-4'>
-					{numbers.map((contact) => (
+					{numbers?.filter().map((contact) => (
 						<Card
 							key={contact.id}
 							className='rounded-2xl shadow-md border border-blue-100'>

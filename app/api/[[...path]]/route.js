@@ -108,7 +108,7 @@ export async function POST(request) {
 			segments[1] === 'contacts' &&
 			segments[2] === 'add'
 		) {
-			const { name, role, mobile } = body;
+			const { name, role, mobile, visibilityGroups } = body;
 			if (!name || !role || !mobile) {
 				return NextResponse.json(
 					{ error: 'name, role, and mobile are required' },
@@ -120,6 +120,7 @@ export async function POST(request) {
 				name,
 				role,
 				mobile,
+				visibilityGroups,
 				createdAt: new Date(),
 			});
 			return NextResponse.json({ contact }, { status: 201 });
