@@ -4,11 +4,12 @@ import React from 'react';
 import { FileText, Type, Plus, Contact } from 'lucide-react';
 import AddContactModal from './content_editors/AddContactModal';
 import CaseStory from './content_editors/CaseStory';
+import TreatmentProcessModal from './content_editors/TreatmentProcessModal';
 
 const sectionModals = {
 	contact: AddContactModal,
 	// meetingDetails: MeetingDetailsModal,
-	// treatmentProcess: TreatmentProcessModal,
+	treatmentProcess: TreatmentProcessModal,
 	successfulTreatment: CaseStory,
 };
 
