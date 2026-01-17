@@ -1,18 +1,15 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import React from 'react';
-import {
-	Layout,
-	FileText,
-	Type,
-	LucideImage,
-	Plus,
-	Contact,
-} from 'lucide-react';
+import { FileText, Type, Plus, Contact } from 'lucide-react';
 import AddContactModal from './content_editors/AddContactModal';
+import CaseStory from './content_editors/CaseStory';
 
 const sectionModals = {
 	contact: AddContactModal,
+	// meetingDetails: MeetingDetailsModal,
+	// treatmentProcess: TreatmentProcessModal,
+	successfulTreatment: CaseStory,
 };
 
 const ContentPage = () => {
