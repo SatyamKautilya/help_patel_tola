@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import RequestList from './RequestList';
@@ -38,13 +38,15 @@ const AdminDashboard = () => {
 		].filter((tab) => hasAccess(userGroups, tab.permission));
 	};
 
+	const [activeTab, setActiveTab] = useState('');
 	React.useEffect(() => {
 		setTabs(calcualteTabs());
 	}, [userGroups]);
 
-	const [activeTab, setActiveTab] = useState(
-		tabs.length > 0 ? tabs[0].key : 'status',
-	);
+	useEffect(() => {
+		setActiveTab(tabs[0]?.key || '');
+	}, [tabs]);
+
 	const [tabIndex, setTabIndex] = useState(0);
 
 	const currentTab = tabs[tabIndex];
