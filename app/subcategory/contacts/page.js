@@ -1,32 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-	Button,
-	Modal,
-	ModalContent,
-	ModalHeader,
-	ModalBody,
-	ModalFooter,
-	Input,
-	useDisclosure,
-	Card,
-	CardBody,
-} from '@heroui/react';
-import { hideBackButton } from '@/hooks/utils';
+import { Card, CardBody } from '@heroui/react';
 import Image from 'next/image';
 import { useDispatch } from 'react-redux';
 import { setLoader } from '@/app/store/appSlice';
 
 export default function App() {
-	const router = useRouter();
 	const [numbers, setNumbers] = useState([]);
-	const [name, setName] = useState('');
-	const [role, setRole] = useState('');
-	const [mobile, setMobile] = useState('');
-	const { isOpen, onOpen, onOpenChange } = useDisclosure();
-	const [access, setAccess] = useState('');
 	const dispatch = useDispatch();
 
 	useEffect(() => {
@@ -45,25 +26,6 @@ export default function App() {
 			console.error('Failed to initialize app:', error);
 		} finally {
 			dispatch(setLoader(false));
-		}
-	};
-
-	const handleSaveContact = async (onClose) => {
-		try {
-			const response = await fetch('/api/subcategory/contacts/add', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name, role, mobile }),
-			});
-			if (response.ok) {
-				setName('');
-				setRole('');
-				setMobile('');
-				onClose();
-				initializeApp();
-			}
-		} catch (error) {
-			console.error('Failed to save contact:', error);
 		}
 	};
 
@@ -119,60 +81,6 @@ export default function App() {
 						</Card>
 					))}
 				</div>
-
-				{/* Access / FAB */}
-				<div className='fixed bottom-6 right-6'>
-					{access !== 'access' ? (
-						<Input
-							label='Admin Password'
-							value={access}
-							onValueChange={setAccess}
-							classNames={{
-								base: 'max-w-[220px]',
-								inputWrapper: 'bg-white shadow-lg border border-gray-200',
-							}}
-						/>
-					) : (
-						<Button
-							color='primary'
-							className='rounded-full px-6 py-4 text-white font-bold shadow-xl'
-							onPress={onOpen}>
-							+ Add Contact
-						</Button>
-					)}
-				</div>
-
-				{/* Modal */}
-				<Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-					<ModalContent>
-						{(onClose) => (
-							<>
-								<ModalHeader className='text-lg font-bold'>
-									Add New Contact
-								</ModalHeader>
-								<ModalBody className='space-y-3'>
-									<Input label='Name' value={name} onValueChange={setName} />
-									<Input label='Role' value={role} onValueChange={setRole} />
-									<Input
-										label='Mobile'
-										value={mobile}
-										onValueChange={setMobile}
-									/>
-								</ModalBody>
-								<ModalFooter>
-									<Button variant='light' onPress={onClose}>
-										Cancel
-									</Button>
-									<Button
-										color='primary'
-										onPress={() => handleSaveContact(onClose)}>
-										Save
-									</Button>
-								</ModalFooter>
-							</>
-						)}
-					</ModalContent>
-				</Modal>
 			</div>
 		</div>
 	);
