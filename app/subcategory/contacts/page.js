@@ -8,7 +8,7 @@ import { setLoader } from '@/app/store/appSlice';
 
 export default function App() {
 	const thisUser = useSelector((state) => state.appContext.user);
-	const userGroups = thisUser.userGroups || [];
+	const userGroups = thisUser?.userGroups || [];
 	const [numbers, setNumbers] = useState([]);
 	const dispatch = useDispatch();
 
