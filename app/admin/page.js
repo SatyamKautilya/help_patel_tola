@@ -7,6 +7,7 @@ import RequestList from './RequestList';
 import NotificationSender from './NotificationSender';
 import StatusPage from './StatusPage';
 import ContentPage from './ContentPage';
+import { useSelector } from 'react-redux';
 
 const PERMISSIONS = {
 	view_stats: ['super_admin'],
@@ -15,10 +16,16 @@ const PERMISSIONS = {
 	send_notifications: ['super_admin', 'notification_sender'],
 };
 
-const hasAccess = (role, action) => PERMISSIONS[action]?.includes(role);
+const hasAccess = (userGroups, action) => {
+	const allowedGroups = PERMISSIONS[action] || [];
+	return userGroups.some((group) => allowedGroups.includes(group));
+};
 
 const AdminDashboard = () => {
-	const userRole = 'super_admin';
+	const thisUser = useSelector((state) => state.appContext.user);
+	const userGroups = thisUser?.userGroups || [];
+	const isSuperAdmin = thisUser?.role === 'super_admin';
+
 	const [activeTab, setActiveTab] = useState('status');
 
 	const [tabIndex, setTabIndex] = useState(0);
@@ -32,7 +39,7 @@ const AdminDashboard = () => {
 			permission: 'send_notifications',
 		},
 		{ key: 'approval', label: 'Requests', permission: 'manage_approvals' },
-	].filter((tab) => hasAccess(userRole, tab.permission));
+	].filter((tab) => hasAccess(userGroups, tab.permission));
 
 	const currentTab = tabs[tabIndex];
 
@@ -54,10 +61,10 @@ const AdminDashboard = () => {
 				animate={{ opacity: 1, y: 0 }}
 				className='mb-8 sm:mb-12 pt-4 text-center'>
 				<h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2'>
-					Admin Control Center
+					Tamohar Control Center
 				</h1>
 				<p className='text-xs sm:text-sm md:text-base text-slate-400'>
-					Manage your platform with precision
+					Manage your platform with precision and keep your community thriving
 				</p>
 			</motion.div>
 

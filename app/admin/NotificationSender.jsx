@@ -48,7 +48,7 @@ const NotificationSender = () => {
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ delay: 0.3 }}
-					className='bg-gradient-to-br max-w-xl from-purple-500/10 to-indigo-500/10 backdrop-blur-xl border border-purple-500/30 rounded-2xl p-8'>
+					className='bg-gradient-to-br max-w-xl from-purple-500/10 to-indigo-800/10 backdrop-blur-xl border border-purple-500/30 rounded-2xl p-8'>
 					<h3 className='text-2xl font-bold mb-4 text-white'>
 						Send Notification
 					</h3>

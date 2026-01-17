@@ -59,6 +59,29 @@ export async function GET(request) {
 			const feedback = await Feedback.find().sort({ createdAt: -1 });
 			return NextResponse.json({ feedback });
 		}
+		if (name === 'total-users') {
+			const totalUsers = await Users.countDocuments();
+			return NextResponse.json({ totalUsers });
+		}
+		if (name === 'today-users') {
+			const todayUser = await Users.countDocuments({
+				lastLogin: {
+					$gte: new Date(new Date().setHours(0, 0, 0, 0)),
+					$lt: new Date(new Date().setHours(23, 59, 59, 999)),
+				},
+			});
+			return NextResponse.json({ todayUser });
+		}
+		if (name === 'total-feedbacks') {
+			const totalFeedbacks = await Feedback.countDocuments();
+			return NextResponse.json({ totalFeedbacks });
+		}
+		if (name === 'last-ten-feedbacks') {
+			const lastTenFeedbacks = await Feedback.find()
+				.sort({ createdAt: -1 })
+				.limit(10);
+			return NextResponse.json({ lastTenFeedbacks });
+		}
 	} catch (error) {
 		console.error('API GET Error:', error);
 		return NextResponse.json(

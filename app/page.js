@@ -58,7 +58,7 @@ export default function HomePage() {
 	const router = useRouter();
 
 	const thisUser = useSelector((state) => state.appContext.user);
-	console.log(thisUser, 'this user');
+
 	useEffect(() => {
 		if (!appContext?.name) {
 			if (typeof window !== 'undefined' && window.APP_CONTEXT) {
