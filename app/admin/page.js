@@ -24,10 +24,7 @@ const hasAccess = (userGroups, action) => {
 const AdminDashboard = () => {
 	const thisUser = useSelector((state) => state.appContext.user);
 	const userGroups = thisUser?.userGroups || [];
-	const isSuperAdmin = thisUser?.role === 'super_admin';
-
 	const [activeTab, setActiveTab] = useState('status');
-
 	const [tabIndex, setTabIndex] = useState(0);
 
 	const tabs = [
@@ -40,6 +37,22 @@ const AdminDashboard = () => {
 		},
 		{ key: 'approval', label: 'Requests', permission: 'manage_approvals' },
 	].filter((tab) => hasAccess(userGroups, tab.permission));
+
+	if (tabs.length === 0) {
+		return (
+			<div className='min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-white p-4 sm:p-6 md:p-10 flex flex-col items-center justify-center'>
+				<motion.div
+					initial={{ opacity: 0, y: -20 }}
+					animate={{ opacity: 1, y: 0 }}
+					className='text-center'>
+					<h1 className='text-3xl font-bold mb-4'>Access Denied</h1>
+					<p className='text-slate-400'>
+						You don't have permission to access the admin dashboard.
+					</p>
+				</motion.div>
+			</div>
+		);
+	}
 
 	const currentTab = tabs[tabIndex];
 
@@ -95,7 +108,7 @@ const AdminDashboard = () => {
 					<ArrowRight size={20} className='rotate-180' />
 				</button>
 				<div className='bg-white/5 backdrop-blur-xl px-4 py-2 rounded-lg border border-white/10 text-center min-w-[150px]'>
-					<p className='text-sm font-semibold'>{currentTab.label}</p>
+					<p className='text-sm font-semibold'>{currentTab?.label}</p>
 				</div>
 				<button
 					onClick={handleNextTab}
