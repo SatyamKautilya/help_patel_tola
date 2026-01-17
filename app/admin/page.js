@@ -38,13 +38,13 @@ const AdminDashboard = () => {
 		].filter((tab) => hasAccess(userGroups, tab.permission));
 	};
 
-	const [activeTab, setActiveTab] = useState('');
 	React.useEffect(() => {
-		setTabs(calcualteTabs());
-	}, [userGroups]);
+		if (tabs.length === 0) setTabs(calcualteTabs());
+	}, [thisUser]);
+	const [activeTab, setActiveTab] = useState(tabs[0]?.key || '');
 
 	useEffect(() => {
-		setActiveTab(tabs[0]?.key || '');
+		if (tabs.length > 0) setActiveTab(tabs[0]?.key || '');
 	}, [tabs]);
 
 	const [tabIndex, setTabIndex] = useState(0);
