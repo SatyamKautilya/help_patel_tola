@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import { useSelector } from 'react-redux';
+
 import RequestList from './RequestList';
 import NotificationSender from './NotificationSender';
 import StatusPage from './StatusPage';
 import ContentPage from './ContentPage';
-import { useSelector } from 'react-redux';
 
 const PERMISSIONS = {
 	view_stats: ['super_admin'],
@@ -21,128 +22,105 @@ const hasAccess = (userGroups, action) => {
 	return userGroups.some((group) => allowedGroups.includes(group));
 };
 
+const ALL_TABS = [
+	{ key: 'status', label: 'System Status', permission: 'view_stats' },
+	{ key: 'content', label: 'Content Manager', permission: 'edit_content' },
+	{
+		key: 'notification',
+		label: 'नोटिफ़िकेशन',
+		permission: 'send_notifications',
+	},
+	{ key: 'approval', label: 'Requests', permission: 'manage_approvals' },
+];
+
 const AdminDashboard = () => {
 	const thisUser = useSelector((state) => state.appContext.user);
 	const userGroups = thisUser?.userGroups || [];
-	const [tabs, setTabs] = useState([]);
-	const calcualteTabs = () => {
-		return [
-			{ key: 'status', label: 'System Status', permission: 'view_stats' },
-			{ key: 'content', label: 'Content Manager', permission: 'edit_content' },
-			{
-				key: 'notification',
-				label: 'नोटिफ़िकेशन',
-				permission: 'send_notifications',
-			},
-			{ key: 'approval', label: 'Requests', permission: 'manage_approvals' },
-		].filter((tab) => hasAccess(userGroups, tab.permission));
-	};
 
-	React.useEffect(() => {
-		if (tabs.length === 0) setTabs(calcualteTabs());
-	}, [thisUser]);
-	const [activeTab, setActiveTab] = useState(tabs[0]?.key || '');
+	/** ✅ Tabs are DERIVED */
+	const tabs = useMemo(() => {
+		return ALL_TABS.filter((tab) => hasAccess(userGroups, tab.permission));
+	}, [userGroups]);
 
+	/** ✅ Single source of truth */
+	const [activeTab, setActiveTab] = useState(null);
+
+	/** ✅ Auto-select first allowed tab */
 	useEffect(() => {
-		if (tabs.length > 0) setActiveTab(tabs[0]?.key || '');
+		if (tabs.length > 0) {
+			setActiveTab((prev) =>
+				tabs.some((t) => t.key === prev) ? prev : tabs[0].key,
+			);
+		}
 	}, [tabs]);
-
-	const [tabIndex, setTabIndex] = useState(0);
-
-	const currentTab = tabs[tabIndex];
-
-	const handlePrevTab = () => {
-		setTabIndex((prev) => Math.max(0, prev - 1));
-		setActiveTab(tabs[Math.max(0, tabIndex - 1)].key);
-	};
-
-	const handleNextTab = () => {
-		setTabIndex((prev) => Math.min(tabs.length - 1, prev + 1));
-		setActiveTab(tabs[Math.min(tabs.length - 1, tabIndex + 1)].key);
-	};
 
 	if (tabs.length === 0) {
 		return (
-			<div className='min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-white p-4 sm:p-6 md:p-10 flex flex-col items-center justify-center'>
-				<motion.div
-					initial={{ opacity: 0, y: -20 }}
-					animate={{ opacity: 1, y: 0 }}
-					className='text-center'>
+			<div className='min-h-screen flex items-center justify-center text-white'>
+				<div className='text-center'>
 					<h1 className='text-3xl font-bold mb-4'>Access Denied</h1>
 					<p className='text-slate-400'>
 						You don't have permission to access the admin dashboard.
 					</p>
-				</motion.div>
+				</div>
 			</div>
 		);
 	}
 
-	return (
-		<div className='min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-white p-4 sm:p-6 md:p-10 flex flex-col items-center'>
-			{/* Header */}
-			<motion.div
-				initial={{ opacity: 0, y: -20 }}
-				animate={{ opacity: 1, y: 0 }}
-				className='mb-8 sm:mb-12 pt-4 text-center'>
-				<h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2'>
-					Tamohar Control Center
-				</h1>
-				<p className='text-xs sm:text-sm md:text-base text-slate-400'>
-					Manage your platform with precision and keep your community thriving
-				</p>
-			</motion.div>
+	const activeIndex = tabs.findIndex((t) => t.key === activeTab);
+	const currentTab = tabs[activeIndex];
 
-			{/* Tab Navigation */}
+	const goPrev = () => {
+		if (activeIndex > 0) setActiveTab(tabs[activeIndex - 1].key);
+	};
+
+	const goNext = () => {
+		if (activeIndex < tabs.length - 1) setActiveTab(tabs[activeIndex + 1].key);
+	};
+
+	return (
+		<div className='min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-white p-6 flex flex-col items-center'>
+			{/* Header */}
+			<h1 className='text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent'>
+				Tamohar Control Center
+			</h1>
+			<p className='text-slate-400 mb-10 text-center'>
+				Manage your platform with precision and keep your community thriving
+			</p>
+
+			{/* Desktop Tabs */}
 			{tabs.length > 1 && (
-				<motion.div
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					className='hidden sm:flex flex-wrap gap-2 sm:gap-3 mb-8 sm:mb-10 bg-white/5 backdrop-blur-xl p-1 rounded-full w-fit border border-white/10 justify-center'>
+				<div className='hidden sm:flex gap-3 mb-10 bg-white/5 p-1 rounded-full border border-white/10'>
 					{tabs.map((tab) => (
 						<TabBtn
 							key={tab.key}
-							active={activeTab === tab.key}
-							onClick={() => {
-								setActiveTab(tab.key);
-								setTabIndex(tabs.findIndex((t) => t.key === tab.key));
-							}}
 							label={tab.label}
+							active={activeTab === tab.key}
+							onClick={() => setActiveTab(tab.key)}
 						/>
 					))}
-				</motion.div>
+				</div>
 			)}
 
-			{/* Mobile Tab Navigation */}
+			{/* Mobile Tabs */}
 			{tabs.length > 1 && (
-				<motion.div
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					className='sm:hidden flex items-center gap-3 mb-8 w-full justify-center'>
-					<button
-						onClick={handlePrevTab}
-						disabled={tabIndex === 0}
-						className='p-2 rounded-lg bg-white/5 border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/10 transition-all'>
-						<ArrowRight size={20} className='rotate-180' />
+				<div className='sm:hidden flex items-center gap-3 mb-8'>
+					<button onClick={goPrev} disabled={activeIndex === 0}>
+						<ArrowRight className='rotate-180' />
 					</button>
-					<div className='bg-white/5 backdrop-blur-xl px-4 py-2 rounded-lg border border-white/10 text-center min-w-[150px]'>
-						<p className='text-sm font-semibold'>{currentTab?.label}</p>
-					</div>
-					<button
-						onClick={handleNextTab}
-						disabled={tabIndex === tabs.length - 1}
-						className='p-2 rounded-lg bg-white/5 border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/10 transition-all'>
-						<ArrowRight size={20} />
+					<span>{currentTab.label}</span>
+					<button onClick={goNext} disabled={activeIndex === tabs.length - 1}>
+						<ArrowRight />
 					</button>
-				</motion.div>
+				</div>
 			)}
 
+			{/* Content */}
 			<motion.div
 				key={activeTab}
 				initial={{ opacity: 0, y: 10 }}
 				animate={{ opacity: 1, y: 0 }}
-				exit={{ opacity: 0, y: -10 }}
-				transition={{ duration: 0.3 }}
-				className='w-full max-w-4xl px-2 sm:px-0'>
+				className='w-full max-w-4xl'>
 				{activeTab === 'status' && <StatusPage />}
 				{activeTab === 'content' && <ContentPage />}
 				{activeTab === 'notification' && <NotificationSender />}
@@ -157,10 +135,10 @@ const TabBtn = ({ active, onClick, label }) => (
 		whileHover={{ scale: 1.05 }}
 		whileTap={{ scale: 0.95 }}
 		onClick={onClick}
-		className={`px-6 py-2 rounded-full text-sm font-semibold transition-all whitespace-nowrap ${
+		className={`px-6 py-2 rounded-full text-sm font-semibold transition-all ${
 			active
-				? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/30'
-				: 'text-slate-400 hover:text-white hover:bg-white/5'
+				? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
+				: 'text-slate-400 hover:text-white'
 		}`}>
 		{label}
 	</motion.button>
