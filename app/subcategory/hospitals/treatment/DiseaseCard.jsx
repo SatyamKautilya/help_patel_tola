@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Card, CardBody } from '@heroui/react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
 	ChevronDown,
 	AlertCircle,
@@ -25,9 +24,7 @@ export default function DiseaseCard({ disease }) {
 
 	function Section({ title, items, icon: Icon, bg, text, border }) {
 		return (
-			<motion.div
-				initial={{ opacity: 0, x: -10 }}
-				animate={{ opacity: 1, x: 0 }}
+			<div
 				className={`rounded-2xl p-4 ${bg} border ${border} backdrop-blur-sm transition-all duration-300 hover:shadow-md`}>
 				<h3
 					className={`flex items-center gap-2 mb-3 text-sm font-black uppercase tracking-wider ${text}`}>
@@ -50,16 +47,12 @@ export default function DiseaseCard({ disease }) {
 						</li>
 					))}
 				</ul>
-			</motion.div>
+			</div>
 		);
 	}
 
 	return (
-		<motion.div
-			layout
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			className='w-full'>
+		<div className='w-full'>
 			<Card
 				className={`overflow-hidden border-none transition-all duration-500 ${
 					open
@@ -95,80 +88,71 @@ export default function DiseaseCard({ disease }) {
 							</div>
 						</div>
 
-						<motion.div
-							animate={{ rotate: open ? 180 : 0 }}
+						<div
 							className={`p-2 rounded-full ${
 								open ? 'bg-gray-100' : 'bg-transparent'
 							}`}>
 							<ChevronDown className='text-gray-400' size={20} />
-						</motion.div>
+						</div>
 					</button>
 
-					{/* Animated Content */}
-					<AnimatePresence>
-						{open && (
-							<motion.div
-								initial={{ height: 0, opacity: 0 }}
-								animate={{ height: 'auto', opacity: 1 }}
-								exit={{ height: 0, opacity: 0 }}
-								transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}>
-								<div className='px-5 pb-6 space-y-4'>
-									<div className='h-px w-full bg-gray-100 mb-4' />
+					{/* Content */}
+					{open && (
+						<div className='px-5 pb-6 space-y-4'>
+							<div className='h-px w-full bg-gray-100 mb-4' />
 
-									{/* Symptoms */}
-									{normalizedDisease.symptoms?.length > 0 && (
-										<Section
-											title='लक्षण'
-											icon={AlertCircle}
-											bg='bg-red-50/50'
-											border='border-red-100'
-											text='text-red-600'
-											items={normalizedDisease.symptoms}
-										/>
-									)}
+							{/* Symptoms */}
+							{normalizedDisease.symptoms?.length > 0 && (
+								<Section
+									title='लक्षण'
+									icon={AlertCircle}
+									bg='bg-red-50/50'
+									border='border-red-100'
+									text='text-red-600'
+									items={normalizedDisease.symptoms}
+								/>
+							)}
 
-									{/* Steps */}
-									{disease.steps?.length > 0 && (
-										<Section
-											title='उपचार के चरण'
-											icon={Stethoscope}
-											bg='bg-blue-50/50'
-											border='border-blue-100'
-											text='text-blue-600'
-											items={disease.steps}
-										/>
-									)}
+							{/* Steps */}
+							{disease.steps?.length > 0 && (
+								<Section
+									title='उपचार के चरण'
+									icon={Stethoscope}
+									bg='bg-blue-50/50'
+									border='border-blue-100'
+									text='text-blue-600'
+									items={disease.steps}
+								/>
+							)}
 
-									{/* Dos & Don'ts Grid */}
-									<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-										{disease.dos?.length > 0 && (
-											<Section
-												title='क्या करें'
-												icon={CheckCircle2}
-												bg='bg-emerald-50/50'
-												border='border-emerald-100'
-												text='text-emerald-600'
-												items={disease.dos}
-											/>
-										)}
+							{/* Dos & Don'ts Grid */}
+							<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+								{disease.dos?.length > 0 && (
+									<Section
+										title='क्या करें'
+										icon={CheckCircle2}
+										bg='bg-emerald-50/50'
+										border='border-emerald-100'
+										text='text-emerald-600'
+										items={disease.dos}
+									/>
+								)}
 
-										{disease.donts?.length > 0 && (
-											<Section
-												title='क्या न करें'
-												icon={XCircle}
-												bg='bg-rose-50/50'
-												border='border-rose-100'
-												text='text-rose-600'
-												items={disease.donts}
-											/>
-										)}
-									</div>
-								</div>
-							</motion.div>
-						)}
-					</AnimatePresence>
+								{disease.donts?.length > 0 && (
+									<Section
+										title='क्या न करें'
+										icon={XCircle}
+										bg='bg-rose-50/50'
+										border='border-rose-100'
+										text='text-rose-600'
+										items={disease.donts}
+									/>
+								)}
+							</div>
+						</div>
+					)}
 				</CardBody>
 			</Card>
-		</motion.div>
+		</div>
 	);
 }

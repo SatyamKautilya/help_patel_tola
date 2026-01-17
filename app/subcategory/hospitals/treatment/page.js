@@ -26,7 +26,7 @@ const page = () => {
 	useEffect(() => {
 		const fetchData = async () => {
 			const savesop = await getSop();
-			setSops(savesop);
+			setSops(savesop || []);
 		};
 		fetchData();
 	}, []);
@@ -106,17 +106,16 @@ const page = () => {
 							},
 						}}
 						className='space-y-4'>
-						{Array.isArray(sops) &&
-							sops.map((sop, idx) => (
-								<motion.div
-									key={idx}
-									variants={{
-										hidden: { opacity: 0, y: 20 },
-										visible: { opacity: 1, y: 0 },
-									}}>
-									<DiseaseCard disease={sop} />
-								</motion.div>
-							))}
+						{sops.map((sop, idx) => (
+							<motion.div
+								key={idx}
+								variants={{
+									hidden: { opacity: 0, y: 20 },
+									visible: { opacity: 1, y: 0 },
+								}}>
+								<DiseaseCard disease={sop} />
+							</motion.div>
+						))}
 					</motion.div>
 				)}
 			</main>

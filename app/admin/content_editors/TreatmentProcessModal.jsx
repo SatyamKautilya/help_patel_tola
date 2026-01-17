@@ -10,25 +10,16 @@ import {
 	Button,
 } from '@heroui/react';
 
-const TreatmentProcessModal = ({
-	isOpen,
-	onOpenChange,
-	onSuccess,
-	treatmentData = {},
-}) => {
-	const [diseaseName, setDiseaseName] = useState(
-		treatmentData?.diseaseName || '',
-	);
-	const [symptoms, setSymptoms] = useState(treatmentData?.symptoms || '');
-	const [steps, setSteps] = useState(treatmentData?.steps || ['']);
-	const [dos, setDos] = useState(treatmentData?.dos || ['']);
-	const [donts, setDonts] = useState(treatmentData?.donts || ['']);
-	const [saving, setSaving] = useState(0);
+const TreatmentProcessModal = ({ isOpen, onOpenChange, onSuccess }) => {
+	const [diseaseName, setDiseaseName] = useState('');
+	const [symptoms, setSymptoms] = useState('');
+	const [steps, setSteps] = useState(['']);
+	const [dos, setDos] = useState(['']);
+	const [donts, setDonts] = useState(['']);
 
 	const handleSave = async () => {
 		if (!diseaseName.trim()) return;
 
-		setSaving(1);
 		try {
 			const response = await fetch('/api/subcategory/hospitals?name=sops', {
 				method: 'POST',
@@ -36,7 +27,7 @@ const TreatmentProcessModal = ({
 				body: JSON.stringify({
 					form: {
 						id: diseaseName,
-						diseaseName,
+						name: diseaseName,
 						symptoms,
 						steps,
 						dos,
@@ -46,13 +37,11 @@ const TreatmentProcessModal = ({
 			});
 
 			if (response.ok) {
-				setSaving(2);
 				onOpenChange(false);
 				onSuccess?.();
 			}
 		} catch (error) {
 			console.error('Error saving treatment:', error);
-			setSaving(0);
 		}
 	};
 
@@ -237,10 +226,9 @@ const TreatmentProcessModal = ({
 					</Button>
 					<Button
 						color='primary'
-						isLoading={saving === 1}
 						onPress={handleSave}
 						className='bg-blue-600 hover:bg-blue-700'>
-						{saving === 2 ? '✓ सहेजा गया' : 'सहेजें'}
+						'सहेजें'
 					</Button>
 				</ModalFooter>
 			</ModalContent>
