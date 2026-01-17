@@ -1,35 +1,42 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Layout, FileText, Type, LucideImage, Plus } from 'lucide-react';
+import {
+	Layout,
+	FileText,
+	Type,
+	LucideImage,
+	Plus,
+	Contact,
+} from 'lucide-react';
 
 const ContentPage = () => {
 	const sections = [
 		{
-			id: 'hero',
-			title: 'Hero Section',
-			icon: <Layout />,
-			desc: 'Main landing page text and banners',
+			id: 'contact',
+			title: 'महत्वपूर्ण संपर्क',
+			icon: <Contact />,
+			desc: 'गाँव के लिए उपयोगी संपर्क जानकारी जोड़ें',
 			gradient: 'from-blue-500 to-cyan-500',
 		},
 		{
-			id: 'about',
-			title: 'About Us',
+			id: 'meetingDetails',
+			title: 'बैठक का विवरण',
 			icon: <FileText />,
-			desc: 'Company mission and vision content',
+			desc: 'गाँव की बैठकों का रिकॉर्ड जोड़े',
 			gradient: 'from-emerald-500 to-teal-500',
 		},
 		{
-			id: 'features',
-			title: 'Features List',
+			id: 'treatmentProcess',
+			title: 'आदर्श उपचार प्रक्रिया',
 			icon: <Type />,
-			desc: 'Add or edit service offerings',
+			desc: 'बीमारी की चरणबद्ध उपचार जानकारी जोड़ें',
 			gradient: 'from-purple-500 to-pink-500',
 		},
 		{
-			id: 'gallery',
-			title: 'Media Gallery',
-			icon: <LucideImage />,
-			desc: 'Upload images for the showcase',
+			id: 'successfulTreatment',
+			title: 'सफल इलाज की कहानी',
+			icon: <FileText />,
+			desc: 'इलाज़ की प्रेरणात्मक कहानियाँ जोड़े',
 			gradient: 'from-orange-500 to-red-500',
 		},
 	];
@@ -43,11 +50,10 @@ const ContentPage = () => {
 			<motion.div
 				initial={{ opacity: 0, y: -10 }}
 				animate={{ opacity: 1, y: 0 }}
-				className='mb-8'>
-				<h1 className='text-4xl font-bold mb-2'>Content Canvas</h1>
-				<p className='text-slate-400 text-lg'>
-					Select a section to modify Tamohar live content.
-				</p>
+				className='mb-8 flex flex-col items-center'>
+				<h1 className='text-2xl font-bold mb-2'>
+					जानकारी अपलोड करने के लिए प्रभाग चुनें।
+				</h1>
 			</motion.div>
 
 			<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
