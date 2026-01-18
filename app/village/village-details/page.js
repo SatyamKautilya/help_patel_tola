@@ -12,6 +12,16 @@ const villageCards = [
 		bgColor: 'bg-orange-100',
 		iconColor: 'text-orange-600',
 		span: 'col-span-2',
+		isUpcoming: true,
+	},
+	{
+		title: 'हमारी बैठकें',
+		desc: 'योजनाएँ और निर्णय',
+		icon: '📅', // Changed icon to meeting
+		slug: '/village/meetings',
+		bgColor: 'bg-emerald-100',
+		iconColor: 'text-emerald-600',
+		isUpcoming: false,
 	},
 	{
 		title: 'खेती व रोजगार',
@@ -20,6 +30,7 @@ const villageCards = [
 		slug: '/village/farming',
 		bgColor: 'bg-emerald-100',
 		iconColor: 'text-emerald-600',
+		isUpcoming: true,
 	},
 	{
 		title: 'शिक्षा',
@@ -28,6 +39,7 @@ const villageCards = [
 		slug: '/village/education',
 		bgColor: 'bg-blue-100',
 		iconColor: 'text-blue-600',
+		isUpcoming: true,
 	},
 	{
 		title: 'स्वास्थ्य',
@@ -36,6 +48,7 @@ const villageCards = [
 		slug: '/village/health',
 		bgColor: 'bg-rose-100',
 		iconColor: 'text-rose-600',
+		isUpcoming: true,
 	},
 	{
 		title: 'आधारभूत सुविधा',
@@ -44,6 +57,7 @@ const villageCards = [
 		slug: '/village/infrastructure',
 		bgColor: 'bg-sky-100',
 		iconColor: 'text-sky-600',
+		isUpcoming: true,
 	},
 	{
 		title: 'समाज व संस्कृति',
@@ -52,6 +66,7 @@ const villageCards = [
 		slug: '/village/community',
 		bgColor: 'bg-amber-100',
 		iconColor: 'text-amber-600',
+		isUpcoming: true,
 	},
 	{
 		title: 'विकास लक्ष्य',
@@ -60,6 +75,7 @@ const villageCards = [
 		slug: '/village/development',
 		bgColor: 'bg-purple-100',
 		iconColor: 'text-purple-600',
+		isUpcoming: true,
 	},
 ];
 
@@ -84,7 +100,7 @@ export default function VillagePage() {
 						हमारा गाँव <span className='text-blue-600'>पटेल टोला</span>
 					</h1>
 					<p className='mt-2 text-slate-500 text-sm font-medium'>
-						जीवन, संस्कृति और विकास की एक सुंदर झलक
+						जीवन, संस्कृति और विकास की यात्रा
 					</p>
 					<div className='mt-4 flex justify-center'>
 						<div className='h-1 w-12 bg-blue-600 rounded-full' />
@@ -101,27 +117,34 @@ export default function VillagePage() {
 							initial={{ opacity: 0, scale: 0.95 }}
 							animate={{ opacity: 1, scale: 1 }}
 							transition={{ delay: index * 0.05 }}
-							onClick={() => router.push(card.slug)}
+							onClick={() => !card.isUpcoming && router.push(card.slug)}
 							className={`
-                                cursor-pointer group relative
-                                flex flex-col justify-between
-                                rounded-[2rem] p-5
-                                bg-white border border-slate-200
-                                shadow-[0_4px_20px_rgba(0,0,0,0.03)]
-                                hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)]
-                                hover:-translate-y-1
-                                active:scale-95 transition-all duration-300
-                                ${card.span || 'col-span-1'}
-                            `}>
+								${!card.isUpcoming ? 'cursor-pointer' : 'cursor-not-allowed opacity-60'}
+								group relative
+								flex flex-col justify-between
+								rounded-[2rem] p-5
+								${card.isUpcoming ? 'bg-slate-100 border-slate-300' : 'bg-white border-slate-200'}
+								border shadow-[0_4px_20px_rgba(0,0,0,0.03)]
+								${!card.isUpcoming ? 'hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1' : ''}
+								active:scale-95 transition-all duration-300
+								${card.span || 'col-span-1'}
+							`}>
 							<div>
-								<div
-									className={`
-                                    text-2xl mb-4 w-12 h-12 
-                                    flex items-center justify-center 
-                                    rounded-2xl ${card.bgColor} 
-                                    shadow-sm group-hover:scale-110 transition-transform duration-300
-                                `}>
-									{card.icon}
+								<div className='flex items-start justify-between mb-4'>
+									<div
+										className={`
+										text-2xl w-12 h-12 
+										flex items-center justify-center 
+										rounded-2xl ${card.bgColor} 
+										shadow-sm ${!card.isUpcoming ? 'group-hover:scale-110' : ''} transition-transform duration-300
+									`}>
+										{card.icon}
+									</div>
+									{card.isUpcoming && (
+										<span className='text-[10px] font-bold bg-slate-300 text-slate-700 px-2 py-1 rounded-full'>
+											शीघ्र आ रहा है
+										</span>
+									)}
 								</div>
 								<h2 className='text-[16px] font-bold text-slate-800 leading-tight'>
 									{card.title}
@@ -132,21 +155,23 @@ export default function VillagePage() {
 							</div>
 
 							{/* Modern Arrow Indicator */}
-							<div className='mt-4 flex items-center text-[11px] font-bold text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity'>
-								विस्तार देखें
-								<svg
-									className='ml-1 w-3 h-3'
-									fill='none'
-									viewBox='0 0 24 24'
-									stroke='currentColor'>
-									<path
-										strokeLinecap='round'
-										strokeLinejoin='round'
-										strokeWidth={3}
-										d='M9 5l7 7-7 7'
-									/>
-								</svg>
-							</div>
+							{!card.isUpcoming && (
+								<div className='mt-4 flex items-center text-[11px] font-bold text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity'>
+									विस्तार देखें
+									<svg
+										className='ml-1 w-3 h-3'
+										fill='none'
+										viewBox='0 0 24 24'
+										stroke='currentColor'>
+										<path
+											strokeLinecap='round'
+											strokeLinejoin='round'
+											strokeWidth={3}
+											d='M9 5l7 7-7 7'
+										/>
+									</svg>
+								</div>
+							)}
 						</motion.div>
 					))}
 				</div>
