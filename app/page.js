@@ -108,15 +108,16 @@ export default function HomePage() {
 		<div className='relative h-screen overflow-hidden bg-white'>
 			{/* 1. FIXED BRANDED BACKGROUND */}
 			<div
-				className='absolute inset-0 bg-cover bg-center'
-				style={{
-					backgroundImage:
-						'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/homebg.png)',
-					backgroundPosition: 'top',
-				}}
+				className='absolute inset-0 bg-cover bg-center bg-gradient-to-b from-indigo-500/90 via-purple-400/80 to-indigo-600/70
+'
+				// style={{
+				// 	backgroundImage:
+				// 		'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/homebg.png)',
+				// 	backgroundPosition: 'top',
+				// }}
 			/>
 			{/* Soft overlay to make content pop */}
-			<div className='absolute inset-0 bg-violet-700/20 backdrop-blur-[3px]' />
+			<div className='absolute inset-0' />
 
 			{/* 2. MAIN LAYOUT */}
 			<div className='relative h-full flex flex-col'>
