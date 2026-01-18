@@ -19,6 +19,64 @@ import {
 	ArrowRight,
 } from 'lucide-react';
 
+const TamoharLogo = () => (
+	<svg
+		width='20'
+		height='20'
+		viewBox='0 0 24 24'
+		fill='none'
+		xmlns='http://www.w3.org/2000/svg'
+		className='text-primary'>
+		{/* Sun/Light Rays representing 'Tamohar' */}
+		<path
+			d='M12 2V4M12 20V22M4 12H2M22 12H20M19.07 4.93L17.66 6.34M6.34 17.66L4.93 19.07M19.07 19.07L17.66 17.66M6.34 4.93L4.93 6.34'
+			stroke='currentColor'
+			strokeWidth='2'
+			strokeLinecap='round'
+		/>
+		{/* Group meeting circle */}
+		<circle cx='12' cy='12' r='4' stroke='currentColor' strokeWidth='2' />
+		<path
+			d='M8 12C8 10 12 9 12 9C12 9 16 10 16 12'
+			stroke='currentColor'
+			strokeWidth='1.5'
+			strokeLinecap='round'
+		/>
+	</svg>
+);
+
+const Header = () => {
+	return (
+		<nav className='sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md'>
+			<div className='mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6'>
+				{/* Logo Section */}
+				<div className='flex items-center gap-2'>
+					<div className='flex items-center justify-center rounded-lg bg-primary/10 p-1'>
+						<TamoharLogo />
+					</div>
+					<span className='text-lg font-bold tracking-tight text-slate-900'>
+						तमोहर
+					</span>
+					<div className='h-4 w-[1px] bg-slate-200 mx-1' />
+					<span className='text-xs font-medium text-slate-500 uppercase tracking-widest'>
+						Meetings
+					</span>
+				</div>
+
+				{/* Right side Actions (Optional) */}
+				<div className='flex items-center gap-4'>
+					<button className='text-sm font-medium text-slate-600 hover:text-primary transition-colors'>
+						Archive
+					</button>
+					<button className='rounded-full bg-slate-900 px-4 py-1.5 text-sm font-medium text-white hover:bg-slate-800 transition-all shadow-sm'>
+						New Session
+					</button>
+				</div>
+			</div>
+		</nav>
+	);
+};
+
 const MeetingsPage = () => {
 	const meetings = [
 		{
@@ -57,6 +115,7 @@ const MeetingsPage = () => {
 
 	return (
 		<div className='min-h-screen bg-slate-50/50 py-12 px-4 sm:px-6'>
+			<Header />
 			<div className='max-w-4xl mx-auto'>
 				{/* Header Section */}
 				<motion.div
