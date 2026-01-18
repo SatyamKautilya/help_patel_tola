@@ -10,7 +10,7 @@ import {
 	Users,
 } from 'lucide-react';
 
-const TamoharMeetingUI = ({ data }) => {
+const MeetingDetailPage = ({ data }) => {
 	// Theme Color Mapping
 	const themeColors = {
 		education: 'bg-blue-100 text-blue-700 border-blue-200',
@@ -173,4 +173,4 @@ const TamoharMeetingUI = ({ data }) => {
 	);
 };
 
-export default TamoharMeetingUI;
+export default MeetingDetailPage;

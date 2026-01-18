@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
-import MeetingDetailPage from '@/components/MeetingDetailPage';
+import MeetingDetailPage from '../MeetingDetailsPage';
 
 export default async function Page({ params }) {
 	const [meeting, setMeeting] = useState([]);
@@ -30,5 +30,5 @@ export default async function Page({ params }) {
 		return <div className='text-center mt-10'>बैठक उपलब्ध नहीं है</div>;
 	}
 
-	return <MeetingDetailPage meeting={meeting} />;
+	return <MeetingDetailPage data={meeting} />;
 }
