@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardBody, Spinner } from '@heroui/react';
 import Image from 'next/image';
 import { useSelector } from 'react-redux';
+import { AlertCircle } from 'lucide-react';
 
 export default function App() {
 	const thisUser = useSelector((state) => state.appContext.user);
@@ -45,7 +46,7 @@ export default function App() {
 				<p className='mt-6 text-gray-600 text-lg'>
 					आपके गाँव के लिए अभी कोई संपर्क उपलब्ध नहीं है।
 				</p>
-				<LucideIcon name='AlertCircle' className='mt-4 text-gray-500' />
+				<AlertCircle className='mt-4 text-gray-500' />
 			</div>
 		);
 	}
