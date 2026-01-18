@@ -10,6 +10,7 @@ import JoinRequest from '@/lib/models/JoinRequest';
 import Device from '@/lib/models/Device';
 import { sendPushNotifications } from '@/lib/sendPush';
 import Contacts from '@/lib/models/Contacts';
+import TamoharMeeting from '@/lib/models/TamoharMeeting';
 // Helper function to get path segments
 function getPathSegments(request) {
 	const url = new URL(request.url);
@@ -335,6 +336,11 @@ export async function POST(request) {
 				},
 			});
 			return NextResponse.json({ success: true, sentTo: tokens.length });
+		}
+		if (name === 'get-tamohar-meeting-by-id') {
+			const { id } = body;
+			const meeting = await TamoharMeeting.findById(id).lean();
+			return NextResponse.json(meeting);
 		}
 
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });

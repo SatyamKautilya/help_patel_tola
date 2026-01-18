@@ -1,136 +1,176 @@
-import { Calendar, MapPin, Target, Users } from 'lucide-react';
+import React from 'react';
+import {
+	Calendar,
+	MapPin,
+	Target,
+	MessageSquare,
+	CheckCircle,
+	Rocket,
+	Lightbulb,
+	Users,
+} from 'lucide-react';
 
-export default function MeetingDetailPage({ meeting }) {
-	if (!meeting) {
-		return <p className='text-center mt-10'>बैठक विवरण उपलब्ध नहीं है</p>;
-	}
+const TamoharMeetingUI = ({ data }) => {
+	// Theme Color Mapping
+	const themeColors = {
+		education: 'bg-blue-100 text-blue-700 border-blue-200',
+		health: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+		moral_value: 'bg-purple-100 text-purple-700 border-purple-200',
+		economy: 'bg-amber-100 text-amber-700 border-amber-200',
+		employment: 'bg-rose-100 text-rose-700 border-rose-200',
+	};
 
 	return (
-		<div className='max-w-4xl mx-auto px-4 py-8 space-y-8'>
-			{/* Header */}
-			<header className='border-b pb-4'>
-				<h1 className='text-2xl font-bold text-gray-800'>
-					{meeting.meetingName}
-				</h1>
-
-				<div className='flex flex-wrap gap-6 mt-3 text-sm text-gray-600'>
-					<div className='flex items-center gap-2'>
-						<Calendar size={16} />
-						<span>
-							<strong>दिनांक:</strong>{' '}
-							{new Date(meeting.meetingDate).toLocaleDateString('hi-IN')}
+		<div className='max-w-5xl mx-auto p-6 bg-slate-50 min-h-screen font-sans text-slate-900'>
+			{/* Header Section */}
+			<header className='bg-white rounded-2xl p-8 shadow-sm border border-slate-200 mb-6'>
+				<div className='flex flex-col md:flex-row md:items-center justify-between gap-4'>
+					<div>
+						<span
+							className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${themeColors[data.theme] || 'bg-slate-100'}`}>
+							{data.theme.replace('_', ' ')}
 						</span>
+						<h1 className='text-3xl font-extrabold mt-3 text-slate-800'>
+							{data.meetingName}
+						</h1>
 					</div>
 
-					<div className='flex items-center gap-2'>
-						<MapPin size={16} />
-						<span>
-							<strong>स्थान:</strong> {meeting.place}
-						</span>
+					<div className='flex flex-wrap gap-4 text-sm text-slate-600'>
+						<div className='flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg'>
+							<Calendar size={18} className='text-slate-400' />
+							<span>
+								{new Date(data.meetingDate).toLocaleDateString('hi-IN')}
+							</span>
+						</div>
+						<div className='flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg'>
+							<MapPin size={18} className='text-slate-400' />
+							<span>{data.place}</span>
+						</div>
 					</div>
 				</div>
 
-				<p className='mt-3 text-sm'>
-					<strong>विषय:</strong>{' '}
-					<span className='capitalize'>{meeting.theme}</span>
-				</p>
+				<div className='mt-6 flex items-start gap-3 p-4 bg-blue-50 rounded-xl border border-blue-100'>
+					<Target className='text-blue-600 mt-1 shrink-0' size={20} />
+					<div>
+						<p className='text-xs font-bold text-blue-600 uppercase tracking-tight'>
+							Meeting Objective (उद्देश्य)
+						</p>
+						<p className='text-slate-700 leading-relaxed'>{data.aim}</p>
+					</div>
+				</div>
 			</header>
 
-			{/* Aim */}
-			<section className='bg-gray-50 rounded-lg p-5'>
-				<h2 className='flex items-center gap-2 text-lg font-semibold mb-2'>
-					<Target size={18} /> उद्देश्य
-				</h2>
-				<p className='text-gray-700 leading-relaxed'>{meeting.aim}</p>
-			</section>
-
-			{/* Discussion */}
-			<section>
-				<h2 className='text-lg font-semibold mb-4'>चर्चा विवरण</h2>
-
-				<div className='space-y-4'>
-					{meeting.charcha.map((item, index) => (
-						<div key={index} className='border rounded-lg p-4'>
-							<h3 className='font-semibold text-gray-800'>
-								चर्चा भाग {index + 1}: {item.title}
-							</h3>
-
-							<p className='mt-2 text-gray-700'>
-								<strong>चर्चा का ब्योरा:</strong> {item.details}
-							</p>
-
-							{item.findings && (
-								<p className='mt-2 text-gray-700'>
-									<strong>निष्कर्ष:</strong> {item.findings}
-								</p>
-							)}
+			<div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+				{/* Left Column: Discussions & Execution */}
+				<div className='lg:col-span-2 space-y-6'>
+					{/* Discussion Section */}
+					<section>
+						<div className='flex items-center gap-2 mb-4'>
+							<MessageSquare className='text-slate-400' size={20} />
+							<h2 className='text-xl font-bold'>चर्चा (Discussion)</h2>
 						</div>
-					))}
-				</div>
-			</section>
-
-			{/* Intervention Strategy */}
-			<section>
-				<h2 className='text-lg font-semibold mb-3'>हस्तक्षेप रणनीति</h2>
-				<ul className='list-disc list-inside space-y-1 text-gray-700'>
-					{meeting.interventionStrategy.map((plan, i) => (
-						<li key={i}>{plan}</li>
-					))}
-				</ul>
-			</section>
-
-			{/* Decisions */}
-			<section>
-				<h2 className='text-lg font-semibold mb-3'>निर्णय</h2>
-				<ul className='list-decimal list-inside space-y-1 text-gray-700'>
-					{meeting.decisions.map((decision, i) => (
-						<li key={i}>{decision}</li>
-					))}
-				</ul>
-			</section>
-
-			{/* 30 Days Execution Plan */}
-			<section>
-				<h2 className='text-lg font-semibold mb-3'>
-					आगामी 30 दिनों की कार्य योजना
-				</h2>
-				<ul className='list-disc list-inside space-y-1 text-gray-700'>
-					{meeting.executionPlan30Days.map((task, i) => (
-						<li key={i}>{task}</li>
-					))}
-				</ul>
-			</section>
-
-			{/* Suggestions */}
-			<section>
-				<h2 className='text-lg font-semibold mb-3'>सहभागियों के सुझाव</h2>
-
-				<div className='space-y-3'>
-					{meeting.suggestionsFromAttendees.map((item, i) => (
-						<div key={i} className='bg-gray-50 p-3 rounded-md'>
-							<p className='font-medium'>{item.name}</p>
-							<p className='text-gray-700 text-sm mt-1'>{item.suggestion}</p>
+						<div className='space-y-4'>
+							{data.charcha.map((item, index) => (
+								<div
+									key={index}
+									className='bg-white p-5 rounded-xl border-l-4 border-l-blue-500 shadow-sm border border-slate-200'>
+									<h3 className='font-bold text-lg text-slate-800 mb-2'>
+										{item.title}
+									</h3>
+									<p className='text-slate-600 text-sm leading-relaxed mb-3'>
+										{item.details}
+									</p>
+									{item.findings && (
+										<div className='bg-slate-50 p-3 rounded-lg text-sm italic text-slate-500'>
+											<strong>Findings:</strong> {item.findings}
+										</div>
+									)}
+								</div>
+							))}
 						</div>
-					))}
-				</div>
-			</section>
+					</section>
 
-			{/* Attendees */}
-			<section>
-				<h2 className='flex items-center gap-2 text-lg font-semibold mb-3'>
-					<Users size={18} /> उपस्थित सदस्य
-				</h2>
-
-				<div className='flex flex-wrap gap-2'>
-					{meeting.attendees.map((name, i) => (
-						<span
-							key={i}
-							className='px-3 py-1 bg-gray-100 rounded-full text-sm'>
-							{name}
-						</span>
-					))}
+					{/* Execution Plan */}
+					<section className='bg-white p-6 rounded-2xl shadow-sm border border-slate-200'>
+						<div className='flex items-center gap-2 mb-4'>
+							<Rocket className='text-orange-500' size={20} />
+							<h2 className='text-xl font-bold'>30-Day Execution Plan</h2>
+						</div>
+						<ul className='space-y-3'>
+							{data.executionPlan30Days.map((step, index) => (
+								<li key={index} className='flex gap-3 items-start'>
+									<span className='flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-100 text-orange-600 text-xs font-bold'>
+										{index + 1}
+									</span>
+									<p className='text-slate-700'>{step}</p>
+								</li>
+							))}
+						</ul>
+					</section>
 				</div>
-			</section>
+
+				{/* Right Column: Decisions, Suggestions & Attendees */}
+				<div className='space-y-6'>
+					{/* Decisions */}
+					<section className='bg-slate-800 text-white p-6 rounded-2xl shadow-lg'>
+						<div className='flex items-center gap-2 mb-4'>
+							<CheckCircle className='text-emerald-400' size={20} />
+							<h2 className='text-xl font-bold'>Decisions Made</h2>
+						</div>
+						<ul className='space-y-3'>
+							{data.decisions.map((decision, index) => (
+								<li
+									key={index}
+									className='flex items-start gap-2 text-slate-300 text-sm'>
+									<div className='h-1.5 w-1.5 rounded-full bg-emerald-400 mt-2 shrink-0' />
+									{decision}
+								</li>
+							))}
+						</ul>
+					</section>
+
+					{/* Suggestions */}
+					<section className='bg-white p-6 rounded-2xl shadow-sm border border-slate-200'>
+						<div className='flex items-center gap-2 mb-4'>
+							<Lightbulb className='text-amber-500' size={20} />
+							<h2 className='text-lg font-bold'>Attendee Suggestions</h2>
+						</div>
+						<div className='space-y-4'>
+							{data.suggestionsFromAttendees.map((sug, index) => (
+								<div
+									key={index}
+									className='border-b border-slate-100 last:border-0 pb-3 last:pb-0'>
+									<p className='text-xs font-bold text-slate-500 mb-1'>
+										{sug.name}
+									</p>
+									<p className='text-sm text-slate-700 italic'>
+										"{sug.suggestion}"
+									</p>
+								</div>
+							))}
+						</div>
+					</section>
+
+					{/* Attendees List */}
+					<section className='bg-white p-6 rounded-2xl shadow-sm border border-slate-200'>
+						<div className='flex items-center gap-2 mb-4'>
+							<Users className='text-slate-400' size={20} />
+							<h2 className='text-lg font-bold'>Attendees</h2>
+						</div>
+						<div className='flex flex-wrap gap-2'>
+							{data.attendees.map((person, index) => (
+								<span
+									key={index}
+									className='bg-slate-100 text-slate-600 px-3 py-1 rounded-md text-xs font-medium'>
+									{person}
+								</span>
+							))}
+						</div>
+					</section>
+				</div>
+			</div>
 		</div>
 	);
-}
+};
+
+export default TamoharMeetingUI;
