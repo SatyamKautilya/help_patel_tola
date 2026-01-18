@@ -342,6 +342,16 @@ export async function POST(request) {
 			const meeting = await TamoharMeeting.findById(id).lean();
 			return NextResponse.json(meeting);
 		}
+		if (name === 'get-tamohar-meetings') {
+			const { visibilityGroups } = body;
+
+			const meetings = await TamoharMeeting.find({
+				visibilityGroups,
+			})
+				.sort({ date: -1 })
+				.lean();
+			return NextResponse.json({ meetings });
+		}
 
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });
 	} catch (error) {
