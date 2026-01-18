@@ -11,6 +11,7 @@ import {
 } from '@heroui/react';
 // Importing an icon library (like Lucide) adds a premium feel
 import { UserPlus, User, Briefcase, Phone, Save, X } from 'lucide-react';
+import { set } from 'mongoose';
 
 const VisibilityGroups = [
 	{
@@ -29,6 +30,7 @@ const AddContactModal = ({ isOpen, onOpenChange, onSuccess }) => {
 	const [loading, setLoading] = useState(false);
 	const [selectedGroups, setSelectedGroups] = useState([]);
 
+	console.log(selectedGroups, 'seel');
 	const handleSaveContact = async (onClose) => {
 		if (mobile.length < 10) {
 			console.error('Mobile number must be at least 10 digits');
@@ -44,13 +46,14 @@ const AddContactModal = ({ isOpen, onOpenChange, onSuccess }) => {
 					name,
 					role,
 					mobile,
-					VisibilityGroups: selectedGroups,
+					visibilityGroups: selectedGroups,
 				}),
 			});
 			if (response.ok) {
 				setName('');
 				setRole('');
 				setMobile('');
+				setSelectedGroups([]);
 				onClose();
 				onSuccess?.();
 			}
@@ -67,7 +70,7 @@ const AddContactModal = ({ isOpen, onOpenChange, onSuccess }) => {
 			onOpenChange={onOpenChange}
 			backdrop='blur' // Modern blurred background
 			classNames={{
-				base: 'border-[#292929]  bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-[#f4f4f5]',
+				base: 'border-[#292929]  dark bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-[#f4f4f5]',
 				header: 'border-b-[1px] border-[#292929]',
 				footer: 'border-t-[1px] border-[#292929] mb-20',
 				closeButton: 'hover:bg-white/5 active:bg-white/10',
@@ -137,14 +140,14 @@ const AddContactModal = ({ isOpen, onOpenChange, onSuccess }) => {
 							<Divider />
 							<div className='flex flex-col gap-2'>
 								<p className='font-medium text-default-400'>
-									दृश्यता समूह चुनें
+									किस समूह को यह संपर्क दिखाई देगा?
 								</p>
 								<div className='flex flex-wrap gap-2'>
 									{VisibilityGroups.map((group) => (
 										<Button
 											key={group.id}
 											variant={
-												selectedGroups.includes(group.id) ? 'solid' : 'outline'
+												selectedGroups.includes(group.id) ? 'solid' : 'bordered'
 											}
 											color='primary'
 											size='sm'

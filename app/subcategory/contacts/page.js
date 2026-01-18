@@ -8,14 +8,6 @@ import { setLoader } from '@/app/store/appSlice';
 
 export default function App() {
 	const thisUser = useSelector((state) => state.appContext.user);
-	const [mounted, setMounted] = useState(false);
-
-	useEffect(() => {
-		setMounted(true);
-	}, []);
-	if (!mounted) return null;
-
-	const userGroups = thisUser?.userGroups ?? [];
 	const [numbers, setNumbers] = useState([]);
 	const dispatch = useDispatch();
 
@@ -23,14 +15,19 @@ export default function App() {
 		initializeApp();
 	}, []);
 
+	const userGroups = thisUser?.userGroups ?? [];
+
 	const initializeApp = async () => {
 		dispatch(setLoader(true));
 		try {
 			const response = await fetch('/api/query/database?name=get-contacts', {
 				method: 'post',
-				body: {
-					visibilityGroups: userGroups,
+				headers: {
+					'Content-Type': 'application/json',
 				},
+				body: JSON.stringify({
+					visibilityGroups: userGroups,
+				}),
 			});
 			if (response.ok) {
 				const data = await response.json();
@@ -62,7 +59,7 @@ export default function App() {
 			{/* Contact List */}
 			<div className='pt-24'>
 				<div className='px-4 py-4 space-y-4'>
-					{numbers?.filter().map((contact) => (
+					{numbers.map((contact) => (
 						<Card
 							key={contact.id}
 							className='rounded-2xl shadow-md border border-blue-100'>
