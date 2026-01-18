@@ -12,7 +12,7 @@ const Kheti = () => {
 				}}
 				style={{
 					backgroundImage:
-						'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/bgfarming.png)',
+						'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/farmbg.png)',
 					backgroundPosition: 'center',
 					backgroundSize: 'cover',
 				}}
@@ -34,9 +34,9 @@ const Kheti = () => {
 				}}
 				style={{
 					backgroundImage:
-						'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/welfare.png)',
+						'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/govtbg.png)',
 					backgroundPosition: '2px 2px',
-					backgroundSize: 'calc(100% - 4px) calc(100% - 4px)',
+					backgroundSize: 'calc(100% - 0px) calc(100% - 0px)',
 				}}
 				className='rounded-2xl bg-white/50  overflow-hidden  w-full h-48
                 backdrop-blur-md
