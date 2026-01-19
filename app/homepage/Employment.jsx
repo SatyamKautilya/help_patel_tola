@@ -21,7 +21,7 @@ const Employment = () => {
 					className='w-full h-full -mt-2 object-contain'
 				/>
 				<div className='flex absolute bottom-0 w-full flex-row justify-end items-end'>
-					<span className='w-full text-center pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-l from-purple-600 to-purple-500 rounded-bl-md rounded-r-md'>
+					<span className='w-full text-center pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-l from-cyan-600 to-cyan-500 rounded-bl-md rounded-r-md'>
 						रोजगार
 					</span>
 				</div>
@@ -43,7 +43,7 @@ const Employment = () => {
 					className='w-full h-full object-cover'
 				/>
 				<div className='flex absolute bottom-0 w-full flex-row justify-center items-end'>
-					<span className='w-full text-center pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-r from-pink-700/90 to-yellow-400 rounded-bl-md rounded-r-md'>
+					<span className='w-full text-center pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-r from-yellow-700 to-yellow-400 rounded-bl-md rounded-r-md'>
 						शिक्षा
 					</span>
 				</div>
