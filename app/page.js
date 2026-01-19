@@ -136,6 +136,7 @@ export default function HomePage() {
 						/>
 					</motion.div>
 					{/* Subtle aesthetic line */}
+					<span className='text-white'>ग्राम के सतत विकास की दिशा में</span>
 					<div className='h-[2px] w-4/5 mt-2 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-60' />
 				</header>
 
