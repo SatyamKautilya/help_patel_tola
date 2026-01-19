@@ -93,6 +93,36 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 										className='w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none'
 										placeholder='तमोहर - बैठक 2'
 									/>
+									<div className='space-y-1'>
+										<label className='text-xs font-semibold text-slate-400 uppercase'>
+											Place
+										</label>
+										<input
+											type='text'
+											className='w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none'
+											placeholder='बैठक का स्थान'
+											value={formData.place}
+											onChange={(e) =>
+												setFormData({ ...formData, place: e.target.value })
+											}
+										/>
+									</div>
+									<div className='space-y-1'>
+										<label className='text-xs font-semibold text-slate-400 uppercase'>
+											Meeting Date
+										</label>
+										<input
+											type='date'
+											className='w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-500 outline-none'
+											value={formData.meetingDate}
+											onChange={(e) =>
+												setFormData({
+													...formData,
+													meetingDate: e.target.value,
+												})
+											}
+										/>
+									</div>
 								</div>
 								<div className='space-y-1'>
 									<label className='text-xs font-semibold text-slate-400 uppercase'>
@@ -128,7 +158,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 								{formData.charcha.map((item, idx) => (
 									<div
 										key={idx}
-										className='p-4 w-full bg-slate-800/50 border border-slate-700 rounded-xl space-y-3 relative'>
+										className='p-4 w-full  bg-slate-800/50 border border-slate-700 rounded-xl space-y-3 relative'>
 										<input
 											className='bg-slate-900/50  text-lg font-bold w-full outline-none placeholder:text-slate-600'
 											placeholder='शीर्षक (Title)'
@@ -143,7 +173,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 											}
 										/>
 										<textarea
-											className='bg-slate-900/50  w-full text-sm text-slate-300 outline-none resize-none'
+											className='bg-slate-900/50 h-70  w-full text-sm text-slate-300 outline-none resize-none'
 											placeholder='विवरण (Details)...'
 											onChange={(e) =>
 												updateArrayOfObjects(

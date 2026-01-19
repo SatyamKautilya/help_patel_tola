@@ -73,7 +73,7 @@ const CaseStory = ({ isOpen, onOpenChange, onSuccess }) => {
 			isOpen={isOpen}
 			onOpenChange={onOpenChange}
 			size='full'
-			className='dark h-full'>
+			className='dark h-full my-10'>
 			<ModalContent className='bg-gray-900 lg:mt-0 mt-10 text-white h-full'>
 				<ModalHeader className='flex flex-col gap-1'>
 					<span className='text-xl font-bold text-white'>सामग्री जोड़ें</span>
