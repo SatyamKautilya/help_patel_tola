@@ -8,7 +8,7 @@ const Employment = () => {
 		<section className='grid grid-cols-2 gap-4'>
 			<div
 				onClick={() => {
-					router.push('/subcategory/farming');
+					router.push('/subcategory/employment');
 				}}
 				className='rounded-2xl overflow-hidden h-48 bg-blue-200 backdrop-blur-md
 				shadow-[0_10px_20px_rgba(0,0,0,0.40)]
@@ -21,7 +21,7 @@ const Employment = () => {
 					className='w-full h-full -mt-2 object-contain'
 				/>
 				<div className='flex absolute bottom-0 w-full flex-row justify-end items-end'>
-					<span className='w-full text-center pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-l from-teal-900 to-teal-500/80 rounded-bl-md rounded-r-md'>
+					<span className='w-full text-center pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-l from-purple-600 to-purple-500 rounded-bl-md rounded-r-md'>
 						रोजगार
 					</span>
 				</div>
@@ -29,7 +29,7 @@ const Employment = () => {
 
 			<div
 				onClick={() => {
-					router.push('/govt-schemes');
+					router.push('/education');
 				}}
 				className='rounded-2xl bg-white/50 overflow-hidden w-full h-48
 				backdrop-blur-md
@@ -43,7 +43,7 @@ const Employment = () => {
 					className='w-full h-full object-cover'
 				/>
 				<div className='flex absolute bottom-0 w-full flex-row justify-center items-end'>
-					<span className='w-full text-center pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-l from-cyan-900 to-cyan-600 rounded-bl-md rounded-r-md'>
+					<span className='w-full text-center pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-r from-pink-700/90 to-yellow-400 rounded-bl-md rounded-r-md'>
 						शिक्षा
 					</span>
 				</div>

@@ -22,7 +22,7 @@ const Kheti = () => {
 				hover:-translate-y-1
 				transition-all duration-300 ease-out'>
 				<div className='flex h-full flex-row justify-end items-end'>
-					<span className=' w-full text-center pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-l from-teal-900 to-teal-500/80 rounded-bl-md rounded-r-md'>
+					<span className=' w-full text-center pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-l from-yellow-600/90 to-yellow-700/80 rounded-bl-md rounded-r-md'>
 						आधुनिक कृषि
 					</span>
 				</div>
