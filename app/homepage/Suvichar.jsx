@@ -453,7 +453,7 @@ const Suvichar = () => {
 			<div className='absolute inset-0 cloud-float opacity-60 pointer-events-none' />
 
 			<div className='relative flex flex-row'>
-				<div className='flex flex-row justify-start items-start gap-1'>
+				<div className='flex flex-row justify-start items-center gap-1'>
 					<Image
 						src='https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/pngwing.com.png'
 						width={50}
@@ -470,13 +470,13 @@ const Suvichar = () => {
 							</div>
 						) : (
 							<>
-								<span className='text-[1.1rem] font-medium tracking-wide text-[#4A2C2A] drop-shadow-[0_1px_2px_rgba(255,255,255,0.35)]'>
-									<b>स्वास्थ्य</b> को समर्पित - वर्ष 2026
-								</span>
+								<h3 className='font-semibold text-md text-green-800'>
+									स्वास्थ्य को समर्पित - वर्ष 2026
+								</h3>
 								<span
 									key={message}
-									className='block mt-1 text-sm text-[#242423] opacity-90 animate-message'>
-									{message}
+									className='block mt-1 text-sm font-bold text-green-900 opacity-90 animate-message'>
+									"{message}"
 								</span>
 							</>
 						)}
