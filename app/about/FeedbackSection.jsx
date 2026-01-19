@@ -62,7 +62,7 @@ export default function FeedbackSection({ sender }) {
 									placeholder: 'text-white',
 									input: 'text-sm text-white bg-transparent',
 									inputWrapper: ` p-2
-											bg-black/20
+											bg-white/50
 											border border-slate-200
 											focus-within:border-blue-500
 											focus-within:ring-2 focus-withing:bg-black-40 focus-within:ring-blue-200
