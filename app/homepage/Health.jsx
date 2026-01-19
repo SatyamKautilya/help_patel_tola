@@ -9,12 +9,13 @@ const Health = () => {
 	return (
 		<section
 			onClick={() => router.push('/subcategory/health')}
-			className='rounded-3xl overflow-hidden h-50 bg-[#dfeee3] flex flex-row  space-y-3 bg-cover bg-center  relative 
+			className='rounded-3xl overflow-hidden h-50 bg-[#dfeee3] flex flex-row space-y-3 bg-cover bg-center relative 
 		  bg-black/10 backdrop-blur-md
-			shadow-[0_10px_20px_rgba(0,0,0,0.40)]
+			
 			hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]
 			hover:-translate-y-1
-			transition-all duration-300 ease-out'
+			transition-all duration-300 ease-out	
+			border-b-2 border-b-teal-400 shadow-[0_0_15px_rgba(20,184,166,0.5)]'
 			style={{
 				backgroundImage:
 					'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/com_hosp_bg.png)',
