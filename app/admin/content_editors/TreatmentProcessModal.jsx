@@ -92,7 +92,7 @@ const TreatmentProcessModal = ({ isOpen, onOpenChange, onSuccess }) => {
 			}}
 			classNames={{
 				backdrop: 'bg-zinc-950/80 backdrop-blur-md',
-				base: 'dark text-foreground bg-zinc-900 border-zinc-800',
+				base: 'dar	k text-foreground bg-zinc-900 border-zinc-800',
 			}}>
 			<ModalContent>
 				<ModalHeader className='flex flex-col gap-2 pt-8'>
