@@ -8,7 +8,7 @@ const nextConfig = {
     // Remove if not using Server Components
     serverComponentsExternalPackages: ['mongodb'],
   },
-  webpack(config, { dev }) {
+  webpack(config, { dev,isServer }) {
     if (dev) {
       // Reduce CPU/memory from file watching
       config.watchOptions = {
@@ -16,6 +16,10 @@ const nextConfig = {
         aggregateTimeout: 300, // wait before rebuilding
         ignored: ['**/node_modules'],
       };
+    }
+    if (isServer) {
+      config.resolve.alias['@opentelemetry/api'] = false;
+      config.resolve.alias['@opentelemetry/sdk-trace-base'] = false;
     }
     return config;
   },
