@@ -28,12 +28,11 @@ export default function RootLayout({ children }) {
 			</head>
 
 			<body className='app-gradient border-3 h-full min-h-screen flex flex-col'>
-				{/* <GlobalLoader /> */}
-				{/* <AnalyticsTracker /> */}
-				<Providers>
-					{' '}
-					<ReduxProvider>{children}</ReduxProvider>
-				</Providers>
+				<ReduxProvider>
+					<GlobalLoader />
+					<AnalyticsTracker />
+					<Providers>{children}</Providers>
+				</ReduxProvider>
 			</body>
 		</html>
 	);

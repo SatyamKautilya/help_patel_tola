@@ -173,7 +173,7 @@ export default function HomePage() {
 								</motion.div>
 							</motion.div>
 						)}
-						{thisUser?.userGroups?.include('PatelTola') && (
+						{true && (
 							<motion.div
 								variants={sectionVariant}
 								initial='hidden'
