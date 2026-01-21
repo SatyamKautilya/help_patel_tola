@@ -2,53 +2,70 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import appReducer from './appSlice';
 
 import {
-	persistStore,
-	persistReducer,
-	FLUSH,
-	REHYDRATE,
-	PAUSE,
-	PERSIST,
-	PURGE,
-	REGISTER,
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
 } from 'redux-persist';
 
-import storage from 'redux-persist/lib/storage'; // localStorage
+import storage from 'redux-persist/lib/storage';
 
-/* ---------------- reducers ---------------- */
+/* ---------- SAFE STORAGE (IMPORTANT) ---------- */
 
-const rootReducer = combineReducers({
-	appContext: appReducer,
-});
-
-/* ---------------- persist config ---------------- */
-
-const persistConfig = {
-	key: 'root',
-	storage,
-	whitelist: ['appContext'], // ✅ persist only what you need
+const createNoopStorage = () => {
+  return {
+    getItem(_key) {
+      return Promise.resolve(null);
+    },
+    setItem(_key, value) {
+      return Promise.resolve(value);
+    },
+    removeItem(_key) {
+      return Promise.resolve();
+    },
+  };
 };
 
-/* ---------------- persisted reducer ---------------- */
+const storageSafe =
+  typeof window !== 'undefined' ? storage : createNoopStorage();
+
+/* ---------- REDUCERS ---------- */
+
+const rootReducer = combineReducers({
+  appContext: appReducer,
+});
+
+/* ---------- PERSIST CONFIG ---------- */
+
+const persistConfig = {
+  key: 'root',
+  storage: storageSafe,
+  whitelist: ['appContext'],
+};
+
+/* ---------- STORE ---------- */
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-/* ---------------- store ---------------- */
-
 export const store = configureStore({
-	reducer: persistedReducer,
-	middleware: (getDefaultMiddleware) =>
-		getDefaultMiddleware({
-			serializableCheck: {
-				ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-			},
-		}),
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [
+          FLUSH,
+          REHYDRATE,
+          PAUSE,
+          PERSIST,
+          PURGE,
+          REGISTER,
+        ],
+      },
+    }),
 });
 
-/* ---------------- persistor ---------------- */
-
 export const persistor = persistStore(store);
-
-/* ---------------- helpers ---------------- */
-
-export const RootState = () => store.getState();
-export const AppDispatch = store.dispatch;
