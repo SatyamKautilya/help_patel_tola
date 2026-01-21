@@ -4,6 +4,7 @@ const nextConfig = {
     unoptimized: true,
   },
   experimental: {
+    instrumentationHook: false, 
     // Remove if not using Server Components
     serverComponentsExternalPackages: ['mongodb'],
   },
