@@ -1,12 +1,54 @@
-import { configureStore } from '@reduxjs/toolkit';
-import reducer from './appSlice';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import appReducer from './appSlice';
 
-export const store = configureStore({
-	reducer: {
-		appContext: reducer,
-	},
+import {
+	persistStore,
+	persistReducer,
+	FLUSH,
+	REHYDRATE,
+	PAUSE,
+	PERSIST,
+	PURGE,
+	REGISTER,
+} from 'redux-persist';
+
+import storage from 'redux-persist/lib/storage'; // localStorage
+
+/* ---------------- reducers ---------------- */
+
+const rootReducer = combineReducers({
+	appContext: appReducer,
 });
 
-// (Optional helpers – fine to keep)
-export const RootState = store.getState;
+/* ---------------- persist config ---------------- */
+
+const persistConfig = {
+	key: 'root',
+	storage,
+	whitelist: ['appContext'], // ✅ persist only what you need
+};
+
+/* ---------------- persisted reducer ---------------- */
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+/* ---------------- store ---------------- */
+
+export const store = configureStore({
+	reducer: persistedReducer,
+	middleware: (getDefaultMiddleware) =>
+		getDefaultMiddleware({
+			serializableCheck: {
+				ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+			},
+		}),
+});
+
+/* ---------------- persistor ---------------- */
+
+export const persistor = persistStore(store);
+
+/* ---------------- helpers ---------------- */
+
+export const RootState = () => store.getState();
 export const AppDispatch = store.dispatch;
