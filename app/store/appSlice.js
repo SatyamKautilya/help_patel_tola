@@ -1,6 +1,4 @@
-import { user } from '@heroui/react';
 import { createSlice } from '@reduxjs/toolkit';
-import { set } from 'mongoose';
 
 const initialState = {
 	appContext: {},
