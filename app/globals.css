@@ -33,7 +33,9 @@
 	opacity: 0;
 	animation: fadeGlow 2.5s ease forwards;
 	text-shadow: 0 0 12px rgba(255, 215, 130, 0.5);
-	animation: fadeGlow 2.5s ease forwards, glowPulse 3s ease-in-out infinite;
+	animation:
+		fadeGlow 2.5s ease forwards,
+		glowPulse 3s ease-in-out infinite;
 }
 
 .meaning {
@@ -182,7 +184,9 @@
 		background-position: 200% 0;
 	}
 }
-
+.abc {
+	display: block;
+}
 .animate-shimmer-text {
 	animation: shimmer-text 5s infinite linear;
 }
