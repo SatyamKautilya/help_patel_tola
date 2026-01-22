@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useChatbot } from '@/hooks/useChatbot';
 import { useEffect, useRef, useState } from 'react';
+import { Dot } from 'lucide-react';
 
 export default function ChatbotFloating({ context, buttonLabel = 'Chat' }) {
 	const [open, setOpen] = useState(false);
@@ -24,7 +25,7 @@ export default function ChatbotFloating({ context, buttonLabel = 'Chat' }) {
 			{/* Floating Button */}
 			{!open && (
 				<button
-					className='fixed bottom-4 right-4 z-50 bg-green-600 text-white px-5 py-3 rounded-full shadow-xl active:scale-95 transition'
+					className='fixed bottom-10 right-4 z-50 bg-green-600 text-white px-5 py-3 rounded-full shadow-xl active:scale-95 transition'
 					onClick={() => setOpen(true)}>
 					{buttonLabel}
 				</button>
@@ -34,17 +35,18 @@ export default function ChatbotFloating({ context, buttonLabel = 'Chat' }) {
 			{open && (
 				<div
 					className='
-            fixed bottom-20 left-2 right-2 sm:left-auto sm:right-4 sm:w-96
-            max-h-[75vh]
-            bg-white rounded-xl shadow-2xl
-            flex flex-col z-50
-            border border-gray-200 overflow-hidden
-          '>
+						fixed bottom-20 left-2 right-2 sm:left-auto sm:right-4 sm:w-96 h-4/5
+						max-h-[75vh]
+						bg-white rounded-xl shadow-2xl
+						flex flex-col z-50
+						border border-gray-200 overflow-hidden
+          				'>
 					{/* Header */}
 					<div className='bg-green-600 text-white px-4 py-3 flex items-center justify-between'>
-						<div>
-							<p className='font-semibold leading-none'>Tamohar Assistant</p>
-							<p className='text-xs opacity-90'>कृषि • स्वास्थ्य • शिक्षा</p>
+						<div className='flex flex-row items-center gap-3'>
+							<Dot className='text-white text-lg' />
+							<p className='font-semibold leading-none'>तमोहर कृषि विशेषज्ञ</p>
+							{/* <p className='text-xs opacity-90'>कृषि • स्वास्थ्य • शिक्षा</p> */}
 						</div>
 						<button
 							onClick={() => setOpen(false)}
@@ -95,8 +97,12 @@ export default function ChatbotFloating({ context, buttonLabel = 'Chat' }) {
 
 						{loading && (
 							<div className='flex justify-start'>
-								<div className='bg-white px-4 py-2 rounded-xl shadow text-gray-500 text-sm'>
-									लिख रहा हूँ…
+								<div className='bg-white px-4 py-3 rounded-xl shadow'>
+									<div className='flex gap-1.5 items-center'>
+										<span className='w-2 h-2 bg-gray-500 rounded-full animate-bounce'></span>
+										<span className='w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:0.2s]'></span>
+										<span className='w-2 h-2 bg-gray-500 rounded-full animate-bounce [animation-delay:0.4s]'></span>
+									</div>
 								</div>
 							</div>
 						)}

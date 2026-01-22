@@ -8,7 +8,7 @@ export async function POST(req) {
 	const { messages, context } = await req.json();
 
 	const stream = await openai.chat.completions.create({
-		model: 'gpt-5-nano-2025-08-07', // fast + cheap
+		model: 'gpt-4o', // fast + cheap
 		stream: true,
 		messages: [
 			{
