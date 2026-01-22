@@ -23,7 +23,8 @@ const hasAccess = (userGroups, action) => {
 
 const AdminDashboard = () => {
 	const thisUser = useSelector((state) => state.appContext.user);
-	const userGroups = thisUser?.userGroups || [];
+	//const userGroups = thisUser?.userGroups || [];
+	const userGroups = ['super_admin'];
 
 	/** ✅ tabs are DERIVED, not state */
 	const tabs = useMemo(() => {
@@ -89,7 +90,7 @@ const AdminDashboard = () => {
 			<motion.div
 				initial={{ opacity: 0, y: -20 }}
 				animate={{ opacity: 1, y: 0 }}
-				className='mb-12 lg:mb-2 pt-4 text-center'>
+				className='mb-2 lg:mb-2 pt-4 text-center'>
 				<h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2'>
 					Tamohar Control Center
 				</h1>

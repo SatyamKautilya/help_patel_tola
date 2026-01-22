@@ -174,7 +174,7 @@ export default function HomePage() {
 								</motion.div>
 							</motion.div>
 						)}
-						{true && (
+						{thisUser?.taggedVillage?.length && (
 							<motion.div
 								variants={sectionVariant}
 								initial='hidden'
