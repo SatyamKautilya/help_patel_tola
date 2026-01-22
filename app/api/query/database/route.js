@@ -406,7 +406,32 @@ export async function POST(request) {
 			await meeting.save();
 			return NextResponse.json({ message: 'Successfully signed the meeting.' });
 		}
-
+		if (name === 'add-meeting-details') {
+			const { meetingDetails } = body;
+			if (!meetingDetails?.title || !meetingDetails?.date) {
+				return NextResponse.json(
+					{ error: 'Meeting title and date are required' },
+					{ status: 400 },
+				);
+			}
+			const newMeeting = await TamoharMeeting.create({
+				title: meetingDetails.title,
+				meetingName: meetingDetails.meetingName || '',
+				theme: meetingDetails.theme || 'education',
+				date: new Date(meetingDetails.date),
+				meetingDate: new Date(meetingDetails.meetingDate),
+				place: meetingDetails.place || '',
+				aim: meetingDetails.aim || '',
+				charcha: meetingDetails.charcha || [
+					{ title: '', details: '', findings: '' },
+				],
+				interventionStrategy: meetingDetails.interventionStrategy || [''],
+				decisions: meetingDetails.decisions || [''],
+				visibilityGroups: meetingDetails.visibilityGroups || [''],
+				attendees: [],
+			});
+			return NextResponse.json(newMeeting);
+		}
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });
 	} catch (error) {
 		console.error('API POST Error:', error);
