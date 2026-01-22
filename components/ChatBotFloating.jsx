@@ -48,9 +48,16 @@ export default function ChatbotFloating({ context, buttonLabel = 'सहाय�
 						animate={{ opacity: 1, y: 0, scale: 1 }}
 						exit={{ opacity: 0, y: 20, scale: 0.95 }}
 						className='
-                            fixed bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:w-[400px] h-[75vh]
-                            max-h-[700px] bg-white/90 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.15)]
-                            flex flex-col z-50 border border-white/40 overflow-hidden
+                          fixed
+						top-16 bottom-4
+						left-2 right-2
+						sm:left-auto sm:right-6 sm:w-[400px]
+						bg-white/95
+						rounded-xl
+						shadow-[0_20px_60px_rgba(0,0,0,0.15)]
+						flex flex-col z-50
+						border border-white/40
+						overflow-hidden
                         '>
 						{/* Header */}
 						<div className='bg-gradient-to-r from-green-600 to-emerald-500 text-white px-5 py-4 flex items-center justify-between shadow-lg'>
