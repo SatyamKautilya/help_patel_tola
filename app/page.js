@@ -248,7 +248,7 @@ export default function HomePage() {
 							</div>
 							<div className='relative flex justify-center'>
 								<span className='bg-gradient-to-r from-transparent via-white to-transparent w-full text-center backdrop-blur-sm px-6 py-1.5  text-sm font-bold text-lime-800 shadow-sm  '>
-									मेरे स्वयं सहायता समूह
+									मेरे स्व सहायता समूह
 								</span>
 							</div>
 						</motion.div>

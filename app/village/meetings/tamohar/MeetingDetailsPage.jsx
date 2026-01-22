@@ -8,8 +8,23 @@ import {
 	Lightbulb,
 	Users,
 } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import { Button } from '@heroui/react';
 
 const MeetingDetailPage = ({ data }) => {
+	const thisUser = useSelector((state) => state.appContext.user);
+
+	const handleSign = () => {
+		const sign = fetch('/api/query/database?name=digital-sign', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				meetingId: data._id,
+				name: thisUser?.name,
+			}),
+		});
+	};
+
 	return (
 		<div className='min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 p-6 font-sans text-slate-900'>
 			<div className='max-w-6xl mx-auto'>
@@ -147,7 +162,7 @@ const MeetingDetailPage = ({ data }) => {
 								<div className='p-2 bg-amber-100 rounded-xl'>
 									<Lightbulb className='text-amber-600' size={24} />
 								</div>
-								<h2 className='text-xl font-black'>प्रतिभागी सुझाव</h2>
+								<h2 className='text-xl font-black'>सदस्यों से प्राप्त सुझाव</h2>
 							</div>
 							<div className='space-y-4'>
 								{data.suggestionsFromAttendees.map((sug, index) => (
@@ -162,15 +177,27 @@ const MeetingDetailPage = ({ data }) => {
 								))}
 							</div>
 						</section>
-
+						<div className='flex flex-row justify-center'>
+							<Button
+								onPress={handleSign}
+								color='success'
+								variant='solid'
+								className='    text-xl font-bold'
+								size='lg'>
+								🖊️ डिजिटल हस्ताक्षर करें
+							</Button>
+						</div>
 						{/* Attendees */}
 						<section className='bg-white p-8 rounded-2xl shadow-md border border-slate-200'>
 							<div className='flex items-center gap-3 mb-6'>
 								<div className='p-2 bg-slate-100 rounded-xl'>
 									<Users className='text-slate-600' size={24} />
 								</div>
-								<h2 className='text-xl font-black'>प्रतिभागी</h2>
+								<h2 className='text-xl font-black'>
+									उपस्थित सदस्यों के हस्ताक्षर
+								</h2>
 							</div>
+
 							<div className='flex flex-wrap gap-2'>
 								{data.attendees.map((person, index) => (
 									<span

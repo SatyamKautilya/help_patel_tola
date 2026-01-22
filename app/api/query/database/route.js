@@ -381,6 +381,31 @@ export async function POST(request) {
 				.lean();
 			return NextResponse.json({ meetings });
 		}
+		if (name === 'digital-sign') {
+			const { meetingId, name } = body;
+			if (!meetingId || !name) {
+				return NextResponse.json(
+					{ error: 'meetingId and name are required' },
+
+					{ status: 400 },
+				);
+			}
+			const meeting = await TamoharMeeting.findById(meetingId);
+			if (!meeting) {
+				return NextResponse.json(
+					{ error: 'Meeting not found' },
+					{ status: 404 },
+				);
+			}
+			if (meeting.attendees && meeting.attendees.includes(name)) {
+				return NextResponse.json({
+					message: 'You have already signed this meeting.',
+				});
+			}
+			meeting.attendees.push(name);
+			await meeting.save();
+			return NextResponse.json({ message: 'Successfully signed the meeting.' });
+		}
 
 		return NextResponse.json({ error: 'Invalid endpoint' }, { status: 404 });
 	} catch (error) {
