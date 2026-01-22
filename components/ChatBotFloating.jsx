@@ -52,7 +52,7 @@ export default function ChatbotFloating({ context, buttonLabel = 'सहाय�
 						top-16 bottom-4
 						left-2 right-2
 						sm:left-auto sm:right-6 sm:w-[400px]
-						bg-white/95
+						bg-white
 						rounded-xl
 						shadow-[0_20px_60px_rgba(0,0,0,0.15)]
 						flex flex-col z-50

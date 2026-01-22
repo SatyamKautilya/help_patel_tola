@@ -223,9 +223,9 @@ export async function POST(request) {
 			return NextResponse.json(feedback);
 		}
 		if (name === 'register-for-village') {
-			const { villageCode, assetId, userName } = body;
+			const { villageCode, assetId, userName, mobileNumber } = body;
 			console.log(body, 'body');
-			if (!villageCode) {
+			if (!villageCode || !mobileNumber) {
 				return NextResponse.json(
 					{ error: 'villageCode is required' },
 					{ status: 400 },
@@ -240,6 +240,7 @@ export async function POST(request) {
 					assetId, // use assetId as id
 					villageId: villageCode,
 					name: userName,
+					mobileNumber: mobileNumber,
 					status: 'pending',
 					createdAt: new Date(),
 				});
@@ -249,7 +250,7 @@ export async function POST(request) {
 			return NextResponse.json({ message: 'पंजीकरण सफल!' });
 		}
 		if (name === 'update-join-request-status') {
-			const { assetId, status } = body;
+			const { assetId, status, mobileNumber } = body;
 			if (!assetId || !status) {
 				return NextResponse.json(
 					{ error: 'assetId and status are required' },
@@ -262,11 +263,39 @@ export async function POST(request) {
 				{ new: true },
 			);
 			if (status === 'approved') {
-				const updatedUser = await Users.findOneAndUpdate(
-					{ id: assetId },
-					{ $push: { userGroups: 'PatelTola' }, isTaggedToVillage: true },
-					{ new: true },
-				);
+				// Look up user by mobile number
+				const existingUserByMobile = await Users.findOne({
+					mobileNumber: mobileNumber,
+				}).lean();
+
+				if (existingUserByMobile) {
+					// Copy content from existing user and update the new user with assetId
+					await Users.findOneAndUpdate(
+						{ id: assetId },
+						{
+							$set: {
+								name: existingUserByMobile.name,
+								mobileNumber: existingUserByMobile.mobileNumber,
+								userGroups: existingUserByMobile.userGroups || [],
+								taggedVillage: existingUserByMobile.taggedVillage || [],
+								isAdmin: existingUserByMobile.isAdmin || false,
+								villageName: existingUserByMobile.villageName || '',
+							},
+						},
+						{ new: true, upsert: true },
+					);
+				} else {
+					// No existing user found, just add the village tag
+					await Users.findOneAndUpdate(
+						{ id: assetId },
+						{
+							$set: { mobileNumber: mobileNumber },
+							$push: { taggedVillage: 'PatelTola' },
+						},
+						{ new: true },
+					);
+				}
+
 				const updatedDevice = await Device.findOneAndUpdate(
 					{ assetId: assetId },
 					{ $push: { groups: 'PatelTola' } },

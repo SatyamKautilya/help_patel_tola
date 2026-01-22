@@ -136,7 +136,7 @@ export default function HomePage() {
 						/>
 					</motion.div>
 					{/* Subtle aesthetic line */}
-					<span className='text-white'>ग्राम के सतत विकास की दिशा में</span>
+					{/* <span className='text-white'>ग्राम के सतत विकास की दिशा में</span> */}
 					<div className='h-[2px] w-4/5 mt-2 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-60' />
 				</header>
 
@@ -250,14 +250,16 @@ export default function HomePage() {
 							viewport={{ once: true }}>
 							<About />
 						</motion.div>
-						<motion.div
-							variants={sectionVariant}
-							initial='hidden'
-							whileInView='visible'
-							viewport={{ once: true }}
-							className='mt-8 w-full max-w-md mx-auto'>
-							<VillageGroupRegistration />
-						</motion.div>
+						{!thisUser?.taggedVillage?.length && (
+							<motion.div
+								variants={sectionVariant}
+								initial='hidden'
+								whileInView='visible'
+								viewport={{ once: true }}
+								className='mt-8 w-full max-w-md mx-auto'>
+								<VillageGroupRegistration />
+							</motion.div>
+						)}
 						<div className='h-[3px]  bg-gradient-to-r from-transparent via-white to-transparent opacity-50' />
 						<motion.div
 							variants={sectionVariant}

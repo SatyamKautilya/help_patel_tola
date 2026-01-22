@@ -73,7 +73,7 @@ const MeetingDetailPage = ({ data }) => {
 									<div
 										key={index}
 										className='bg-white rounded-2xl border-1 border-blue-600 shadow-md hover:shadow-lg transition-shadow p-6 overflow-hidden group'>
-										<div className='absolute top-0 right-0 w-20 h-20 bg-blue-50 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform' />
+										{/* <div className='absolute top-0 right-0 w-20 h-20 bg-blue-50 rounded-full -mr-10 -mt-10 group-hover:scale-110 transition-transform' /> */}
 										<h3 className='font-black text-lg text-slate-800 mb-2 relative z-10'>
 											{item.title}
 										</h3>

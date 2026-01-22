@@ -25,6 +25,12 @@ export default function RootLayout({ children }) {
             });
           `}
 				</Script>
+				<meta
+					name='viewport'
+					content='width=device-width,
+           initial-scale=1,
+           maximum-scale=1,
+           user-scalable=no'></meta>
 			</head>
 
 			<body className='app-gradient border-3 h-full min-h-screen flex flex-col'>

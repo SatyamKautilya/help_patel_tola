@@ -184,8 +184,9 @@
 		background-position: 200% 0;
 	}
 }
-.abc {
-	display: block;
+html {
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
 }
 .animate-shimmer-text {
 	animation: shimmer-text 5s infinite linear;
