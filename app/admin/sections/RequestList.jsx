@@ -23,13 +23,17 @@ const RequestList = () => {
 		init();
 	}, []);
 
-	const handleApprove = async (id) => {
+	const handleApprove = async (id, mobileNumber) => {
 		setRequests(requests.filter((r) => r.assetId !== id));
 		const approve = async () => {
 			await fetch(`/api/query/database?name=update-join-request-status`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ assetId: id, status: 'approved' }),
+				body: JSON.stringify({
+					assetId: id,
+					status: 'approved',
+					mobileNumber: mobileNumber,
+				}),
 			});
 		};
 		await approve();
@@ -119,7 +123,7 @@ const RequestList = () => {
 									<motion.button
 										whileHover={{ scale: 1.05 }}
 										whileTap={{ scale: 0.95 }}
-										onClick={() => handleApprove(req.assetId)}
+										onClick={() => handleApprove(req.assetId, req.mobileNumber)}
 										className='flex items-center gap-2 px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-500/30 rounded-lg text-emerald-400 text-xs font-semibold transition-all'>
 										<Plus size={16} />
 										Approve
