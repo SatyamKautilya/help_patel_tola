@@ -32,7 +32,7 @@ export default function ChatbotFloating({ context, buttonLabel = 'सहाय�
 						exit={{ scale: 0, opacity: 0 }}
 						whileHover={{ scale: 1.05 }}
 						whileTap={{ scale: 0.95 }}
-						className='fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-gradient-to-tr from-green-600 to-emerald-500 text-white px-6 py-4 rounded-full shadow-[0_10px_40px_rgba(22,163,74,0.4)] transition-all'
+						className='fixed bottom-12 right-6 z-50 flex items-center gap-2 bg-gradient-to-tr from-green-600 to-emerald-500 text-white px-6 py-4 rounded-full shadow-[0_10px_40px_rgba(22,163,74,0.4)] transition-all'
 						onClick={() => setOpen(true)}>
 						<MessageCircle className='w-6 h-6' />
 						<span className='font-medium'>{buttonLabel}</span>
