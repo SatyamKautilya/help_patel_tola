@@ -1,6 +1,7 @@
 'use client';
 
 import { setLoader } from '@/app/store/appSlice';
+import ChatbotFloating from '@/components/ChatBotFloating';
 import { Button } from '@heroui/react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
@@ -120,18 +121,18 @@ export default function AgriculturePage() {
 					))}
 				</motion.div>
 				{/* AI Button */}
-				<motion.button
-					initial={{ opacity: 0, y: 50 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{
-						type: 'spring',
-						stiffness: 120,
-						delay: 1.2,
-						duration: 0.5,
-					}}
-					className='fixed bottom-8 right-5 rounded-full bg-green-600 px-6 py-3 text-base font-semibold text-white shadow-xl hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-300'>
-					🤖 विशेषज्ञ से पूछें
-				</motion.button>
+				<ChatbotFloating
+					context={`
+						you are तमोहर apps farming expert.
+						rules
+						- you will answer in hindi text.
+						- you will not use more than 100 words in answer and 50 words for first hi/hello.
+						- you will ask followup questions if necessary.
+						- when suggesting pesticide you will suggest only from sygenta, adama, bayer and upl products.
+						- you will try to diagnose the desease based on farmer's description.
+						`}
+					buttonLabel='तमोहर- कृषि विशेषज्ञ से पूछें'
+				/>
 			</div>
 		</div>
 	);
