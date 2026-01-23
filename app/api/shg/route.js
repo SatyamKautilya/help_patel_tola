@@ -1,3 +1,5 @@
+export const runtime = 'nodejs';
+
 import { NextResponse } from 'next/server';
 
 // import User from '@/models/User';
@@ -10,42 +12,50 @@ import BankLoan from '@/lib/models/shgModels/BankLoan';
 import { connectToDatabase } from '@/lib/mongodb';
 
 export async function POST(req) {
-	await connectToDatabase();
-	const { searchParams } = new URL(req.url);
-	const name = searchParams.get('name');
+	try {
+		await connectToDatabase();
+		const { searchParams } = new URL(req.url);
+		const name = searchParams.get('name');
 
-	const body = await req.json();
+		const body = await req.json();
 
-	switch (name) {
-		case 'create-shg':
-			return createSHG(body);
+		switch (name) {
+			case 'create-shg':
+				return createSHG(body);
 
-		case 'add-member':
-			return addMember(body);
+			case 'add-member':
+				return addMember(body);
 
-		case 'monthly-deposit':
-			return monthlyDeposit(body);
+			case 'monthly-deposit':
+				return monthlyDeposit(body);
 
-		case 'lump-sum':
-			return lumpSumContribution(body);
+			case 'lump-sum':
+				return lumpSumContribution(body);
 
-		case 'create-loan':
-			return createLoan(body);
+			case 'create-loan':
+				return createLoan(body);
 
-		case 'loan-repayment':
-			return loanRepayment(body);
+			case 'loan-repayment':
+				return loanRepayment(body);
 
-		case 'bank-loan':
-			return createBankLoan(body);
+			case 'bank-loan':
+				return createBankLoan(body);
 
-		case 'opening-balance':
-			return openingBalance(body);
+			case 'opening-balance':
+				return openingBalance(body);
 
-		default:
-			return NextResponse.json(
-				{ error: 'Invalid API action' },
-				{ status: 400 },
-			);
+			default:
+				return NextResponse.json(
+					{ error: 'Invalid API action' },
+					{ status: 400 },
+				);
+		}
+	} catch (error) {
+		console.error('API Error:', error);
+		return NextResponse.json(
+			{ error: error.message || 'Internal Server Error' },
+			{ status: 500 },
+		);
 	}
 }
 
