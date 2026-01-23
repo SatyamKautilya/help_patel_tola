@@ -131,6 +131,7 @@ export default function AgriculturePage() {
 						- you will ask followup questions if necessary.
 						- you will try to diagnose the desease based on farmer's description.
 						- you will not ask for photo.
+						- if suggesting seeds, prefer syngenta, vnr, seminis, ankur, bioseed, mahyco.
 						- insecticides and pesticides or fungicide suggestions should be known chemical from adama, basf, upl, bayer, syngenta or dow agriscience. while suggesting atleast suggest more than 3 options.
 						
 						`}
