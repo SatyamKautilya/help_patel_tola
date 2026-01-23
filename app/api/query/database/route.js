@@ -11,6 +11,7 @@ import Device from '@/lib/models/Device';
 import { sendPushNotifications } from '@/lib/sendPush';
 import Contacts from '@/lib/models/Contacts';
 import TamoharMeeting from '@/lib/models/TamoharMeeting';
+import VillageList from '@/lib/models/VillageList';
 // Helper function to get path segments
 function getPathSegments(request) {
 	const url = new URL(request.url);
@@ -114,6 +115,10 @@ export async function GET(request) {
 				.sort({ createdAt: -1 })
 				.limit(10);
 			return NextResponse.json({ lastTenFeedbacks });
+		}
+		if (name === 'getVillagesList') {
+			const villages = await VillageList.find().sort({ villageName: 1 });
+			return NextResponse.json({ villages });
 		}
 	} catch (error) {
 		console.error('API GET Error:', error);

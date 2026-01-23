@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import {
 	X,
 	ChevronRight,
@@ -18,7 +19,40 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
+	const thisUser = useSelector((state) => state.appContext.user);
 	const [currentIndex, setCurrentIndex] = useState(0);
+	const [villages, setVillages] = useState([]);
+	const getVillages = async () => {
+		const resp = await fetch('/api/query/database?name=getVillagesList', {
+			method: 'GET',
+		});
+		const data = await resp.json();
+		return data.villages;
+	};
+
+	useEffect(() => {
+		// villages =[
+		//   {
+		//     villageName: "Pipariya",
+		//     villageCode: "PIP001",
+		//     villageId: "VIL-101"
+		//   },
+		//   {
+		//     villageName: "Khargone",
+		//     villageCode: "KHA002",
+		//     villageId: "VIL-102"
+		//   }
+		// ]
+		getVillages().then((villages) => {
+			// Do something with the villages, e.g., set them in state
+			setVillages(
+				villages.filter((v) =>
+					thisUser?.taggedVillage?.includes(v.villageCode),
+				),
+			);
+		});
+	}, []);
+
 	const [formData, setFormData] = useState({
 		meetingName: '',
 		theme: 'education',
@@ -29,7 +63,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 		interventionStrategy: [''],
 		decisions: [''],
 		suggestionsFromAttendees: [{ name: '', suggestion: '' }], // Added back
-		visibilityGroups: 'Public',
+		visibilityGroups: [],
 	});
 
 	if (!isOpen) return null;
@@ -335,14 +369,28 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 										subtitle='दृश्यता का चयन करें'
 									/>
 									<div className='grid grid-cols-1 gap-3'>
-										{['Public', 'Admin Only'].map((option) => (
+										{villages.map((option) => (
 											<div
-												key={option}
-												onClick={() => updateField('visibilityGroups', option)}
-												className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.visibilityGroups === option ? 'border-blue-500 bg-blue-500/10' : 'border-slate-800 bg-slate-800/40'}`}>
+												key={option.villageCode}
+												onClick={() =>
+													updateField(
+														'visibilityGroups',
+														formData.visibilityGroups.includes(
+															option.villageCode,
+														)
+															? formData.visibilityGroups.filter(
+																	(v) => v !== option.villageCode,
+																)
+															: [
+																	...formData.visibilityGroups,
+																	option.villageCode,
+																],
+													)
+												}
+												className={`p-4 rounded-2xl border-2 cursor-pointer transition-all ${formData.visibilityGroups.includes(option.villageCode) ? 'border-blue-500 bg-blue-500/10' : 'border-slate-800 bg-slate-800/40'}`}>
 												<p
-													className={`font-bold ${formData.visibilityGroups === option ? 'text-blue-400' : 'text-slate-400'}`}>
-													{option}
+													className={`font-bold ${formData.visibilityGroups.includes(option.villageCode) ? 'text-blue-400' : 'text-slate-400'}`}>
+													{option.villageName}
 												</p>
 											</div>
 										))}
