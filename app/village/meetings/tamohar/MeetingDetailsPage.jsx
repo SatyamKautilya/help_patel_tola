@@ -13,18 +13,36 @@ import { Button } from '@heroui/react';
 
 const MeetingDetailPage = ({ data }) => {
 	const thisUser = useSelector((state) => state.appContext.user);
+	const [isLoading, setIsLoading] = React.useState(false);
 
-	const handleSign = () => {
-		const sign = fetch('/api/query/database?name=digital-sign', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				meetingId: data._id,
-				name: thisUser?.name,
-			}),
-		});
+	const handleSign = async () => {
+		setIsLoading(true);
+		try {
+			await fetch('/api/query/database?name=digital-sign', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					meetingId: data._id,
+					name: thisUser?.name,
+				}),
+			});
+		} catch (error) {
+			console.error('Error signing:', error);
+		} finally {
+			setIsLoading(false);
+		}
 	};
 
+	if (isLoading) {
+		return (
+			<div className='flex justify-center items-center h-screen'>
+				<div className='loader animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600'></div>
+				<p className='text-lg text-slate-700 ml-4 animate-pulse'>
+					साइन किया जा रहा है...
+				</p>
+			</div>
+		);
+	}
 	return (
 		<div className='min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-slate-50 p-6 font-sans text-slate-900'>
 			<div className='max-w-6xl mx-auto'>
