@@ -8,12 +8,14 @@ import StatusPage from './sections/StatusPage';
 import ContentPage from './sections/ContentPage';
 import NotificationSender from './sections/NotificationSender';
 import RequestList from './sections/RequestList';
+import OnboardingFlow from '../shg/onboarding/OnboardingFlow';
 
 const PERMISSIONS = {
 	view_stats: ['super_admin'],
 	manage_approvals: ['super_admin', 'approver'],
 	edit_content: ['super_admin', 'content_editor'],
 	send_notifications: ['super_admin', 'notification_sender'],
+	onboard_shgs: ['super_admin', 'shg_onboarder'],
 };
 
 const hasAccess = (userGroups, action) => {
@@ -37,6 +39,11 @@ const AdminDashboard = () => {
 				permission: 'send_notifications',
 			},
 			{ key: 'approval', label: 'Requests', permission: 'manage_approvals' },
+			{
+				key: 'onboarding',
+				label: 'SHG Onboarding',
+				permission: 'onboard_shgs',
+			},
 		].filter((tab) => hasAccess(userGroups, tab.permission));
 	}, [userGroups]);
 
@@ -148,6 +155,7 @@ const AdminDashboard = () => {
 				{activeTab === 'content' && <ContentPage />}
 				{activeTab === 'notification' && <NotificationSender />}
 				{activeTab === 'approval' && <RequestList />}
+				{activeTab === 'onboarding' && <OnboardingFlow />}
 			</motion.div>
 		</div>
 	);
