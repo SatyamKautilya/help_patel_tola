@@ -205,7 +205,10 @@ const MeetingDetailPage = ({ data }) => {
 									size='lg'>
 									🖊️ डिजिटल हस्ताक्षर करें
 								</Button>
-								<div>{JSON.stringify(data.attendees)}</div>
+								<div>
+									{thisUser.hindiName}
+									{data.attendees?.includes(thisUser.hindiName)}
+								</div>
 							</div>
 						)}
 						{/* Attendees */}
