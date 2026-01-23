@@ -33,10 +33,6 @@ const MeetingDetailPage = ({ data }) => {
 		}
 	};
 
-	alert(data.attendees?.includes(thisUser.hindiName));
-	alert(thisUser.hindiName);
-	alert(data.attendees);
-
 	if (isLoading) {
 		return (
 			<div className='flex justify-center items-center h-screen'>

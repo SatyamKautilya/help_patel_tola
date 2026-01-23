@@ -55,7 +55,7 @@ const RequestList = () => {
 				status: 'approved',
 				villageId: villageId,
 				mobileNumber: mobileNumber,
-				hindiName: hindiNames[id],
+				hindiName: hindiNames[id]?.trim(),
 			}),
 		});
 		setHindiNames((prev) => {
