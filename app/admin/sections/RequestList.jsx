@@ -1,10 +1,31 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Globe, Users, Plus, MessageSquare, CheckCircle } from 'lucide-react'; // Import CheckCircle icon
+import { Globe, Users, Plus, MessageSquare, CheckCircle } from 'lucide-react';
 
 const RequestList = () => {
 	const [requests, setRequests] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const [hindiNames, setHindiNames] = useState({});
+	const [villages, setVillages] = useState([]);
+
+	const getVillages = async () => {
+		const resp = await fetch('/api/query/database?name=getVillagesList', {
+			method: 'GET',
+		});
+		const data = await resp.json();
+		return data.villages;
+	};
+	useEffect(() => {
+		const loadVillages = async () => {
+			try {
+				const data = await getVillages();
+				setVillages(data);
+			} catch (error) {
+				console.error('Error fetching villages:', error);
+			}
+		};
+		loadVillages();
+	}, []);
 
 	const init = async () => {
 		try {
@@ -23,32 +44,33 @@ const RequestList = () => {
 		init();
 	}, []);
 
-	const handleApprove = async (id, mobileNumber) => {
+	const handleApprove = async (id, mobileNumber, villageId) => {
 		setRequests(requests.filter((r) => r.assetId !== id));
-		const approve = async () => {
-			await fetch(`/api/query/database?name=update-join-request-status`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					assetId: id,
-					status: 'approved',
-					mobileNumber: mobileNumber,
-				}),
-			});
-		};
-		await approve();
+		await fetch(`/api/query/database?name=update-join-request-status`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				assetId: id,
+				status: 'approved',
+				villageId: villageId,
+				mobileNumber: mobileNumber,
+				hindiName: hindiNames[id],
+			}),
+		});
+		setHindiNames((prev) => {
+			const updated = { ...prev };
+			delete updated[id];
+			return updated;
+		});
 	};
 
 	const handleReject = async (id) => {
 		setRequests(requests.filter((r) => r.assetId !== id));
-		const Reject = async () => {
-			await fetch(`/api/query/database?name=update-join-request-status`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ assetId: id, status: 'rejected' }),
-			});
-		};
-		await Reject();
+		await fetch(`/api/query/database?name=update-join-request-status`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ assetId: id, status: 'rejected' }),
+		});
 	};
 
 	if (loading) {
@@ -110,7 +132,11 @@ const RequestList = () => {
 										<Globe size={18} className='text-blue-400' />
 										<span className='text-slate-400 text-xs'>Village:</span>
 										<span className='font-semibold text-white'>
-											{req.villageId === '1' ? 'Patel Tola' : req.villageId}
+											{
+												villages?.find(
+													(village) => village.id === req.villageId,
+												)?.villageName
+											}
 										</span>
 									</div>
 									<div className='flex items-center gap-2'>
@@ -119,23 +145,44 @@ const RequestList = () => {
 										<span className='font-semibold text-white'>{req.name}</span>
 									</div>
 								</div>
-								<div className='flex pt-3 justify-between gap-3'>
-									<motion.button
-										whileHover={{ scale: 1.05 }}
-										whileTap={{ scale: 0.95 }}
-										onClick={() => handleApprove(req.assetId, req.mobileNumber)}
-										className='flex items-center gap-2 px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-500/30 rounded-lg text-emerald-400 text-xs font-semibold transition-all'>
-										<Plus size={16} />
-										Approve
-									</motion.button>
-									<motion.button
-										whileHover={{ scale: 1.05 }}
-										whileTap={{ scale: 0.95 }}
-										onClick={() => handleReject(req.assetId)}
-										className='flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/40 border border-red-500/30 rounded-lg text-red-400 text-xs font-semibold transition-all'>
-										<MessageSquare size={16} />
-										Reject
-									</motion.button>
+								<div className='flex flex-col gap-3'>
+									<input
+										type='text'
+										placeholder='Hindi Name'
+										value={hindiNames[req.assetId] || ''}
+										onChange={(e) =>
+											setHindiNames((prev) => ({
+												...prev,
+												[req.assetId]: e.target.value,
+											}))
+										}
+										className='px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 text-xs focus:outline-none focus:border-blue-400'
+									/>
+									<div className='flex pt-3 justify-between gap-3'>
+										<motion.button
+											whileHover={{ scale: 1.05 }}
+											whileTap={{ scale: 0.95 }}
+											onClick={() =>
+												handleApprove(
+													req.assetId,
+													req.mobileNumber,
+													req.villageId,
+												)
+											}
+											disabled={!hindiNames[req.assetId]?.trim()}
+											className='flex items-center gap-2 px-4 py-2 bg-emerald-500/20 hover:bg-emerald-500/40 border border-emerald-500/30 rounded-lg text-emerald-400 text-xs font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed'>
+											<Plus size={16} />
+											Approve
+										</motion.button>
+										<motion.button
+											whileHover={{ scale: 1.05 }}
+											whileTap={{ scale: 0.95 }}
+											onClick={() => handleReject(req.assetId)}
+											className='flex items-center gap-2 px-4 py-2 bg-red-500/20 hover:bg-red-500/40 border border-red-500/30 rounded-lg text-red-400 text-xs font-semibold transition-all'>
+											<MessageSquare size={16} />
+											Reject
+										</motion.button>
+									</div>
 								</div>
 							</motion.div>
 						))}

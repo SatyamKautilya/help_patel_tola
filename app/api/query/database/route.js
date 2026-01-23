@@ -236,7 +236,15 @@ export async function POST(request) {
 					{ status: 400 },
 				);
 			}
-
+			const village = await VillageList.findOne({
+				villageId: villageCode,
+			}).lean();
+			if (!village) {
+				return NextResponse.json(
+					{ error: 'Village not found' },
+					{ status: 404 },
+				);
+			}
 			// Add your village registration logic here
 			const existingRequest = await JoinRequest.findOne({ assetId: assetId });
 			if (!existingRequest) {
@@ -255,7 +263,7 @@ export async function POST(request) {
 			return NextResponse.json({ message: 'पंजीकरण सफल!' });
 		}
 		if (name === 'update-join-request-status') {
-			const { assetId, status, mobileNumber } = body;
+			const { assetId, status, mobileNumber, hindiName } = body;
 			if (!assetId || !status) {
 				return NextResponse.json(
 					{ error: 'assetId and status are required' },
@@ -265,6 +273,7 @@ export async function POST(request) {
 			const updatedRequest = await JoinRequest.findOneAndUpdate(
 				{ assetId: assetId },
 				{ status: status },
+
 				{ new: true },
 			);
 			if (status === 'approved') {
@@ -280,6 +289,7 @@ export async function POST(request) {
 						{
 							$set: {
 								name: existingUserByMobile.name,
+								hindiName: existingUserByMobile.hindiName,
 								mobileNumber: existingUserByMobile.mobileNumber,
 								userGroups: existingUserByMobile.userGroups || [],
 								taggedVillage: existingUserByMobile.taggedVillage || [],
@@ -294,7 +304,7 @@ export async function POST(request) {
 					await Users.findOneAndUpdate(
 						{ id: assetId },
 						{
-							$set: { mobileNumber: mobileNumber },
+							$set: { mobileNumber: mobileNumber, hindiName: hindiName },
 							$push: { taggedVillage: 'PatelTola' },
 						},
 						{ new: true },
