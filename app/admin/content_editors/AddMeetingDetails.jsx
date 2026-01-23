@@ -44,13 +44,13 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 	const [formData, setFormData] = useState({
 		meetingName: '',
 		theme: 'education',
-		meetingDate: '', // Initialized as empty for validation
+		meetingDate: '',
 		place: '',
 		aim: '',
 		charcha: [{ title: '', details: '', findings: '' }],
 		interventionStrategy: [''],
 		decisions: [''],
-		suggestionsFromAttendees: [],
+		suggestionsFromAttendees: [{ name: '', suggestion: '' }], // 🟢 Restored
 		visibilityGroups: [],
 	});
 
@@ -60,12 +60,12 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 	const totalInterventions = formData.interventionStrategy.length;
 	const totalAttendees = formData.suggestionsFromAttendees.length;
 
+	// Total: General(1) + Charcha(N) + Interventions(M) + Decisions(1) + Attendees(K) + Visibility(1)
 	const totalSteps =
 		1 + totalCharcha + totalInterventions + 1 + totalAttendees + 1;
 
 	// --- 🛡️ Validation Logic ---
 	const isStepValid = () => {
-		// Step 0: General Info
 		if (currentIndex === 0) {
 			return (
 				formData.meetingName &&
@@ -74,12 +74,10 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 				formData.aim
 			);
 		}
-		// Steps 1 to N: Charcha
 		if (currentIndex > 0 && currentIndex <= totalCharcha) {
 			const item = formData.charcha[currentIndex - 1];
 			return item.title && item.details && item.findings;
 		}
-		// Steps N+1 to M: Interventions
 		if (
 			currentIndex > totalCharcha &&
 			currentIndex <= totalCharcha + totalInterventions
@@ -87,17 +85,16 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 			return (
 				formData.interventionStrategy[
 					currentIndex - totalCharcha - 1
-				].trim() !== ''
+				]?.trim() !== ''
 			);
 		}
-		// Step M+1: Decisions
 		if (currentIndex === totalCharcha + totalInterventions + 1) {
 			return (
 				formData.decisions.length > 0 &&
 				formData.decisions.every((d) => d.trim() !== '')
 			);
 		}
-		// Steps M+2 to K: Attendees
+		// 🟢 Validation for restored suggestions
 		if (
 			currentIndex > totalCharcha + totalInterventions + 1 &&
 			currentIndex <= totalCharcha + totalInterventions + 1 + totalAttendees
@@ -108,7 +105,6 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 				];
 			return attendee.name && attendee.suggestion;
 		}
-		// Final Step: Visibility
 		if (currentIndex === totalSteps - 1) {
 			return formData.visibilityGroups.length > 0;
 		}
@@ -153,7 +149,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 
 	const saveMeetingDetails = () => {
 		if (!isStepValid()) {
-			alert('कृपया कम से कम एक गांव (Visibility Group) चुनें।');
+			alert('कृपया कम से कम एक गांव चुनें।');
 			return;
 		}
 
@@ -229,7 +225,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 									<StepHeader
 										icon={<Target className='text-blue-400' />}
 										title='बुनियादी जानकारी'
-										subtitle='बैठक का नाम और स्थान (सभी अनिवार्य)'
+										subtitle='बैठक का नाम और स्थान *'
 									/>
 									<Input
 										label='बैठक का नाम *'
@@ -268,7 +264,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 											<StepHeader
 												icon={<BookOpen className='text-emerald-400' />}
 												title={`चर्चा बिन्दु #${idx + 1}`}
-												subtitle='विषय का पूरा विवरण भरें'
+												subtitle='विषय का विवरण भरें *'
 											/>
 											<Input
 												label='शीर्षक (Title) *'
@@ -317,7 +313,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 											<StepHeader
 												icon={<ClipboardList className='text-orange-400' />}
 												title={`हस्तक्षेप रणनीति #${idx + 1}`}
-												subtitle='रणनीति का विवरण अनिवार्य है'
+												subtitle='रणनीति का विवरण भरें *'
 											/>
 											<TextArea
 												label='रणनीति का विवरण *'
@@ -346,7 +342,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 									<StepHeader
 										icon={<ListChecks className='text-purple-400' />}
 										title='अंतिम निर्णय'
-										subtitle='कम से कम एक निर्णय लिखें'
+										subtitle='निर्णय बिंदुओं की सूची *'
 									/>
 									{formData.decisions.map((d, i) => (
 										<div key={i} className='flex gap-2'>
@@ -379,6 +375,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 								</div>
 							)}
 
+							{/* 🟢 RESTORED: Attendees & Suggestions UI */}
 							{currentIndex > totalCharcha + totalInterventions + 1 &&
 								currentIndex <=
 									totalCharcha + totalInterventions + 1 + totalAttendees &&
@@ -390,7 +387,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 											<StepHeader
 												icon={<UserPlus className='text-pink-400' />}
 												title={`उपस्थित सदस्य #${idx + 1}`}
-												subtitle='सदस्य और सुझाव भरें'
+												subtitle='नाम और सुझाव भरें *'
 											/>
 											<Input
 												label='सदस्य का नाम *'
