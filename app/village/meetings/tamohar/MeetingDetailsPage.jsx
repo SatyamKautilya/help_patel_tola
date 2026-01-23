@@ -33,6 +33,10 @@ const MeetingDetailPage = ({ data }) => {
 		}
 	};
 
+	alert(data.attendees?.includes(thisUser.hindiName));
+	alert(thisUser.hindiName);
+	alert(data.attendees);
+
 	if (isLoading) {
 		return (
 			<div className='flex justify-center items-center h-screen'>
@@ -195,7 +199,7 @@ const MeetingDetailPage = ({ data }) => {
 								))}
 							</div>
 						</section>
-						{data.attendees?.includes(thisUser.hindiName) ? null : (
+						{!data.attendees?.includes(thisUser.hindiName) && (
 							<div className='flex flex-row justify-center'>
 								<Button
 									onPress={handleSign}
@@ -205,10 +209,6 @@ const MeetingDetailPage = ({ data }) => {
 									size='lg'>
 									🖊️ डिजिटल हस्ताक्षर करें
 								</Button>
-								<div>
-									{thisUser.hindiName}
-									{data.attendees?.includes(thisUser.hindiName)}
-								</div>
 							</div>
 						)}
 						{/* Attendees */}
