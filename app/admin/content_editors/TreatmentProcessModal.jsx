@@ -84,12 +84,13 @@ const TreatmentProcessModal = ({ isOpen, onOpenChange, onSuccess }) => {
 	return (
 		<Modal
 			scrollBehavior='inside'
-			size='full'
+			// size='full'
 			isOpen={isOpen}
 			onOpenChange={(open) => {
 				if (!open) resetForm();
 				onOpenChange(open);
 			}}
+			className='h-4/5'
 			classNames={{
 				backdrop: 'bg-zinc-950/80 backdrop-blur-md',
 				base: 'dark text-foreground bg-zinc-900 border-zinc-800',
