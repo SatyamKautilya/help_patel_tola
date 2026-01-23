@@ -174,7 +174,7 @@ export default function HomePage() {
 								</motion.div>
 							</motion.div>
 						)}
-						{thisUser?.taggedVillage?.length && (
+						{thisUser?.taggedVillage?.length ? (
 							<motion.div
 								variants={sectionVariant}
 								initial='hidden'
@@ -182,7 +182,7 @@ export default function HomePage() {
 								viewport={{ once: true }}>
 								<PatelTola />
 							</motion.div>
-						)}
+						) : null}
 
 						<motion.div
 							variants={sectionVariant}

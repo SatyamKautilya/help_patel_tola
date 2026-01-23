@@ -263,20 +263,24 @@ export async function POST(request) {
 			return NextResponse.json({ message: 'पंजीकरण सफल!' });
 		}
 		if (name === 'update-join-request-status') {
-			const { assetId, status, mobileNumber, hindiName } = body;
+			const { assetId, status, mobileNumber, hindiName, villageId } = body;
 			if (!assetId || !status) {
 				return NextResponse.json(
 					{ error: 'assetId and status are required' },
 					{ status: 400 },
 				);
 			}
+
 			const updatedRequest = await JoinRequest.findOneAndUpdate(
 				{ assetId: assetId },
 				{ status: status },
-
 				{ new: true },
 			);
 			if (status === 'approved') {
+				const village = await VillageList.findOne({
+					villageId: villageId,
+				}).lean();
+				const villageCode = village?.villageCode;
 				// Look up user by mobile number
 				const existingUserByMobile = await Users.findOne({
 					mobileNumber: mobileNumber,
@@ -305,7 +309,7 @@ export async function POST(request) {
 						{ id: assetId },
 						{
 							$set: { mobileNumber: mobileNumber, hindiName: hindiName },
-							$push: { taggedVillage: 'PatelTola' },
+							$push: { taggedVillage: villageCode },
 						},
 						{ new: true },
 					);
@@ -313,7 +317,7 @@ export async function POST(request) {
 
 				const updatedDevice = await Device.findOneAndUpdate(
 					{ assetId: assetId },
-					{ $push: { groups: 'PatelTola' } },
+					{ $push: { groups: villageCode } },
 					{ new: true },
 				);
 				``;

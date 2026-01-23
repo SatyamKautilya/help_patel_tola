@@ -15,6 +15,7 @@ const RequestList = () => {
 		const data = await resp.json();
 		return data.villages;
 	};
+
 	useEffect(() => {
 		const loadVillages = async () => {
 			try {
@@ -134,7 +135,7 @@ const RequestList = () => {
 										<span className='font-semibold text-white'>
 											{
 												villages?.find(
-													(village) => village.id === req.villageId,
+													(village) => village.villageId === req.villageId,
 												)?.villageName
 											}
 										</span>

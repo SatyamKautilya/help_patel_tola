@@ -30,6 +30,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 		return data.villages;
 	};
 
+	console.log(villages, 'vila');
 	useEffect(() => {
 		// villages =[
 		//   {
