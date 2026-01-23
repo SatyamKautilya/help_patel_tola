@@ -1,17 +1,16 @@
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
 
-import User from '@/models/User';
+// import User from '@/models/User';
 import Shg from '@/lib/models/shgModels/Shg';
 import ShgMember from '@/lib/models/shgModels/ShgMember';
 import Transaction from '@/lib/models/shgModels/Transaction';
 import Loan from '@/lib/models/shgModels/Loan';
 import LoanRepayment from '@/lib/models/shgModels/LoanRepayment';
 import BankLoan from '@/lib/models/shgModels/BankLoan';
+import { connectToDatabase } from '@/lib/mongodb';
 
 export async function POST(req) {
-	await connectDB();
-
+	await connectToDatabase();
 	const { searchParams } = new URL(req.url);
 	const name = searchParams.get('name');
 
