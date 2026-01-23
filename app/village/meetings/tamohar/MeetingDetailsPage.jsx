@@ -23,7 +23,7 @@ const MeetingDetailPage = ({ data }) => {
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					meetingId: data._id,
-					name: thisUser?.name,
+					name: thisUser?.hindiName,
 				}),
 			});
 		} catch (error) {
@@ -195,16 +195,18 @@ const MeetingDetailPage = ({ data }) => {
 								))}
 							</div>
 						</section>
-						<div className='flex flex-row justify-center'>
-							<Button
-								onPress={handleSign}
-								color='success'
-								variant='solid'
-								className='    text-xl font-bold'
-								size='lg'>
-								🖊️ डिजिटल हस्ताक्षर करें
-							</Button>
-						</div>
+						{data.attendees?.includes(thisUser.hindiName) ? null : (
+							<div className='flex flex-row justify-center'>
+								<Button
+									onPress={handleSign}
+									color='success'
+									variant='solid'
+									className='    text-xl font-bold'
+									size='lg'>
+									🖊️ डिजिटल हस्ताक्षर करें
+								</Button>
+							</div>
+						)}
 						{/* Attendees */}
 						<section className='bg-white p-8 rounded-2xl shadow-md border border-slate-200'>
 							<div className='flex items-center gap-3 mb-6'>

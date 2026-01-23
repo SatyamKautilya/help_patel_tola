@@ -427,7 +427,7 @@ export async function POST(request) {
 		}
 		if (name === 'add-meeting-details') {
 			const { meetingDetails } = body;
-			if (!meetingDetails?.title || !meetingDetails?.date) {
+			if (!meetingDetails?.meetingDate || !meetingDetails?.meetingName) {
 				return NextResponse.json(
 					{ error: 'Meeting title and date are required' },
 					{ status: 400 },
@@ -446,8 +446,10 @@ export async function POST(request) {
 				],
 				interventionStrategy: meetingDetails.interventionStrategy || [''],
 				decisions: meetingDetails.decisions || [''],
+				executionPlan30Days: meetingDetails.executionPlan30Days || [''],
 				visibilityGroups: meetingDetails.visibilityGroups || [''],
 				attendees: [],
+				updatedBy: meetingDetails.updatedBy,
 			});
 			return NextResponse.json(newMeeting);
 		}

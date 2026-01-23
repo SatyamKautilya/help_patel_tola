@@ -57,7 +57,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 	const [formData, setFormData] = useState({
 		meetingName: '',
 		theme: 'education',
-		meetingDate: '',
+		meetingDate: Date.now(),
 		place: '',
 		aim: '',
 		charcha: [{ title: '', details: '', findings: '' }],
@@ -67,6 +67,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 		visibilityGroups: [],
 	});
 
+	console.log(formData, 'formdata');
 	if (!isOpen) return null;
 
 	// --- Navigation Logic ---
@@ -107,6 +108,40 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 
 	const addMore = (field, defaultValue) => {
 		updateField(field, [...formData[field], defaultValue]);
+	};
+
+	const saveMeetingDetails = () => {
+		// Validate required fields before submission
+		if (!formData.meetingName || !formData.place || !formData.aim) {
+			alert('कृपया सभी आवश्यक फ़ील्ड भरें।');
+			return;
+		}
+		fetch('/api/query/database?name=add-meeting-details', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				meetingDetails: {
+					...formData,
+					executionPlan30Days: formData.interventionStrategy,
+					updatedBy: thisUser?.name || 'admin',
+				},
+			}),
+		})
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.error) {
+					alert('त्रुटि: ' + data.error);
+				} else {
+					alert('बैठक विवरण सफलतापूर्वक सहेजे गए।');
+					onSuccess();
+					onOpenChange();
+				}
+			})
+			.catch((error) => {
+				alert('सर्वर त्रुटि: ' + error.message);
+			});
 	};
 
 	return (
@@ -417,7 +452,9 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 							आगे <ChevronRight size={20} />
 						</button>
 					) : (
-						<button className='flex items-center gap-2 px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/20 transition-all'>
+						<button
+							onClick={saveMeetingDetails}
+							className='flex items-center gap-2 px-8 py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold shadow-lg shadow-emerald-500/20 transition-all'>
 							<Save size={20} /> सेव करें
 						</button>
 					)}
