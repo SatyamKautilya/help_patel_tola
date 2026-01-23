@@ -44,7 +44,7 @@ export default function AddMembers({ shgId, onNext }) {
 	};
 
 	return (
-		<div className='max-w-md mx-auto p-8 space-y-6 bg-gray-900 text-gray-100 rounded-2xl shadow-xl border border-gray-800'>
+		<>
 			<div className='flex items-center gap-3 mb-6'>
 				<div className='p-3 bg-blue-500/10 rounded-full'>
 					<Users className='w-6 h-6 text-blue-400' />
@@ -56,7 +56,6 @@ export default function AddMembers({ shgId, onNext }) {
 					<p className='text-gray-400 text-sm'>Build your SHG team</p>
 				</div>
 			</div>
-
 			<div className='space-y-4'>
 				<div className='relative group'>
 					<div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
@@ -121,7 +120,6 @@ export default function AddMembers({ shgId, onNext }) {
 					)}
 				</div>
 			</div>
-
 			<div>
 				<div className='flex items-center justify-between mb-3'>
 					<h3 className='text-sm font-semibold text-gray-400 uppercase tracking-wider'>
@@ -152,7 +150,6 @@ export default function AddMembers({ shgId, onNext }) {
 					)}
 				</div>
 			</div>
-
 			<button
 				onClick={() => onNext()}
 				disabled={members.length === 0}
@@ -160,6 +157,6 @@ export default function AddMembers({ shgId, onNext }) {
 				<span>Continue to Next Step</span>
 				<ArrowRight className='w-5 h-5 group-hover:translate-x-1 transition-transform' />
 			</button>
-		</div>
+		</>
 	);
 }
