@@ -22,6 +22,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 	const thisUser = useSelector((state) => state.appContext.user);
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [villages, setVillages] = useState([]);
+
 	const getVillages = async () => {
 		const resp = await fetch('/api/query/database?name=getVillagesList', {
 			method: 'GET',
@@ -30,61 +31,101 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 		return data.villages;
 	};
 
-	console.log(villages, 'vila');
 	useEffect(() => {
-		// villages =[
-		//   {
-		//     villageName: "Pipariya",
-		//     villageCode: "PIP001",
-		//     villageId: "VIL-101"
-		//   },
-		//   {
-		//     villageName: "Khargone",
-		//     villageCode: "KHA002",
-		//     villageId: "VIL-102"
-		//   }
-		// ]
 		getVillages().then((villages) => {
-			// Do something with the villages, e.g., set them in state
 			setVillages(
 				villages.filter((v) =>
 					thisUser?.taggedVillage?.includes(v.villageCode),
 				),
 			);
 		});
-	}, []);
+	}, [thisUser]);
 
 	const [formData, setFormData] = useState({
 		meetingName: '',
 		theme: 'education',
-		meetingDate: Date.now(),
+		meetingDate: '', // Initialized as empty for validation
 		place: '',
 		aim: '',
 		charcha: [{ title: '', details: '', findings: '' }],
 		interventionStrategy: [''],
 		decisions: [''],
-		suggestionsFromAttendees: [], // Added back
+		suggestionsFromAttendees: [],
 		visibilityGroups: [],
 	});
 
-	console.log(formData, 'formdata');
 	if (!isOpen) return null;
 
-	// --- Navigation Logic ---
 	const totalCharcha = formData.charcha.length;
 	const totalInterventions = formData.interventionStrategy.length;
 	const totalAttendees = formData.suggestionsFromAttendees.length;
 
-	// Total: General(1) + Charcha(N) + Interventions(M) + Decisions(1) + Attendees(K) + Visibility(1)
 	const totalSteps =
 		1 + totalCharcha + totalInterventions + 1 + totalAttendees + 1;
 
-	const handleNext = () =>
+	// --- 🛡️ Validation Logic ---
+	const isStepValid = () => {
+		// Step 0: General Info
+		if (currentIndex === 0) {
+			return (
+				formData.meetingName &&
+				formData.place &&
+				formData.meetingDate &&
+				formData.aim
+			);
+		}
+		// Steps 1 to N: Charcha
+		if (currentIndex > 0 && currentIndex <= totalCharcha) {
+			const item = formData.charcha[currentIndex - 1];
+			return item.title && item.details && item.findings;
+		}
+		// Steps N+1 to M: Interventions
+		if (
+			currentIndex > totalCharcha &&
+			currentIndex <= totalCharcha + totalInterventions
+		) {
+			return (
+				formData.interventionStrategy[
+					currentIndex - totalCharcha - 1
+				].trim() !== ''
+			);
+		}
+		// Step M+1: Decisions
+		if (currentIndex === totalCharcha + totalInterventions + 1) {
+			return (
+				formData.decisions.length > 0 &&
+				formData.decisions.every((d) => d.trim() !== '')
+			);
+		}
+		// Steps M+2 to K: Attendees
+		if (
+			currentIndex > totalCharcha + totalInterventions + 1 &&
+			currentIndex <= totalCharcha + totalInterventions + 1 + totalAttendees
+		) {
+			const attendee =
+				formData.suggestionsFromAttendees[
+					currentIndex - (totalCharcha + totalInterventions + 2)
+				];
+			return attendee.name && attendee.suggestion;
+		}
+		// Final Step: Visibility
+		if (currentIndex === totalSteps - 1) {
+			return formData.visibilityGroups.length > 0;
+		}
+		return true;
+	};
+
+	const handleNext = () => {
+		if (!isStepValid()) {
+			alert('कृपया आगे बढ़ने से पहले सभी जानकारी भरें।');
+			return;
+		}
 		currentIndex < totalSteps - 1 && setCurrentIndex(currentIndex + 1);
+	};
+
 	const handlePrev = () =>
 		currentIndex > 0 && setCurrentIndex(currentIndex - 1);
 
-	// --- Fixed Update Helpers ---
 	const updateField = (field, value) =>
 		setFormData((prev) => ({ ...prev, [field]: value }));
 
@@ -111,16 +152,14 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 	};
 
 	const saveMeetingDetails = () => {
-		// Validate required fields before submission
-		if (!formData.meetingName || !formData.place || !formData.aim) {
-			alert('कृपया सभी आवश्यक फ़ील्ड भरें।');
+		if (!isStepValid()) {
+			alert('कृपया कम से कम एक गांव (Visibility Group) चुनें।');
 			return;
 		}
+
 		fetch('/api/query/database?name=add-meeting-details', {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
+			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				meetingDetails: {
 					...formData,
@@ -177,7 +216,6 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 					))}
 				</div>
 
-				{/* Body Content */}
 				<div className='flex-1 overflow-y-auto p-8 custom-scrollbar'>
 					<AnimatePresence mode='wait'>
 						<motion.div
@@ -186,27 +224,26 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 							animate={{ x: 0, opacity: 1 }}
 							exit={{ x: -10, opacity: 0 }}
 							className='space-y-6'>
-							{/* PAGE 0: General Info */}
 							{currentIndex === 0 && (
 								<div className='space-y-4'>
 									<StepHeader
 										icon={<Target className='text-blue-400' />}
 										title='बुनियादी जानकारी'
-										subtitle='बैठक का नाम और स्थान'
+										subtitle='बैठक का नाम और स्थान (सभी अनिवार्य)'
 									/>
 									<Input
-										label='बैठक का नाम'
+										label='बैठक का नाम *'
 										value={formData.meetingName}
 										onChange={(e) => updateField('meetingName', e.target.value)}
 									/>
 									<div className='grid grid-cols-2 gap-4'>
 										<Input
-											label='स्थान'
+											label='स्थान *'
 											value={formData.place}
 											onChange={(e) => updateField('place', e.target.value)}
 										/>
 										<Input
-											label='तारीख'
+											label='तारीख *'
 											type='date'
 											value={formData.meetingDate}
 											onChange={(e) =>
@@ -215,14 +252,13 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 										/>
 									</div>
 									<TextArea
-										label='उद्देश्य (Aim)'
+										label='उद्देश्य (Aim) *'
 										value={formData.aim}
 										onChange={(e) => updateField('aim', e.target.value)}
 									/>
 								</div>
 							)}
 
-							{/* DYNAMIC: Charcha Pages */}
 							{currentIndex > 0 &&
 								currentIndex <= totalCharcha &&
 								(() => {
@@ -232,17 +268,17 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 											<StepHeader
 												icon={<BookOpen className='text-emerald-400' />}
 												title={`चर्चा बिन्दु #${idx + 1}`}
-												subtitle='विषय का विवरण'
+												subtitle='विषय का पूरा विवरण भरें'
 											/>
 											<Input
-												label='शीर्षक (Title)'
+												label='शीर्षक (Title) *'
 												value={formData.charcha[idx].title}
 												onChange={(e) =>
 													updateCharcha(idx, 'title', e.target.value)
 												}
 											/>
 											<TextArea
-												label='विवरण (Details)'
+												label='विवरण (Details) *'
 												rows={5}
 												value={formData.charcha[idx].details}
 												onChange={(e) =>
@@ -250,13 +286,12 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 												}
 											/>
 											<Input
-												label='निष्कर्ष (Findings)'
+												label='निष्कर्ष (Findings) *'
 												value={formData.charcha[idx].findings}
 												onChange={(e) =>
 													updateCharcha(idx, 'findings', e.target.value)
 												}
 											/>
-
 											{currentIndex === totalCharcha && (
 												<AddMoreButton
 													onClick={() =>
@@ -266,14 +301,13 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 															findings: '',
 														})
 													}
-													label='एक और चर्चा जोड़ें'
+													label='एक और चर्चा जोड़ें'
 												/>
 											)}
 										</div>
 									);
 								})()}
 
-							{/* DYNAMIC: Interventions */}
 							{currentIndex > totalCharcha &&
 								currentIndex <= totalCharcha + totalInterventions &&
 								(() => {
@@ -283,10 +317,10 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 											<StepHeader
 												icon={<ClipboardList className='text-orange-400' />}
 												title={`हस्तक्षेप रणनीति #${idx + 1}`}
-												subtitle='कार्ययोजना का विवरण'
+												subtitle='रणनीति का विवरण अनिवार्य है'
 											/>
 											<TextArea
-												label='रणनीति का विवरण'
+												label='रणनीति का विवरण *'
 												rows={6}
 												value={formData.interventionStrategy[idx]}
 												onChange={(e) =>
@@ -297,24 +331,22 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 													)
 												}
 											/>
-
 											{currentIndex === totalCharcha + totalInterventions && (
 												<AddMoreButton
 													onClick={() => addMore('interventionStrategy', '')}
-													label='एक और रणनीति जोड़ें'
+													label='एक और रणनीति जोड़ें'
 												/>
 											)}
 										</div>
 									);
 								})()}
 
-							{/* PAGE: Decisions (Single Page List) */}
 							{currentIndex === totalCharcha + totalInterventions + 1 && (
 								<div className='space-y-4'>
 									<StepHeader
 										icon={<ListChecks className='text-purple-400' />}
 										title='अंतिम निर्णय'
-										subtitle='मुख्य निर्णय बिंदुओं की सूची'
+										subtitle='कम से कम एक निर्णय लिखें'
 									/>
 									{formData.decisions.map((d, i) => (
 										<div key={i} className='flex gap-2'>
@@ -325,27 +357,28 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 													updateListItem('decisions', i, e.target.value)
 												}
 											/>
-											<button
-												onClick={() =>
-													updateField(
-														'decisions',
-														formData.decisions.filter((_, idx) => idx !== i),
-													)
-												}
-												className='p-3 text-slate-500 hover:text-red-400'>
-												<Trash2 size={20} />
-											</button>
+											{formData.decisions.length > 1 && (
+												<button
+													onClick={() =>
+														updateField(
+															'decisions',
+															formData.decisions.filter((_, idx) => idx !== i),
+														)
+													}
+													className='p-3 text-slate-500 hover:text-red-400'>
+													<Trash2 size={20} />
+												</button>
+											)}
 										</div>
 									))}
 									<button
 										onClick={() => addMore('decisions', '')}
 										className='text-blue-400 font-bold text-sm flex items-center gap-2 mt-2'>
-										<Plus size={16} /> निर्णय जोड़ें
+										<Plus size={16} /> निर्णय जोड़ें
 									</button>
 								</div>
 							)}
 
-							{/* DYNAMIC: Attendees & Suggestions */}
 							{currentIndex > totalCharcha + totalInterventions + 1 &&
 								currentIndex <=
 									totalCharcha + totalInterventions + 1 + totalAttendees &&
@@ -357,17 +390,17 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 											<StepHeader
 												icon={<UserPlus className='text-pink-400' />}
 												title={`उपस्थित सदस्य #${idx + 1}`}
-												subtitle='नाम और उनके सुझाव'
+												subtitle='सदस्य और सुझाव भरें'
 											/>
 											<Input
-												label='सदस्य का नाम'
+												label='सदस्य का नाम *'
 												value={formData.suggestionsFromAttendees[idx].name}
 												onChange={(e) =>
 													updateAttendee(idx, 'name', e.target.value)
 												}
 											/>
 											<TextArea
-												label='सुझाव (Suggestion)'
+												label='सुझाव (Suggestion) *'
 												rows={5}
 												value={
 													formData.suggestionsFromAttendees[idx].suggestion
@@ -376,7 +409,6 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 													updateAttendee(idx, 'suggestion', e.target.value)
 												}
 											/>
-
 											{currentIndex ===
 												totalCharcha +
 													totalInterventions +
@@ -389,20 +421,19 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 															suggestion: '',
 														})
 													}
-													label='एक और सदस्य जोड़ें'
+													label='एक और सदस्य जोड़ें'
 												/>
 											)}
 										</div>
 									);
 								})()}
 
-							{/* PAGE: Visibility */}
 							{currentIndex === totalSteps - 1 && (
 								<div className='space-y-6'>
 									<StepHeader
 										icon={<Eye className='text-blue-400' />}
 										title='पब्लिश सेटिंग्स'
-										subtitle='दृश्यता का चयन करें'
+										subtitle='कम से कम एक गांव चुनें *'
 									/>
 									<div className='grid grid-cols-1 gap-3'>
 										{villages.map((option) => (
@@ -437,14 +468,12 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 					</AnimatePresence>
 				</div>
 
-				{/* Footer Navigation */}
 				<div className='p-6 flex justify-between items-center bg-slate-950/50'>
 					<button
 						onClick={handlePrev}
 						className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition ${currentIndex === 0 ? 'opacity-0 pointer-events-none' : 'text-slate-400 hover:bg-white/5'}`}>
 						<ChevronLeft size={20} /> पीछे
 					</button>
-
 					{currentIndex < totalSteps - 1 ? (
 						<button
 							onClick={handleNext}
@@ -464,7 +493,6 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 	);
 };
 
-// --- Reusable Sub-components ---
 const StepHeader = ({ icon, title, subtitle }) => (
 	<div className='mb-6'>
 		<div className='flex items-center gap-3 mb-2'>
@@ -474,7 +502,6 @@ const StepHeader = ({ icon, title, subtitle }) => (
 		<p className='text-slate-400 text-sm'>{subtitle}</p>
 	</div>
 );
-
 const AddMoreButton = ({ onClick, label }) => (
 	<button
 		onClick={onClick}
@@ -482,7 +509,6 @@ const AddMoreButton = ({ onClick, label }) => (
 		<Plus size={18} /> {label}
 	</button>
 );
-
 const Input = ({ label, onChange, ...props }) => (
 	<div className='space-y-1.5 flex-1'>
 		<label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1'>
@@ -495,7 +521,6 @@ const Input = ({ label, onChange, ...props }) => (
 		/>
 	</div>
 );
-
 const TextArea = ({ label, onChange, ...props }) => (
 	<div className='space-y-1.5'>
 		<label className='text-[10px] font-bold text-slate-500 uppercase tracking-wider ml-1'>
