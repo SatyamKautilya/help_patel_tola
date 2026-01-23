@@ -63,7 +63,7 @@ const AddMeetingDetails = ({ isOpen, onOpenChange, onSuccess }) => {
 		charcha: [{ title: '', details: '', findings: '' }],
 		interventionStrategy: [''],
 		decisions: [''],
-		suggestionsFromAttendees: [{ name: '', suggestion: '' }], // Added back
+		suggestionsFromAttendees: [], // Added back
 		visibilityGroups: [],
 	});
 

@@ -447,6 +447,7 @@ export async function POST(request) {
 				interventionStrategy: meetingDetails.interventionStrategy || [''],
 				decisions: meetingDetails.decisions || [''],
 				executionPlan30Days: meetingDetails.executionPlan30Days || [''],
+				suggestionsFromAttendees: meetingDetails.suggestionsFromAttendees || [],
 				visibilityGroups: meetingDetails.visibilityGroups || [''],
 				attendees: [],
 				updatedBy: meetingDetails.updatedBy,
