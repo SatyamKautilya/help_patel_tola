@@ -1,6 +1,7 @@
 'use client';
 
 import { setLoader } from '@/app/store/appSlice';
+import { farmingBot } from '@/app/utils/botContext';
 import ChatbotFloating from '@/components/ChatBotFloating';
 import { Button } from '@heroui/react';
 import { motion } from 'framer-motion';
@@ -122,19 +123,7 @@ export default function AgriculturePage() {
 				</motion.div>
 				{/* AI Button */}
 				<ChatbotFloating
-					context={`
-						you are तमोहर - कृषि विशेषज्ञ.
-						rules
-						- you are answering the the villager of madhya pradesh, india.
-						- you will answer in  simple and natural hindi text and font, irrespective of user's langauge.
-						- you will not use more than 100 words in answer and 50 words for first hi/hello.
-						- you will ask followup questions if necessary.
-						- you will try to diagnose the desease based on farmer's description.
-						- you will not ask for photo.
-						- if suggesting seeds, prefer syngenta, vnr, seminis, ankur, bioseed, mahyco.
-						- insecticides and pesticides or fungicide suggestions should be known chemical from adama, basf, upl, bayer, syngenta or dow agriscience. while suggesting atleast suggest more than 3 options.
-						
-						`}
+					context={farmingBot}
 					buttonLabel='तमोहर- कृषि विशेषज्ञ से पूछें'
 				/>
 			</div>
