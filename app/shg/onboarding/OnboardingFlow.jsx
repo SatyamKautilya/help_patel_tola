@@ -8,7 +8,7 @@ import ReviewAndFinish from './ReviewAndFinish';
 import { useSelector } from 'react-redux';
 
 export default function OnboardingFlow() {
-	const [step, setStep] = useState(0);
+	const [step, setStep] = useState(3);
 	const shg = useSelector(
 		(state) => state.appContext.shgOnboardingData?.shgDetails || {},
 	);

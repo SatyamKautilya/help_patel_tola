@@ -1,13 +1,20 @@
 import { useState } from 'react';
 import { Search, UserPlus, Users, ArrowRight, User } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setShgOnboardingData } from '@/app/store/appSlice';
+import { setLoader, setShgOnboardingData } from '@/app/store/appSlice';
 
 /**
  * STEP 1: Ask how many members
  */
 function MemberCountStep({ onConfirm }) {
 	const [count, setCount] = useState('');
+	const [loading, setLoading] = useState(false);
+
+	const handleConfirm = async () => {
+		setLoading(true);
+		await onConfirm(Number(count));
+		setLoading(false);
+	};
 
 	return (
 		<div className='space-y-6'>
@@ -32,8 +39,8 @@ function MemberCountStep({ onConfirm }) {
 			/>
 
 			<button
-				disabled={!count || Number(count) < 1}
-				onClick={() => onConfirm(Number(count))}
+				disabled={!count || Number(count) < 1 || loading}
+				onClick={handleConfirm}
 				className='w-full bg-gradient-to-r from-indigo-500 to-pink-500 hover:bg-green-500 disabled:opacity-50 py-3 rounded-xl font-semibold transition'>
 				आगे बढ़ें
 			</button>
@@ -49,13 +56,18 @@ function AddSingleMember({ shgId, index, total, onAdded }) {
 	const [foundUser, setFoundUser] = useState(null);
 	const [customName, setCustomName] = useState('');
 	const [loading, setLoading] = useState(false);
+	const [addingMember, setAddingMember] = useState(false);
+	const [selectedRole, setSelectedRole] = useState('MEMBER');
 
 	const memberCode = `M${String(index + 1).padStart(3, '0')}`;
+	const dispatch = useDispatch();
 
 	const searchUser = async () => {
 		if (!mobile) return;
+
 		setLoading(true);
 		try {
+			dispatch(setLoader(true));
 			const res = await fetch(`/api/shg?name=fetch-by-mobile`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -66,30 +78,43 @@ function AddSingleMember({ shgId, index, total, onAdded }) {
 		} catch {
 			setFoundUser(null);
 		} finally {
+			dispatch(setLoader(false));
 			setLoading(false);
 		}
 	};
 
-	const addMember = async ({ name, userId = null, mobileNumber = null }) => {
-		const res = await fetch('/api/shg?name=add-member', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				shgId,
-				name,
-				userId,
-				memberCode,
-				role: 'MEMBER',
-				mobileNumber,
-			}),
-		});
+	const addMember = async ({
+		name,
+		userId = null,
+		mobileNumber = null,
+		role,
+	}) => {
+		setAddingMember(true);
+		try {
+			dispatch(setLoader(true));
+			const res = await fetch('/api/shg?name=add-member', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					shgId,
+					name,
+					userId,
+					memberCode,
+					role,
+					mobileNumber,
+				}),
+			});
 
-		const member = await res.json();
-		onAdded(member);
-
-		setMobile('');
-		setFoundUser(null);
-		setCustomName('');
+			const member = await res.json();
+			onAdded(member);
+			setSelectedRole('MEMBER');
+			setMobile('');
+			setFoundUser(null);
+			setCustomName('');
+		} finally {
+			dispatch(setLoader(false));
+			setAddingMember(false);
+		}
 	};
 
 	return (
@@ -115,34 +140,43 @@ function AddSingleMember({ shgId, index, total, onAdded }) {
 				<button
 					onClick={searchUser}
 					disabled={loading}
-					className='absolute right-2 top-2 bottom-2 bg-blue-600 hover:bg-blue-500 px-4 rounded-lg text-sm'>
+					className='absolute right-2 top-2 bottom-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 px-4 rounded-lg text-sm'>
 					ढूँढे
 				</button>
 			</div>
 
 			<div className='bg-gray-800/60 border border-gray-700 rounded-xl p-4 space-y-4'>
 				{foundUser ? (
-					<div className='flex items-center justify-between'>
+					<div className='flex flex-col gap-4 items-center justify-between'>
 						<div className='flex items-center gap-3'>
-							<div className='w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white'>
-								{(foundUser.hindiName || foundUser.name)?.charAt(0)}
-							</div>
-							<div>
-								<p className='font-medium'>
+							<div className='border-1 flex flex-row gap-2 rounded-xl border-pink-600 p-3'>
+								<span>सदस्य का नाम:</span>{' '}
+								<p className='font-bold text-lg '>
 									{foundUser.hindiName || foundUser.name}
 								</p>
-								<p className='text-xs text-green-400'>मोबाइल उपयोगकर्ता</p>
 							</div>
 						</div>
+						<select
+							value={selectedRole}
+							onChange={(e) => setSelectedRole(e.target.value)}
+							disabled={addingMember}
+							className='bg-gray-700 border border-gray-600 rounded-lg p-2 text-sm text-gray-100 disabled:opacity-50'>
+							<option value='MEMBER'>सदस्य</option>
+							<option value='PRESIDENT'>अध्यक्ष</option>
+							<option value='SECRETARY'>सचिव</option>
+							<option value='TREASURER'>कोषाध्यक्ष</option>
+						</select>
 						<button
 							onClick={() =>
 								addMember({
 									name: foundUser.hindiName || foundUser.name,
 									mobileNumber: foundUser.mobileNumber,
 									userId: foundUser._id,
+									role: selectedRole,
 								})
 							}
-							className='flex items-center gap-2 bg-green-600 hover:bg-green-500 px-4 py-2 rounded-lg text-sm'>
+							disabled={addingMember}
+							className='flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-pink-500 hover:bg-green-500 disabled:opacity-50 px-4 py-2 rounded-lg text-sm'>
 							<UserPlus className='w-4 h-4' />
 							जोड़ें
 						</button>
@@ -154,11 +188,24 @@ function AddSingleMember({ shgId, index, total, onAdded }) {
 							placeholder='सदस्य का नाम लिखें'
 							value={customName}
 							onChange={(e) => setCustomName(e.target.value)}
-							className='w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm'
+							disabled={addingMember}
+							className='w-full bg-gray-700 border border-gray-600 rounded-lg p-3 text-sm disabled:opacity-50'
 						/>
+						<select
+							value={selectedRole}
+							onChange={(e) => setSelectedRole(e.target.value)}
+							disabled={addingMember}
+							className='bg-gray-700 border border-gray-600 rounded-lg p-2 text-sm text-gray-100 disabled:opacity-50'>
+							<option value='MEMBER'>सदस्य</option>
+							<option value='PRESIDENT'>अध्यक्ष</option>
+							<option value='SECRETARY'>सचिव</option>
+							<option value='TREASURER'>कोषाध्यक्ष</option>
+						</select>
 						<button
-							disabled={!customName}
-							onClick={() => addMember({ name: customName })}
+							disabled={!customName || addingMember}
+							onClick={() =>
+								addMember({ name: customName, role: selectedRole })
+							}
 							className='w-full flex items-center justify-center gap-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 px-4 py-2 rounded-lg text-sm'>
 							<UserPlus className='w-4 h-4' />
 							मोबाइल के बिना जोड़ें
@@ -178,9 +225,17 @@ function AddSingleMember({ shgId, index, total, onAdded }) {
  * FINAL SUMMARY
  */
 function MembersSummary({ members, onNext }) {
+	const [loading, setLoading] = useState(false);
+
+	const handleNext = async () => {
+		setLoading(true);
+		await onNext();
+		setLoading(false);
+	};
+
 	return (
 		<div className='space-y-6'>
-			<h2 className='text-xl font-bold'>सदस्य जोड़े गए</h2>
+			<h2 className='text-xl font-bold'>सदस्यों की जानकारी</h2>
 
 			<div className='space-y-2 max-h-64 overflow-y-auto'>
 				{members.map((m) => (
@@ -188,17 +243,27 @@ function MembersSummary({ members, onNext }) {
 						key={m._id}
 						className='flex items-center gap-3 bg-gray-800 p-3 rounded-lg'>
 						<User className='w-4 h-4 text-gray-400' />
-						<span>
-							{m.name}{' '}
-							<span className='text-xs text-gray-400'>({m.memberCode})</span>
+						<span className='text-lg'>
+							{m.name}
+							{/* <span className='text-xs text-gray-400'>({m.memberCode})</span> */}
+						</span>
+						<span className='ml-auto text-sm px-2 py-1 bg-pink-600/20 text-indigo-400 rounded-lg'>
+							{m.role === 'PRESIDENT'
+								? 'अध्यक्ष'
+								: m.role === 'SECRETARY'
+									? 'सचिव'
+									: m.role === 'TREASURER'
+										? 'कोषाध्यक्ष'
+										: 'सदस्य'}
 						</span>
 					</div>
 				))}
 			</div>
 
 			<button
-				onClick={onNext}
-				className='w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 py-3 rounded-xl font-semibold'>
+				onClick={handleNext}
+				disabled={loading}
+				className='w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-500 to-pink-500 disabled:opacity-50 py-3 rounded-xl font-semibold'>
 				आगे बढ़ें
 				<ArrowRight className='w-5 h-5' />
 			</button>

@@ -124,7 +124,7 @@ const StatusPage = () => {
 						<div className='space-y-3'>
 							{lastTenFeedbacks?.map((i, index) => (
 								<motion.div
-									key={i}
+									key={index}
 									initial={{ opacity: 0, x: -10 }}
 									animate={{ opacity: 1, x: 0 }}
 									transition={{ delay: 0.3 + index * 0.1 }}

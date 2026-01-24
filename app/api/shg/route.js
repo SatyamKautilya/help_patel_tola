@@ -73,9 +73,9 @@ async function createSHG(data) {
 		village: data.village,
 		block: data.block,
 		district: data.district,
-		state: data.state,
 		monthlyContribution: data.monthlyContribution,
 		formationDate: data.formationDate,
+		totalMembers: data.totalMembers,
 		createdBy: data.createdBy,
 	});
 
@@ -203,14 +203,15 @@ async function createBankLoan(data) {
 	return NextResponse.json(loan);
 }
 async function openingBalance(data) {
-	const existing = await Transaction.findOne({
-		shgId: data.shgId,
-		type: 'OPENING_BALANCE',
-	});
+	// const existing = await Transaction.findOne({
+	// 	shgId: data.shgId,
+	// 	type: 'OPENING_BALANCE',
+	// 	memberId: data.memberId || null,
+	// });
 
-	if (existing) {
-		throw new Error('Opening balance already set for this SHG');
-	}
+	// if (existing) {
+	// 	throw new Error('Opening balance already set for this SHG');
+	// }
 
 	const txn = await Transaction.create({
 		shgId: data.shgId,

@@ -7,7 +7,7 @@ const SHGSection = () => {
 	return (
 		<div
 			onClick={() => {
-				router.push('/my-shg');
+				router.push('/shg/shg-homepage');
 				// Add your click handler logic here
 			}}
 			style={{

@@ -1,4 +1,4 @@
-import { setShgOnboardingData } from '@/app/store/appSlice';
+import { setLoader, setShgOnboardingData } from '@/app/store/appSlice';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -11,10 +11,13 @@ export default function CreateShg({ onNext }) {
 		district: '',
 		monthlyContribution: '',
 		formationDate: '',
+		totalMembers: '',
 	});
+	console.log(form, 'form data');
 
 	const handleSubmit = async () => {
 		try {
+			dispatch(setLoader(true));
 			const res = await fetch('/api/shg?name=create-shg', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -24,6 +27,7 @@ export default function CreateShg({ onNext }) {
 					formationDate: form.formationDate
 						? new Date(form.formationDate)
 						: new Date(),
+					totalMembers: Number(form.totalMembers),
 				}),
 			});
 
@@ -32,6 +36,8 @@ export default function CreateShg({ onNext }) {
 			onNext();
 		} catch (error) {
 			console.error('Error creating SHG:', error);
+		} finally {
+			dispatch(setLoader(false));
 		}
 	};
 
@@ -41,6 +47,7 @@ export default function CreateShg({ onNext }) {
 		block: 'ब्लॉक',
 		district: 'जिला',
 		formationDate: 'गठन तारीख',
+		totalMembers: 'कुल सदस्य',
 	};
 
 	return (
@@ -51,21 +58,32 @@ export default function CreateShg({ onNext }) {
 				</h2>
 			</div>
 			<div className='space-y-4'>
-				{['name', 'village', 'block', 'district', 'formationDate'].map(
-					(field) => (
-						<div key={field} className='space-y-1'>
-							<label className='text-xs font-medium text-gray-500 uppercase tracking-wide ml-1'>
-								{fieldLabels[field]}
-							</label>
-							<input
-								type={field === 'formationDate' ? 'date' : 'text'}
-								placeholder={`${fieldLabels[field]} दर्ज करें`}
-								className='w-full bg-gray-800 text-gray-100 border border-gray-700 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all placeholder-gray-500'
-								onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-							/>
-						</div>
-					),
-				)}
+				{[
+					'name',
+					'totalMembers',
+					'village',
+					'block',
+					'district',
+					'formationDate',
+				].map((field) => (
+					<div key={field} className='space-y-1'>
+						<label className='text-xs font-medium text-gray-500 uppercase tracking-wide ml-1'>
+							{fieldLabels[field]}
+						</label>
+						<input
+							type={
+								field === 'formationDate'
+									? 'date'
+									: field === 'totalMembers'
+										? 'number'
+										: 'text'
+							}
+							placeholder={`${fieldLabels[field]} दर्ज करें`}
+							className='w-full bg-gray-800 text-gray-100 border border-gray-700 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all placeholder-gray-500'
+							onChange={(e) => setForm({ ...form, [field]: e.target.value })}
+						/>
+					</div>
+				))}
 
 				<div className='space-y-1'>
 					<label className='text-xs font-medium text-gray-500 uppercase tracking-wide ml-1'>
