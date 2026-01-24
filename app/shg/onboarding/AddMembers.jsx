@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Search, UserPlus, Users, ArrowRight, User } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setShgOnboardingData } from '@/app/store/appSlice';
 
 /**
  * STEP 1: Ask how many members
@@ -32,7 +34,7 @@ function MemberCountStep({ onConfirm }) {
 			<button
 				disabled={!count || Number(count) < 1}
 				onClick={() => onConfirm(Number(count))}
-				className='w-full bg-green-600 hover:bg-green-500 disabled:opacity-50 py-3 rounded-xl font-semibold transition'>
+				className='w-full bg-gradient-to-r from-indigo-500 to-pink-500 hover:bg-green-500 disabled:opacity-50 py-3 rounded-xl font-semibold transition'>
 				आगे बढ़ें
 			</button>
 		</div>
@@ -68,7 +70,7 @@ function AddSingleMember({ shgId, index, total, onAdded }) {
 		}
 	};
 
-	const addMember = async ({ name, userId = null }) => {
+	const addMember = async ({ name, userId = null, mobileNumber = null }) => {
 		const res = await fetch('/api/shg?name=add-member', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
@@ -78,6 +80,7 @@ function AddSingleMember({ shgId, index, total, onAdded }) {
 				userId,
 				memberCode,
 				role: 'MEMBER',
+				mobileNumber,
 			}),
 		});
 
@@ -107,7 +110,7 @@ function AddSingleMember({ shgId, index, total, onAdded }) {
 					value={mobile}
 					onChange={(e) => setMobile(e.target.value)}
 					onKeyDown={(e) => e.key === 'Enter' && searchUser()}
-					className='w-full bg-gray-800 border border-gray-700 rounded-xl py-3 pl-10 pr-24 text-gray-100'
+					className='w-full bg-gray-800  focus:ring-2 focus:ring-pink-500 rounded-xl py-3 pl-10 pr-24 text-gray-100'
 				/>
 				<button
 					onClick={searchUser}
@@ -135,6 +138,7 @@ function AddSingleMember({ shgId, index, total, onAdded }) {
 							onClick={() =>
 								addMember({
 									name: foundUser.hindiName || foundUser.name,
+									mobileNumber: foundUser.mobileNumber,
 									userId: foundUser._id,
 								})
 							}
@@ -205,17 +209,33 @@ function MembersSummary({ members, onNext }) {
 /**
  * MAIN EXPORT
  */
-export default function AddMembersFlow({ shgId, onNext }) {
+export default function AddMembersFlow({ onNext }) {
+	const shg = useSelector((state) => state.appContext.shgOnboardingData);
+	console.log(shg, 'shg');
+	const shgId = shg?.shgDetails?._id;
 	const [total, setTotal] = useState(null);
 	const [current, setCurrent] = useState(0);
 	const [members, setMembers] = useState([]);
+	const dispatch = useDispatch();
+
+	const saveMembersToStore = () => {
+		dispatch(setShgOnboardingData({ members: members }));
+	};
 
 	if (!total) {
 		return <MemberCountStep onConfirm={setTotal} />;
 	}
 
 	if (current >= total) {
-		return <MembersSummary members={members} onNext={onNext} />;
+		return (
+			<MembersSummary
+				members={members}
+				onNext={() => {
+					saveMembersToStore();
+					onNext();
+				}}
+			/>
+		);
 	}
 
 	const handleAdded = (member) => {

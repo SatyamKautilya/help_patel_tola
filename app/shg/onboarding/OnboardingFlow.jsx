@@ -5,10 +5,13 @@ import CreateShg from './CreateShg';
 import AddMembers from './AddMembers';
 import ShgFinancialSetup from './ShgFinancialSetup';
 import ReviewAndFinish from './ReviewAndFinish';
+import { useSelector } from 'react-redux';
 
 export default function OnboardingFlow() {
 	const [step, setStep] = useState(0);
-	const [shg, setShg] = useState(null);
+	const shg = useSelector(
+		(state) => state.appContext.shgOnboardingData?.shgDetails || {},
+	);
 
 	const steps = [
 		{ id: 1, title: 'Create SHG' },
@@ -100,8 +103,7 @@ export default function OnboardingFlow() {
 							animate={{ opacity: 1, x: 0 }}
 							exit={{ opacity: 0, x: -20 }}>
 							<CreateShg
-								onNext={(s) => {
-									setShg(s);
+								onNext={() => {
 									setStep(2);
 								}}
 							/>
@@ -136,6 +138,10 @@ export default function OnboardingFlow() {
 					)}
 				</AnimatePresence>
 			</div>
+
+			<button onClick={() => setStep(step - 1)} disabled={step === 1}>
+				back
+			</button>
 		</div>
 	);
 }

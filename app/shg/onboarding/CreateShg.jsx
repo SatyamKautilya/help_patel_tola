@@ -1,31 +1,38 @@
+import { setShgOnboardingData } from '@/app/store/appSlice';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function CreateShg({ onNext }) {
+	const dispatch = useDispatch();
 	const [form, setForm] = useState({
 		name: '',
 		village: '',
 		block: '',
 		district: '',
-		state: '',
 		monthlyContribution: '',
 		formationDate: '',
 	});
 
 	const handleSubmit = async () => {
-		const res = await fetch('/api/shg?name=create-shg', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				...form,
-				monthlyContribution: Number(form.monthlyContribution),
-				formationDate: form.formationDate
-					? new Date(form.formationDate)
-					: new Date(),
-			}),
-		});
+		try {
+			const res = await fetch('/api/shg?name=create-shg', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					...form,
+					monthlyContribution: Number(form.monthlyContribution),
+					formationDate: form.formationDate
+						? new Date(form.formationDate)
+						: new Date(),
+				}),
+			});
 
-		const shg = await res.json();
-		onNext(shg);
+			const shg = await res.json();
+			dispatch(setShgOnboardingData({ shgDetails: shg }));
+			onNext();
+		} catch (error) {
+			console.error('Error creating SHG:', error);
+		}
 	};
 
 	const fieldLabels = {
