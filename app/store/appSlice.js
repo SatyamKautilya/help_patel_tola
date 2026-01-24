@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { set } from 'mongoose';
 
 const initialState = {
 	appContext: {},
@@ -6,6 +7,7 @@ const initialState = {
 	loader: false,
 	isPatelTolaMember: false,
 	user: null,
+	shgOboardingData: null,
 };
 
 const appContextSlice = createSlice({
@@ -30,6 +32,12 @@ const appContextSlice = createSlice({
 		setUser(state, action) {
 			state.user = action.payload;
 		},
+		setShgOboardingData(state, action) {
+			state.shgOboardingData = {
+				...state.shgOboardingData,
+				...action.payload,
+			};
+		},
 	},
 });
 
@@ -39,6 +47,7 @@ export const {
 	setLoader,
 	setIsPatelTolaMember,
 	setUser,
+	setShgOnboardingData,
 } = appContextSlice.actions;
 
 export default appContextSlice.reducer;

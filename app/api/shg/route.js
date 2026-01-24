@@ -10,6 +10,7 @@ import Loan from '@/lib/models/shgModels/Loan';
 import LoanRepayment from '@/lib/models/shgModels/LoanRepayment';
 import BankLoan from '@/lib/models/shgModels/BankLoan';
 import { connectToDatabase } from '@/lib/mongodb';
+import Users from '@/lib/models/Users';
 
 export async function POST(req) {
 	try {
@@ -20,6 +21,9 @@ export async function POST(req) {
 		const body = await req.json();
 
 		switch (name) {
+			case 'fetch-by-mobile':
+				return fetchByMobile(body);
+
 			case 'create-shg':
 				return createSHG(body);
 
@@ -59,6 +63,10 @@ export async function POST(req) {
 	}
 }
 
+async function fetchByMobile(data) {
+	const user = await Users.findOne({ mobileNumber: data.mobile })?.lean();
+	return NextResponse.json(user);
+}
 async function createSHG(data) {
 	const shg = await Shg.create({
 		name: data.name,
