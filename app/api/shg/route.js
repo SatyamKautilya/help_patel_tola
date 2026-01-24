@@ -147,6 +147,7 @@ async function createLoan(data) {
 }
 
 async function loanRepayment(data) {
+	const loan = await Loan.findById(data.loanId);
 	const repayment = await LoanRepayment.create({
 		loanId: data.loanId,
 		shgId: data.shgId,
@@ -194,6 +195,15 @@ async function createBankLoan(data) {
 	return NextResponse.json(loan);
 }
 async function openingBalance(data) {
+	const existing = await Transaction.findOne({
+		shgId: data.shgId,
+		type: 'OPENING_BALANCE',
+	});
+
+	if (existing) {
+		throw new Error('Opening balance already set for this SHG');
+	}
+
 	const txn = await Transaction.create({
 		shgId: data.shgId,
 		fromAccount: data.fromAccount,
