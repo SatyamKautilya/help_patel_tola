@@ -138,12 +138,12 @@ export default function HomePage() {
 					</motion.div>
 					{/* Subtle aesthetic line */}
 					{/* <span className='text-white'>ग्राम के सतत विकास की दिशा में</span> */}
-					<div className='h-[2px] w-4/5 mt-2 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-60' />
+					<div className='h-[2px] w-4/5 mt-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-60' />
 				</header>
 
 				{/* 📜 SCROLLABLE CONTENT */}
 				<main className='flex-1 overflow-y-auto px-4 pb-20 scroll-smooth custom-scrollbar'>
-					<div className='max-w-md mx-auto pt-6 space-y-5'>
+					<div className='max-w-md mx-auto pt-2 space-y-3'>
 						{/* Moral / Light Section */}
 						<motion.div
 							variants={sectionVariant}
@@ -248,7 +248,7 @@ export default function HomePage() {
 							</div>
 							<div className='relative flex justify-center'>
 								<span className='bg-gradient-to-r from-transparent via-white to-transparent w-full text-center backdrop-blur-sm px-6 py-1.5  text-sm font-bold text-lime-800 shadow-sm  '>
-									मेरे स्व सहायता समूह
+									स्व सहायता समूह एवं बचत
 								</span>
 							</div>
 						</motion.div>

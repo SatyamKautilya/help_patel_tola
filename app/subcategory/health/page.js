@@ -9,28 +9,58 @@ import { setLoader } from '@/app/store/appSlice';
 import { motion } from 'framer-motion';
 
 const Page = () => {
-	const [topics, setTopics] = useState([]);
+	// const [topics, setTopics] = useState([]);
+
+	const topics = [
+		{
+			_id: '694f7f8533e4ff605bb9e8a0',
+			id: 'misconceptions',
+			topicName: 'अप्रभावी/ अप्रामाणिक पद्धति का उन्मूलन',
+			owner: 'सचेतन',
+		},
+		{
+			_id: '694f7fdd33e4ff605bb9e8a1',
+			id: 'hospitals',
+			owner: 'आपके पास के शहरों के',
+			topicName: 'आयुष्मान अस्पताल',
+			route: '/subcategory/hospitals',
+		},
+		{
+			_id: '694f80a333e4ff605bb9e8a2',
+			id: 'sop',
+			topicName: 'आदर्श रोग उपचार प्रक्रिया',
+			owner: 'मार्गदर्शक',
+			route: '/subcategory/hospitals/treatment',
+		},
+		{
+			_id: '695509cd909c6634b5eb0647',
+			id: 'successStory',
+			topicName: 'सफल ईलाज़ की कहानी',
+			owner: 'प्रेरणादायक',
+			route: '/subcategory/hospitals/casestory',
+		},
+	];
 	const router = useRouter();
-	const dispatch = useDispatch();
+	// const dispatch = useDispatch();
 
-	const initializeApp = async () => {
-		dispatch(setLoader(true));
-		try {
-			const response = await fetch('/api/subcategory/hospitals');
-			if (response.ok) {
-				const data = await response.json();
-				setTopics(data.healthtopics || []);
-			}
-		} catch (error) {
-			console.error('Failed to initialize app:', error);
-		} finally {
-			dispatch(setLoader(false));
-		}
-	};
+	// const initializeApp = async () => {
+	// 	dispatch(setLoader(true));
+	// 	try {
+	// 		const response = await fetch('/api/subcategory/hospitals');
+	// 		if (response.ok) {
+	// 			const data = await response.json();
+	// 			setTopics(data.healthtopics || []);
+	// 		}
+	// 	} catch (error) {
+	// 		console.error('Failed to initialize app:', error);
+	// 	} finally {
+	// 		dispatch(setLoader(false));
+	// 	}
+	// };
 
-	useEffect(() => {
-		initializeApp();
-	}, []);
+	// useEffect(() => {
+	// 	initializeApp();
+	// }, []);
 
 	const containerVariants = {
 		hidden: { opacity: 0 },
