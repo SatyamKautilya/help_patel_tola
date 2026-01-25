@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Your Components
-import { setAppContext, setUser } from './store/appSlice';
+import { setAppContext, setLoader, setUser } from './store/appSlice';
 import Suvichar from './homepage/Suvichar';
 import Health from './homepage/Health';
 import Kheti from './homepage/Kheti';
@@ -70,6 +70,7 @@ export default function HomePage() {
 	}, []);
 
 	useEffect(() => {
+		dispatch(setLoader(false));
 		const fetchUserData = async () => {
 			if (!appContext?.name) return;
 			const hasVisited = sessionStorage.getItem('user_details_sent');
