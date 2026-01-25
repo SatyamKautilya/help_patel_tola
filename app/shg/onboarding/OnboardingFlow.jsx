@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 
 export default function OnboardingFlow() {
 	const router = useRouter();
-	const [step, setStep] = useState(4);
+	const [step, setStep] = useState(0);
 	const shg = useSelector(
 		(state) => state.appContext.shgOnboardingData?.shgDetails || {},
 	);
