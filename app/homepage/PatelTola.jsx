@@ -29,7 +29,7 @@ const PatelTola = () => {
 				<div className='flex-1'>
 					<h3 className='text-lg font-bold text-gray-800'>पटेल टोला</h3>
 					<p className='text-sm text-gray-600'>
-						गांव की जानकारी, योजनाएं और संपर्क
+						गांव की बैठकें और विकास योजनाएँ
 					</p>
 				</div>
 
@@ -44,12 +44,12 @@ const PatelTola = () => {
 					<p className='text-green-600'>31 जनवरी</p>
 				</div>
 				<div className='rounded-xl bg-blue-50 py-2 hover:bg-blue-100 transition-colors duration-200'>
-					<p className='font-semibold text-blue-700'>मुद्दे</p>
-					<p className='text-blue-600'>2</p>
+					<p className='font-semibold text-blue-700'>--</p>
+					<p className='text-blue-600'>-</p>
 				</div>
 				<div className='rounded-xl bg-purple-50 py-2 hover:bg-purple-100 transition-colors duration-200'>
-					<p className='font-semibold text-purple-700'>टारगेट</p>
-					<p className='text-purple-600'>8</p>
+					<p className='font-semibold text-purple-700'>--</p>
+					<p className='text-purple-600'>-</p>
 				</div>
 			</div>
 		</div>
