@@ -6,24 +6,34 @@ import { ArrowUpRight, Lock, MapPin, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 
 const villageCards = [
-	{
-		title: 'गाँव परिचय',
-		desc: 'इतिहास, लोग और गौरवशाली संस्कार',
-		icon: '🏡',
-		slug: '/village/about',
-		accent: 'bg-orange-500',
-		bgGradient: 'from-orange-500/10 to-orange-500/5',
-		span: 'col-span-2',
-		isUpcoming: true,
-	},
+	// {
+	// 	title: 'गाँव परिचय',
+	// 	desc: 'इतिहास, लोग और गौरवशाली संस्कार',
+	// 	icon: '🏡',
+	// 	slug: '/village/about',
+	// 	accent: 'bg-orange-500',
+	// 	bgGradient: 'from-orange-500/10 to-orange-500/5',
+	// 	span: 'col-span-2',
+	// 	isUpcoming: true,
+	// },
 	{
 		title: 'मिशन तमोहर',
 		desc: 'बैठकें और योजनाए',
 		icon: '💡',
 		slug: '/village/meetings/tamohar',
 		accent: 'bg-blue-600',
+		span: 'col-span-2',
 		bgGradient: 'from-blue-600/10 to-indigo-600/5',
 		isUpcoming: false,
+	},
+	{
+		title: 'संसाधन विकास',
+		desc: 'गाँव के लिए आधुनिक संसाधन',
+		icon: '💧',
+		slug: '/village/infrastructure',
+		accent: 'bg-sky-500',
+		bgGradient: 'from-sky-500/10 to-blue-500/5',
+		isUpcoming: true,
 	},
 	{
 		title: 'नवयुवक समिति',
@@ -70,24 +80,7 @@ const villageCards = [
 		bgGradient: 'from-violet-500/10 to-purple-500/5',
 		isUpcoming: true,
 	},
-	{
-		title: 'स्वास्थ्य',
-		desc: 'अस्पताल व सुविधा',
-		icon: '🏥',
-		slug: '/village/health',
-		accent: 'bg-red-500',
-		bgGradient: 'from-red-500/10 to-rose-500/5',
-		isUpcoming: true,
-	},
-	{
-		title: 'आधारभूत सुविधा',
-		desc: 'पानी, बिजली, सड़क',
-		icon: '💧',
-		slug: '/village/infrastructure',
-		accent: 'bg-sky-500',
-		bgGradient: 'from-sky-500/10 to-blue-500/5',
-		isUpcoming: true,
-	},
+
 	{
 		title: 'समाज व संस्कृति',
 		desc: 'त्योहार और एकता',
