@@ -165,7 +165,7 @@ export default function App() {
 			</AnimatePresence>
 
 			{/* Main Content */}
-			<main className='pt-[120px] pb-10 px-4 max-w-7xl mx-auto relative z-10'>
+			<main className='pt-[90px] pb-10 px-4 max-w-7xl mx-auto relative z-10'>
 				<AnimatePresence mode='wait'>
 					{!loading && (
 						<motion.section
