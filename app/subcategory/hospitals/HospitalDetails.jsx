@@ -39,7 +39,7 @@ const HospitalDetails = ({ hospitals }) => {
 	return (
 		<>
 			{hospitals.map((hospital) => (
-				<div key={hospital.id} className=' py-3'>
+				<div key={hospital._id} className=' py-3'>
 					<Card
 						className='
 							p-6 rounded-3xl

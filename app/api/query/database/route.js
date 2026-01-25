@@ -158,7 +158,29 @@ export async function POST(request) {
 				const specialityPrompt = `
 					Identify medical speciality IDs from the text. 
 					Return ONLY an object {msg:your one liner suggestion in hindi,specialityId: JSON array from this list:
-					MG, SG, MC, MO, SN, SB, SE, SM, ER, MP, ST, IN }
+					 [
+    "MG",
+    "SG",
+    "MC",
+    "MO",
+    "SN",
+    "MN",
+    "SO",
+    "SB",
+    "SE",
+    "SM",
+    "SL",
+    "SP",
+    "ST",
+    "ER",
+    "SU",
+    "SC",
+    "SV",
+    "SS",
+    "MP",
+    "IN",
+    "NA"
+  ] }
 
 					Text:
 					"${message}"
