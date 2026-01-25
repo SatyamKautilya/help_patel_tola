@@ -12,48 +12,63 @@ import {
 	ChevronLeft,
 	TrendingUp,
 	ShieldCheck,
+	LayoutDashboard,
 } from 'lucide-react';
 
 const actions = [
 	{
-		title: 'सदस्य प्रबंधन',
-		desc: 'नए सदस्य जोड़ें या हटाएं',
+		title: 'सदस्य',
+		desc: 'मैनेजमेंट',
 		icon: Users,
 		href: 'members',
 		color: 'text-rose-600',
 		bg: 'bg-rose-50',
+		border: 'border-rose-200',
 	},
 	{
-		title: 'मासिक बचत',
-		desc: 'बचत और उपस्थिति',
+		title: 'बचत',
+		desc: 'एंट्री',
 		icon: IndianRupee,
 		href: 'savings',
 		color: 'text-indigo-600',
 		bg: 'bg-indigo-50',
+		border: 'border-indigo-200',
 	},
 	{
-		title: 'सदस्य ऋण',
-		desc: 'ऋण स्वीकृति और वितरण',
+		title: 'ऋण दें',
+		desc: 'वितरण',
 		icon: HandCoins,
 		href: 'loans',
 		color: 'text-emerald-600',
 		bg: 'bg-emerald-50',
+		border: 'border-emerald-200',
 	},
 	{
-		title: 'ऋण भुगतान',
-		desc: 'किस्त और ब्याज दर्ज करें',
+		title: 'भुगतान',
+		desc: 'किस्त',
 		icon: FileText,
 		href: 'repayment',
-		color: 'text-amber-600',
-		bg: 'bg-amber-50',
+		color: 'text-orange-600',
+		bg: 'bg-orange-50',
+		border: 'border-orange-200',
 	},
 	{
-		title: 'SHG नियम',
-		desc: 'ब्याज दर और दंड अपडेट',
+		title: 'नियम',
+		desc: 'सेटिंग्स',
 		icon: Settings,
 		href: 'settings',
 		color: 'text-purple-600',
 		bg: 'bg-purple-50',
+		border: 'border-purple-200',
+	},
+	{
+		title: 'रिपोर्ट',
+		desc: 'विवरण',
+		icon: TrendingUp,
+		href: 'reports',
+		color: 'text-sky-600',
+		bg: 'bg-sky-50',
+		border: 'border-sky-200',
 	},
 ];
 
@@ -62,100 +77,123 @@ export default function ShgManagerHome({ params }) {
 	const router = useRouter();
 
 	return (
-		<div className='min-h-screen bg-[#FDFEFF] bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-slate-100 via-white to-blue-50 pb-12'>
-			{/* Minimal Header */}
-			<div className='px-6 pt-8 flex items-center justify-between max-w-2xl mx-auto'>
-				<button
-					onClick={() => router.back()}
-					className='p-2 bg-white rounded-xl shadow-sm border border-slate-100'>
-					<ChevronLeft className='w-6 h-6 text-slate-600' />
-				</button>
-				<div className='flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100'>
-					<ShieldCheck className='w-4 h-4 text-emerald-600' />
-					<span className='text-[10px] font-bold text-emerald-700 uppercase tracking-wider'>
-						अध्यक्ष एक्सेस
+		<div className='h-screen overflow-hidden bg-[#fafafa] relative flex flex-col'>
+			{/* Background Decorative Gradients */}
+			<div className='absolute top-[-10%] left-[-10%] w-[50%] h-[40%] bg-pink-200/40 rounded-full blur-[80px]' />
+			<div className='absolute bottom-[-10%] right-[-10%] w-[50%] h-[40%] bg-sky-200/40 rounded-full blur-[80px]' />
+			<div className='absolute top-[20%] right-[5%] w-[30%] h-[30%] bg-indigo-200/30 rounded-full blur-[80px]' />
+
+			{/* Header Section */}
+			<nav className='relative z-10 px-6 pt-6 flex items-center justify-between'>
+				<div className='flex items-center gap-3'>
+					<div className='w-10 h-10 bg-gradient-to-tr from-indigo-600 to-pink-500 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200'>
+						<LayoutDashboard className='w-6 h-6 text-white' />
+					</div>
+					<div>
+						<h1 className='text-xl font-black text-slate-800 tracking-tighter leading-none'>
+							Tamohar
+						</h1>
+						<span className='text-[10px] font-bold text-indigo-500 uppercase tracking-widest'>
+							SHG Platform
+						</span>
+					</div>
+				</div>
+
+				<div className='flex items-center gap-2 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-white shadow-sm'>
+					<ShieldCheck className='w-4 h-4 text-emerald-500' />
+					<span className='text-[10px] font-black text-slate-600 uppercase tracking-widest'>
+						Admin
 					</span>
 				</div>
-			</div>
+			</nav>
 
-			<main className='max-w-2xl mx-auto p-6'>
-				{/* Title Section */}
-				<header className='mb-8'>
-					<h1 className='text-3xl font-black text-slate-900 tracking-tight'>
+			<main className='relative z-10 flex-1 flex flex-col px-6 py-4 justify-between'>
+				{/* Greeting & Subtitle */}
+				<header>
+					<h2 className='text-2xl font-black text-slate-900 tracking-tight leading-tight'>
 						समूह <span className='text-indigo-600'>प्रबंधन</span>
-					</h1>
-					<p className='text-slate-500 font-medium mt-1'>
-						मैनेजमेंट डैशबोर्ड में आपका स्वागत है
+					</h2>
+					<p className='text-xs font-semibold text-slate-500'>
+						ID: {shgId?.slice(-6).toUpperCase() || 'MASTER'}
 					</p>
 				</header>
 
-				{/* Quick Financial Summary Card */}
+				{/* Glassmorphism Financial Card (Light & Colorful) */}
 				<motion.div
 					initial={{ opacity: 0, scale: 0.95 }}
 					animate={{ opacity: 1, scale: 1 }}
-					className='bg-slate-900 rounded-[2.5rem] p-8 mb-10 relative overflow-hidden shadow-2xl shadow-slate-200'>
-					<div className='relative z-10'>
-						<div className='flex items-center gap-2 text-slate-400 mb-2'>
-							<TrendingUp className='w-4 h-4' />
-							<span className='text-xs font-bold uppercase tracking-widest'>
+					className='relative group'>
+					<div className='absolute inset-0 bg-white/40 backdrop-blur-2xl rounded-[2.5rem] border border-white/60 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)]' />
+					<div className='relative p-6 flex justify-between items-center'>
+						<div className='space-y-1'>
+							<p className='text-[10px] font-black text-indigo-400 uppercase tracking-widest'>
 								कुल उपलब्ध कोष
-							</span>
+							</p>
+							<h3 className='text-4xl font-black text-slate-800 tracking-tighter'>
+								₹45,280
+							</h3>
 						</div>
-						<h2 className='text-4xl font-black text-white'>₹45,280</h2>
-						<div className='mt-6 flex gap-4'>
-							<div className='px-4 py-2 bg-white/10 rounded-2xl backdrop-blur-md'>
-								<p className='text-[10px] text-slate-400 font-bold uppercase'>
-									इस महीने
-								</p>
-								<p className='text-white font-bold text-sm'>+ ₹2,400</p>
-							</div>
+						<div className='flex flex-col items-center bg-indigo-600 px-4 py-3 rounded-3xl shadow-lg shadow-indigo-100'>
+							<p className='text-[8px] font-bold text-indigo-100 uppercase'>
+								इस माह
+							</p>
+							<p className='text-white font-black text-sm'>+₹2,400</p>
 						</div>
 					</div>
-					{/* Decorative Background Elements */}
-					<div className='absolute -right-10 -top-10 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl' />
-					<div className='absolute -left-10 -bottom-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl' />
 				</motion.div>
 
-				{/* Actions Grid */}
-				<div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
+				{/* Grid Section - Optimized for height */}
+				<div className='grid grid-cols-2 gap-3 h-full max-h-[52vh]'>
 					{actions.map((a, i) => (
 						<motion.button
 							key={a.href}
 							onClick={() => router.push(`/shg/${shgId}/manage/${a.href}`)}
-							initial={{ opacity: 0, y: 20 }}
+							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: i * 0.05 }}
-							whileHover={{ y: -5 }}
-							whileTap={{ scale: 0.97 }}
-							className='group relative flex flex-col bg-white border border-slate-100 rounded-[2rem] p-6 text-left shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all overflow-hidden'>
-							{/* Visual Background Decoration */}
+							whileTap={{ scale: 0.95 }}
+							className={`group relative flex flex-col justify-center bg-white/70 backdrop-blur-sm border-2 ${a.border} rounded-[2rem] p-4 text-left hover:bg-white transition-all overflow-hidden shadow-sm`}>
 							<div
-								className={`absolute -right-4 -top-4 w-20 h-20 ${a.bg} opacity-30 rounded-full group-hover:scale-150 transition-transform duration-500`}
-							/>
-
-							<div
-								className={`w-14 h-14 rounded-2xl ${a.bg} flex items-center justify-center ${a.color} mb-6 transition-colors`}>
-								<a.icon className='w-7 h-7' />
+								className={`w-11 h-11 rounded-2xl ${a.bg} flex items-center justify-center ${a.color} mb-3 shadow-sm`}>
+								<a.icon className='w-6 h-6' />
 							</div>
-
-							<div className='mt-auto'>
-								<h3 className='text-xl font-bold text-slate-800 tracking-tight'>
+							<div>
+								<h3 className='text-sm font-bold text-slate-800 tracking-tight leading-none'>
 									{a.title}
 								</h3>
-								<p className='text-sm font-medium text-slate-500 mt-1 leading-snug'>
+								<p className='text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter'>
 									{a.desc}
 								</p>
 							</div>
-
 							<div
-								className={`mt-6 flex items-center gap-2 text-xs font-black uppercase tracking-tighter ${a.color}`}>
-								शुरू करें{' '}
-								<ArrowRight className='w-4 h-4 group-hover:translate-x-1 transition-transform' />
+								className={`absolute right-4 bottom-4 p-1 rounded-lg ${a.bg}`}>
+								<ArrowRight className={`w-3 h-3 ${a.color}`} />
 							</div>
 						</motion.button>
 					))}
 				</div>
+
+				{/* Mini Footer */}
+				<div className='flex justify-between items-center px-2 opacity-60'>
+					<div className='flex items-center gap-2'>
+						<div className='w-2 h-2 bg-emerald-500 rounded-full animate-pulse' />
+						<span className='text-[9px] font-black text-slate-400 uppercase tracking-widest'>
+							Live Management
+						</span>
+					</div>
+					<p className='text-[9px] font-black text-indigo-600 uppercase tracking-widest'>
+						Version 2.6.0
+					</p>
+				</div>
 			</main>
+
+			{/* Back Button - Fixed Bottom Left */}
+			<motion.button
+				whileTap={{ scale: 0.8 }}
+				onClick={() => router.back()}
+				className='absolute bottom-6 left-6 p-3 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white z-20'>
+				<ChevronLeft className='w-5 h-5 text-slate-600' />
+			</motion.button>
 		</div>
 	);
 }
