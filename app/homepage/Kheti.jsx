@@ -38,7 +38,7 @@ const Kheti = () => {
 
 					backgroundSize: 'calc(100% - 0px) calc(100% - 0px)',
 				}}
-				className='rounded-2xl border-b-3 bg-blue-200 bg-white/50  overflow-hidden  w-full h-48
+				className='rounded-2xl border-1 border-blue-300 border-b-3 bg-blue-200 bg-white/50  overflow-hidden  w-full h-48
                 backdrop-blur-md
 				shadow-[0_10px_20px_rgba(0,0,0,0.40)]
 				hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]
