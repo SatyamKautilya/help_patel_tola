@@ -25,8 +25,8 @@ const hasAccess = (userGroups, action) => {
 
 const AdminDashboard = () => {
 	const thisUser = useSelector((state) => state.appContext.user);
-	const userGroups = thisUser?.userGroups || [];
-	// const userGroups = ['super_admin'];
+	// const userGroups = thisUser?.userGroups || [];
+	const userGroups = ['shg_onboarder'];
 
 	/** ✅ tabs are DERIVED, not state */
 	const tabs = useMemo(() => {
