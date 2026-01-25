@@ -49,9 +49,6 @@ const MeetingDetailPage = ({ data }) => {
 				<header className='mb-8'>
 					<div className='flex flex-col md:flex-row md:items-start justify-between gap-3 mb-6'>
 						<div className='flex-1'>
-							<div className='bg-green-700 text-white  w-max py-1 px-2 mb-2 rounded-2xl'>
-								{data.theme}
-							</div>
 							<h1 className='text-4xl md:text-3xl font-black bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent '>
 								{data.meetingName}
 							</h1>
