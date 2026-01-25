@@ -91,9 +91,14 @@ export default function UserHomePage() {
 										transition={{ delay: index * 0.1 }}
 										whileHover={{ scale: 1.02 }}
 										whileTap={{ scale: 0.98 }}
-										onClick={() =>
-											router.push(`/shg/shg-details/${shg._id}/manage`)
-										}
+										onClick={() => {
+											if (index === 1) {
+												router.push(
+													`/shg/shg-details/${shg._id}/member/passbook`,
+												);
+											}
+											router.push(`/shg/shg-details/${shg._id}/manage`);
+										}}
 										className='group relative overflow-hidden bg-white/80 backdrop-blur-xl border border-white/60 rounded-[2rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-all cursor-pointer'>
 										{/* Role Accent Line */}
 										<div

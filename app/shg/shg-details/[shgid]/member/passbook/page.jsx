@@ -1,202 +1,220 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import {
-	Users,
-	IndianRupee,
-	HandCoins,
-	FileText,
-	Settings,
-	ArrowRight,
-	ChevronLeft,
-	TrendingUp,
-	ShieldCheck,
-	Calendar,
+	ArrowDownLeft,
 	ArrowUpRight,
+	IndianRupee,
+	FileText,
+	ChevronLeft,
+	Download,
+	ReceiptText,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
-const actions = [
-	{
-		title: 'सदस्य प्रबंधन',
-		desc: 'नए सदस्य जोड़ें या विवरण बदलें',
-		icon: Users,
-		href: 'members',
-		color: 'text-rose-600',
-		bg: 'bg-rose-50',
-		border: 'border-rose-100',
-	},
-	{
-		title: 'मासिक बचत',
-		desc: 'बचत और उपस्थिति दर्ज करें',
-		icon: IndianRupee,
-		href: 'savings',
-		color: 'text-indigo-600',
-		bg: 'bg-indigo-50',
-		border: 'border-indigo-100',
-	},
-	{
-		title: 'सदस्य ऋण',
-		desc: 'ऋण स्वीकृति और वितरण',
-		icon: HandCoins,
-		href: 'loans',
-		color: 'text-emerald-600',
-		bg: 'bg-emerald-50',
-		border: 'border-emerald-100',
-	},
-	{
-		title: 'ऋण भुगतान',
-		desc: 'किस्त और ब्याज जमा करें',
-		icon: FileText,
-		href: 'repayment',
-		color: 'text-amber-600',
-		bg: 'bg-amber-50',
-		border: 'border-amber-100',
-	},
-	{
-		title: 'SHG नियम',
-		desc: 'ब्याज और दंड सेटिंग्स',
-		icon: Settings,
-		href: 'settings',
-		color: 'text-purple-600',
-		bg: 'bg-purple-50',
-		border: 'border-purple-100',
-	},
-];
-
-export default function ShgManagerHome({ params }) {
+export default function MemberPassbook({ params }) {
 	const { shgId } = params;
 	const router = useRouter();
+	const [rows, setRows] = useState([]);
+	const [summary, setSummary] = useState(null);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		(async () => {
+			try {
+				// Simulated fetching
+				const data = {
+					summary: { savings: 4500, loanOutstanding: 1200 },
+					transactions: [
+						{
+							_id: '1',
+							type: 'SAVINGS',
+							date: '2026-01-20',
+							amount: 200,
+							toAccount: 'SHG_CASH',
+						},
+						{
+							_id: '2',
+							type: 'LOAN_REPAYMENT',
+							date: '2026-01-15',
+							amount: 500,
+							toAccount: 'SHG_CASH',
+						},
+						{
+							_id: '3',
+							type: 'LOAN_DISBURSEMENT',
+							date: '2026-01-05',
+							amount: 1200,
+							toAccount: 'MEMBER',
+						},
+					],
+				};
+				setRows(data.transactions);
+				setSummary(data.summary);
+			} finally {
+				setLoading(false);
+			}
+		})();
+	}, [shgId]);
+
+	const getTxDetails = (type) => {
+		switch (type) {
+			case 'SAVINGS':
+				return {
+					label: 'मासिक बचत',
+					color: 'text-emerald-600',
+					bg: 'bg-emerald-50',
+				};
+			case 'LOAN_REPAYMENT':
+				return { label: 'ऋण वापसी', color: 'text-blue-600', bg: 'bg-blue-50' };
+			case 'LOAN_DISBURSEMENT':
+				return { label: 'ऋण लिया', color: 'text-rose-600', bg: 'bg-rose-50' };
+			default:
+				return { label: type, color: 'text-slate-600', bg: 'bg-slate-50' };
+		}
+	};
 
 	return (
-		<div className='min-h-screen bg-[#F8FAFC] pb-20'>
-			{/* Glassmorphic Top Nav */}
-			<nav className='sticky top-0 z-30 backdrop-blur-md bg-white/70 border-b border-slate-200/50 px-6 py-4'>
-				<div className='max-w-2xl mx-auto flex items-center justify-between'>
-					<motion.button
-						whileTap={{ scale: 0.9 }}
-						onClick={() => router.back()}
-						className='p-2 hover:bg-slate-100 rounded-xl transition-colors'>
-						<ChevronLeft className='w-6 h-6 text-slate-600' />
-					</motion.button>
+		<div className='min-h-screen bg-[#F8FAFC] pb-24'>
+			{/* Header / Nav */}
+			<div className='px-6 pt-8 pb-4 flex items-center justify-between max-w-2xl mx-auto'>
+				<button
+					onClick={() => router.back()}
+					className='p-2 bg-white rounded-xl shadow-sm border border-slate-100'>
+					<ChevronLeft className='w-6 h-6 text-slate-600' />
+				</button>
+				<h1 className='text-lg font-bold text-slate-800'>डिजिटल पासबुक</h1>
+				<div className='w-10' /> {/* Spacer */}
+			</div>
 
-					<div className='flex items-center gap-2 bg-slate-900 px-4 py-2 rounded-2xl shadow-lg shadow-slate-200'>
-						<ShieldCheck className='w-4 h-4 text-emerald-400' />
-						<span className='text-[11px] font-black text-white uppercase tracking-widest'>
-							Admin Panel
-						</span>
-					</div>
-				</div>
-			</nav>
-
-			<main className='max-w-2xl mx-auto p-6'>
-				{/* Header Section */}
-				<header className='mb-8 flex justify-between items-end'>
-					<div>
-						<div className='flex items-center gap-2 text-indigo-600 mb-1'>
-							<Calendar className='w-4 h-4' />
-							<span className='text-xs font-bold uppercase tracking-tight'>
-								जनवरी 2026
-							</span>
-						</div>
-						<h1 className='text-3xl font-black text-slate-900 tracking-tighter'>
-							समूह{' '}
-							<span className='text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600'>
-								प्रबंधन
-							</span>
-						</h1>
-					</div>
-					<div className='text-right'>
-						<p className='text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none'>
-							ID: {shgId?.slice(-6) || 'N/A'}
-						</p>
-					</div>
-				</header>
-
-				{/* Refined Financial Summary Card */}
+			<main className='max-w-2xl mx-auto px-6'>
+				{/* Summary Wallet Card */}
 				<motion.div
-					initial={{ opacity: 0, y: 20 }}
-					animate={{ opacity: 1, y: 0 }}
-					className='relative group mb-10'>
-					<div className='absolute inset-0 bg-gradient-to-r from-indigo-600 to-violet-700 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-30 transition-opacity' />
-					<div className='relative bg-slate-950 rounded-[2.5rem] p-8 overflow-hidden'>
-						<div className='flex justify-between items-start mb-8'>
-							<div>
-								<p className='text-slate-400 text-xs font-bold uppercase tracking-widest mb-1'>
-									कुल उपलब्ध कोष
-								</p>
-								<h2 className='text-5xl font-black text-white tracking-tighter'>
-									₹45,280
-								</h2>
-							</div>
-							<div className='bg-white/10 p-3 rounded-2xl backdrop-blur-md'>
-								<TrendingUp className='w-6 h-6 text-emerald-400' />
-							</div>
+					initial={{ opacity: 0, scale: 0.9 }}
+					animate={{ opacity: 1, scale: 1 }}
+					className='relative overflow-hidden bg-slate-900 rounded-[2.5rem] p-6 text-white shadow-2xl shadow-indigo-200/50 mb-8'>
+					<div className='relative z-10'>
+						<p className='text-xs font-bold text-slate-400 uppercase tracking-widest mb-4'>
+							कुल बैलेंस
+						</p>
+						<div className='flex items-baseline gap-1'>
+							<span className='text-4xl font-black'>
+								₹{summary?.savings || 0}
+							</span>
+							<span className='text-emerald-400 text-xs font-bold flex items-center gap-0.5'>
+								<ArrowUpRight className='w-3 h-3' /> 12%
+							</span>
 						</div>
 
-						<div className='grid grid-cols-2 gap-3'>
-							<div className='bg-white/5 border border-white/10 p-4 rounded-3xl'>
-								<p className='text-[10px] text-slate-500 font-bold uppercase mb-1'>
-									इस माह की बचत
+						<div className='grid grid-cols-2 gap-4 mt-8'>
+							<div className='bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/5'>
+								<p className='text-[10px] text-slate-400 font-bold uppercase mb-1'>
+									कुल बचत
 								</p>
-								<p className='text-white font-bold text-lg'>₹2,400</p>
+								<p className='text-lg font-bold'>₹{summary?.savings || 0}</p>
 							</div>
-							<div className='bg-white/5 border border-white/10 p-4 rounded-3xl'>
-								<p className='text-[10px] text-slate-500 font-bold uppercase mb-1'>
+							<div className='bg-white/10 backdrop-blur-md rounded-2xl p-3 border border-white/5'>
+								<p className='text-[10px] text-slate-400 font-bold uppercase mb-1'>
 									बकाया ऋण
 								</p>
-								<p className='text-white font-bold text-lg'>₹12,800</p>
-							</div>
-						</div>
-
-						{/* Abstract Background Shapes */}
-						<div className='absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-[60px]' />
-						<div className='absolute bottom-0 left-0 w-24 h-24 bg-violet-500/20 rounded-full blur-[50px]' />
-					</div>
-				</motion.div>
-
-				{/* Command Center Grid */}
-				<div className='grid grid-cols-1 sm:grid-cols-2 gap-5'>
-					{actions.map((a, i) => (
-						<motion.button
-							key={a.href}
-							onClick={() => router.push(`/shg/${shgId}/manage/${a.href}`)}
-							initial={{ opacity: 0, scale: 0.95 }}
-							animate={{ opacity: 1, scale: 1 }}
-							transition={{ delay: i * 0.05 }}
-							whileHover={{ y: -8, scale: 1.02 }}
-							whileTap={{ scale: 0.98 }}
-							className='group relative flex flex-col bg-white border border-slate-200 rounded-[2.2rem] p-6 text-left shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all'>
-							{/* Icon & Action Arrow */}
-							<div className='flex justify-between items-start mb-6'>
-								<div
-									className={`w-14 h-14 rounded-2xl ${a.bg} flex items-center justify-center ${a.color} shadow-inner`}>
-									<a.icon className='w-7 h-7' />
-								</div>
-								<div className='p-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2 transition-all duration-300'>
-									<ArrowUpRight className={`w-5 h-5 ${a.color}`} />
-								</div>
-							</div>
-
-							{/* Text Content */}
-							<div>
-								<h3 className='text-xl font-bold text-slate-900 tracking-tight group-hover:text-indigo-600 transition-colors'>
-									{a.title}
-								</h3>
-								<p className='text-sm font-medium text-slate-500 mt-1 leading-relaxed'>
-									{a.desc}
+								<p className='text-lg font-bold text-rose-300'>
+									₹{summary?.loanOutstanding || 0}
 								</p>
 							</div>
+						</div>
+					</div>
+					{/* Artistic Background */}
+					<div className='absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl' />
+				</motion.div>
 
-							{/* Bottom Label */}
-							<div
-								className={`mt-6 w-fit px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${a.border} ${a.bg} ${a.color}`}>
-								Manage
-							</div>
-						</motion.button>
-					))}
+				{/* Transactions Section */}
+				<div className='flex items-center justify-between mb-4 px-2'>
+					<h2 className='text-sm font-bold text-slate-500 uppercase tracking-wider'>
+						लेन-देन का इतिहास
+					</h2>
+					<ReceiptText className='w-4 h-4 text-slate-400' />
 				</div>
+
+				<div className='space-y-4 relative'>
+					{/* Timeline Line */}
+					<div className='absolute left-8 top-0 bottom-0 w-0.5 bg-slate-100 hidden sm:block' />
+
+					<AnimatePresence>
+						{rows.map((tx, i) => {
+							const details = getTxDetails(tx.type);
+							const isCredit = tx.toAccount === 'SHG_CASH';
+
+							return (
+								<motion.div
+									key={tx._id}
+									initial={{ opacity: 0, x: -10 }}
+									animate={{ opacity: 1, x: 0 }}
+									transition={{ delay: i * 0.05 }}
+									className='relative flex items-center gap-4 bg-white hover:bg-slate-50 border border-slate-100 p-4 rounded-3xl transition-all group cursor-pointer'>
+									{/* Icon Badge */}
+									<div
+										className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${details.bg} ${details.color} transition-transform group-hover:scale-110`}>
+										{isCredit ? (
+											<ArrowUpRight className='w-6 h-6' />
+										) : (
+											<ArrowDownLeft className='w-6 h-6' />
+										)}
+									</div>
+
+									{/* Info */}
+									<div className='flex-1'>
+										<p className='font-bold text-slate-800 tracking-tight'>
+											{details.label}
+										</p>
+										<p className='text-[11px] font-semibold text-slate-400'>
+											{new Date(tx.date).toLocaleDateString('hi-IN', {
+												day: 'numeric',
+												month: 'long',
+												year: 'numeric',
+											})}
+										</p>
+									</div>
+
+									{/* Amount */}
+									<div className='text-right'>
+										<p
+											className={`text-lg font-black tracking-tighter ${details.color}`}>
+											{isCredit ? '+' : '-'} ₹{tx.amount}
+										</p>
+										<p className='text-[9px] font-bold text-slate-300 uppercase tracking-widest'>
+											सफल
+										</p>
+									</div>
+								</motion.div>
+							);
+						})}
+					</AnimatePresence>
+				</div>
+
+				{/* Empty State */}
+				{!loading && rows.length === 0 && (
+					<div className='text-center py-20'>
+						<div className='w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4'>
+							<IndianRupee className='w-8 h-8 text-slate-200' />
+						</div>
+						<p className='text-slate-500 font-medium'>
+							अभी तक कोई लेन-देन नहीं हुआ है
+						</p>
+					</div>
+				)}
 			</main>
+
+			{/* Fixed Footer Actions */}
+			<div className='fixed bottom-8 left-0 right-0 px-6 flex justify-center pointer-events-none'>
+				<motion.button
+					whileHover={{ scale: 1.05 }}
+					whileTap={{ scale: 0.95 }}
+					className='pointer-events-auto bg-indigo-600 text-white flex items-center gap-3 px-8 py-4 rounded-2xl shadow-2xl shadow-indigo-200 font-bold'>
+					<Download className='w-5 h-5' />
+					स्टेटमेंट डाउनलोड करें
+				</motion.button>
+			</div>
 		</div>
 	);
 }
