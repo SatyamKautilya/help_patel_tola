@@ -6,9 +6,11 @@ import AddMembers from './AddMembers';
 import ShgFinancialSetup from './ShgFinancialSetup';
 import ReviewAndFinish from './ReviewAndFinish';
 import { useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 
 export default function OnboardingFlow() {
-	const [step, setStep] = useState(3);
+	const router = useRouter();
+	const [step, setStep] = useState(4);
 	const shg = useSelector(
 		(state) => state.appContext.shgOnboardingData?.shgDetails || {},
 	);
@@ -133,15 +135,11 @@ export default function OnboardingFlow() {
 							initial={{ opacity: 0, x: 20 }}
 							animate={{ opacity: 1, x: 0 }}
 							exit={{ opacity: 0, x: -20 }}>
-							<ReviewAndFinish shg={shg} onFinish={() => alert('Done')} />
+							<ReviewAndFinish shg={shg} onFinish={() => router.push('/')} />
 						</motion.div>
 					)}
 				</AnimatePresence>
 			</div>
-
-			<button onClick={() => setStep(step - 1)} disabled={step === 1}>
-				back
-			</button>
 		</div>
 	);
 }
