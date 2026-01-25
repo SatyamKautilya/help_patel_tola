@@ -16,7 +16,7 @@ const Kheti = () => {
 					backgroundPosition: 'center',
 					backgroundSize: 'cover',
 				}}
-				className='rounded-2xl  overflow-hidden   h-30  bg-blue-200 backdrop-blur-md
+				className='rounded-2xl border-1 border-b-3 border-b-yellow-200 overflow-hidden   h-30  bg-blue-200 backdrop-blur-md
 				shadow-[0_10px_20px_rgba(0,0,0,0.40)]
 				hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]
 				hover:-translate-y-1
@@ -38,7 +38,7 @@ const Kheti = () => {
 
 					backgroundSize: 'calc(100% - 0px) calc(100% - 0px)',
 				}}
-				className='rounded-2xl bg-white/50  overflow-hidden  w-full h-48
+				className='rounded-2xl border-b-3 bg-blue-200 bg-white/50  overflow-hidden  w-full h-48
                 backdrop-blur-md
 				shadow-[0_10px_20px_rgba(0,0,0,0.40)]
 				hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]

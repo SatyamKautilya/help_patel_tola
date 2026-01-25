@@ -19,7 +19,7 @@ const SHGSection = () => {
 			className='shg-card border-1 border-b-3 border-b-pink-100 rounded-3xl overflow-hidden shadow-lg flex flex-col justify-end text-center text-white'>
 			{/* Add your card content here */}
 
-			<div className='flex flex-row px-2 mb-1 w-full justify-between'>
+			{/* <div className='flex flex-row px-2 mb-1 w-full justify-between'>
 				<span className='bg-green-800 px-4 w-full border rounded-2xl'>
 					मेरे समूह
 				</span>
@@ -27,7 +27,7 @@ const SHGSection = () => {
 				<span className='bg-pink-600 px-4 w-full border rounded-2xl'>
 					बकाया
 				</span>
-			</div>
+			</div> */}
 		</div>
 	);
 };
