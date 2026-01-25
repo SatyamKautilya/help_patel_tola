@@ -204,7 +204,7 @@ export default function HomePage() {
 								<div className='w-full border-t border-white/30'></div>
 							</div>
 							<div className='relative flex justify-center'>
-								<span className='bg-gradient-to-r from-transparent via-white to-transparent w-full text-center backdrop-blur-sm px-6 py-1.5  text-sm font-bold text-lime-800 shadow-sm  '>
+								<span className='bg-gradient-to-r from-white/5 via-white to-white/5 w-full text-center rounded-xl backdrop-blur-sm px-6 py-1.5  text-sm font-bold text-lime-800 shadow-sm  '>
 									आजीविका एवं विकास
 								</span>
 							</div>
@@ -216,6 +216,7 @@ export default function HomePage() {
 							viewport={{ once: true }}>
 							<Kheti />
 						</motion.div>
+
 						<motion.div
 							variants={sectionVariant}
 							initial='hidden'
@@ -226,29 +227,7 @@ export default function HomePage() {
 								<div className='w-full border-t border-white/30'></div>
 							</div>
 							<div className='relative flex justify-center'>
-								<span className='bg-gradient-to-r from-transparent via-white to-transparent w-full text-center backdrop-blur-sm px-6 py-1.5  text-sm font-bold text-lime-800 shadow-sm  '>
-									शिक्षा, कौशल एवं रोजगार
-								</span>
-							</div>
-						</motion.div>
-						<motion.div
-							variants={sectionVariant}
-							initial='hidden'
-							whileInView='visible'
-							viewport={{ once: true }}>
-							<Employment />
-						</motion.div>
-						<motion.div
-							variants={sectionVariant}
-							initial='hidden'
-							whileInView='visible'
-							viewport={{ once: true }}
-							className='relative '>
-							<div className='absolute inset-0 flex items-center'>
-								<div className='w-full border-t border-white/30'></div>
-							</div>
-							<div className='relative flex justify-center'>
-								<span className='bg-gradient-to-r from-transparent via-white to-transparent w-full text-center backdrop-blur-sm px-6 py-1.5  text-sm font-bold text-lime-800 shadow-sm  '>
+								<span className='bg-gradient-to-r from-white/5 via-white to-white/5 w-full text-center rounded-xl backdrop-blur-sm px-6 py-1.5  text-sm font-bold text-lime-800 shadow-sm  '>
 									स्व सहायता समूह एवं बचत
 								</span>
 							</div>
@@ -259,6 +238,28 @@ export default function HomePage() {
 							whileInView='visible'
 							viewport={{ once: true }}>
 							<SHGSection />
+						</motion.div>
+						<motion.div
+							variants={sectionVariant}
+							initial='hidden'
+							whileInView='visible'
+							viewport={{ once: true }}
+							className='relative '>
+							<div className='absolute inset-0 flex items-center'>
+								<div className='w-full border-t border-white/30'></div>
+							</div>
+							<div className='relative flex justify-center'>
+								<span className='bg-gradient-to-r from-white/5 via-white to-white/5 w-full text-center rounded-xl backdrop-blur-sm px-6 py-1.5  text-sm font-bold text-lime-800 shadow-sm  '>
+									शिक्षा, कौशल एवं रोजगार
+								</span>
+							</div>
+						</motion.div>
+						<motion.div
+							variants={sectionVariant}
+							initial='hidden'
+							whileInView='visible'
+							viewport={{ once: true }}>
+							<Employment />
 						</motion.div>
 						<motion.div
 							variants={sectionVariant}

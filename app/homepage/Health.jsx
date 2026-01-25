@@ -15,7 +15,7 @@ const Health = () => {
 			hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]
 			hover:-translate-y-1
 			transition-all duration-300 ease-out	
-			border-b-3 border-b-pink-200'
+			 border-1 border-pink-200 border-b-3 border-b-pink-200'
 			style={{
 				backgroundImage:
 					'url(https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/com_hosp_bg.png)',
