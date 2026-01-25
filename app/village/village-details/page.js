@@ -42,7 +42,7 @@ const villageCards = [
 		slug: '/village/meetings/youth-committee',
 		accent: 'bg-emerald-500',
 		bgGradient: 'from-emerald-500/10 to-teal-500/5',
-		isUpcoming: false,
+		isUpcoming: true,
 	},
 	{
 		title: 'रामायण मंडली',
@@ -51,7 +51,7 @@ const villageCards = [
 		slug: '/village/meetings/ramayan-mandali',
 		accent: 'bg-cyan-500',
 		bgGradient: 'from-cyan-500/10 to-blue-500/5',
-		isUpcoming: false,
+		isUpcoming: true,
 	},
 	{
 		title: 'होली समूह',
@@ -60,7 +60,7 @@ const villageCards = [
 		slug: '/village/meetings/holi-group',
 		accent: 'bg-rose-500',
 		bgGradient: 'from-rose-500/10 to-pink-500/5',
-		isUpcoming: false,
+		isUpcoming: true,
 	},
 	{
 		title: 'खेती व रोजगार',
