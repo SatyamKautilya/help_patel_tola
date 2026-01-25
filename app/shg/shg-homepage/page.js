@@ -96,8 +96,7 @@ export default function UserHomePage() {
 												router.push(
 													`/shg/shg-details/${shg._id}/member/passbook`,
 												);
-											}
-											router.push(`/shg/shg-details/${shg._id}/manage`);
+											} else router.push(`/shg/shg-details/${shg._id}/manage`);
 										}}
 										className='group relative overflow-hidden bg-white/80 backdrop-blur-xl border border-white/60 rounded-[2rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-all cursor-pointer'>
 										{/* Role Accent Line */}
