@@ -10,10 +10,11 @@ export default function UserHomePage() {
 	const [shgs, setShgs] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const router = useRouter();
-	// const thisUser = useSelector((state) => state.appContext.user);
-	const user_id = new mongoose.Types.ObjectId(
-		'6972263aaadbfedf49fba70c', // 👈 must be 24-char hex
-	);
+	const thisUser = useSelector((state) => state.appContext.user);
+	// const user_id = new mongoose.Types.ObjectId(
+	// 	'6972263aaadbfedf49fba70c', // 👈 must be 24-char hex
+	// );
+	const user_id = thisUser?._id;
 
 	const getShgByUserId = async () => {
 		// Placeholder for actual API call
