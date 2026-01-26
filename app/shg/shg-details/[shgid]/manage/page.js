@@ -29,7 +29,7 @@ const actions = [
     upcoming: false,
   },
   {
-    title: "penalty",
+    title: "पेनल्टी",
     desc: "एंट्री",
     icon: IndianRupee,
     href: "penalty-entry",
@@ -160,7 +160,7 @@ export default function ShgManagerHome({ params }) {
 			</motion.div>
 
 			{/* Grid Section - Optimized for height */}
-				<div className="grid grid-cols-2 gap-3 h-full max-h-[52vh]">
+				<div className="grid grid-cols-2 gap-5 h-full mb-16">
 				  {actions.map((a, i) => (
 					<motion.button
 					  key={a.href}

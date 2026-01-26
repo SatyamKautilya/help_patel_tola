@@ -119,28 +119,28 @@ export default function UserHomePage() {
           </p>
         )}
 
-        {/* Loading State */}
-        <div className="grid gap-4">
-          <AnimatePresence>
-            {loading
-              ? Array.from({ length: 3 }).map((_, i) => (
-                  <motion.div
-                    key={`skeleton-${i}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="h-32 rounded-3xl bg-white/40 animate-pulse border border-white"
-                  />
-                ))
-              : shgs.map((shg, index) => (
-                  <motion.div
-                    key={shg._id}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => {
+        
+          <div className="grid gap-4">
+            <AnimatePresence>
+              {loading
+                ? Array.from({ length: 3 }).map((_, i) => (
+              <motion.div
+                key={`skeleton-${i}`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="h-32 rounded-3xl bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 animate-pulse border border-slate-300 shadow-md"
+              />
+            ))
+                : shgs.map((shg, index) => (
+              <motion.div
+                key={shg._id}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
                       router.push(
                         `/shg/shg-details/${shg.shgId}/member/passbook`,
                       );
@@ -194,7 +194,7 @@ export default function UserHomePage() {
                             e.stopPropagation();
                             router.push(`/shg/shg-details/${shg.shgId}/manage`);
                           }}
-                          className="px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 transition-colors"
+                          className="px-5 py-3 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 transition-colors"
                         >
 						  समूह संचालन
                         </motion.button>

@@ -57,6 +57,8 @@ export default function MonthlySavingsEntry({ params }) {
     return activeDues.every((d) => d === first) ? first : null;
   }, [members]);
 
+  console.log(members, memberDueMap);
+
   const applyBulkSavings = () => {
     const newEntries = {};
     members.forEach((m) => {
@@ -141,7 +143,7 @@ export default function MonthlySavingsEntry({ params }) {
         <motion.button
           whileTap={{ scale: 0.9 }}
           onClick={() => router.back()}
-          className="p-2.5 bg-slate-100 rounded-xl text-slate-600"
+          className="p-2.5 bg-slate-100 shadow rounded-xl text-slate-600"
         >
           <ChevronLeft size={20} />
         </motion.button>
@@ -195,16 +197,16 @@ export default function MonthlySavingsEntry({ params }) {
                 : "bg-white border-rose-50"
             }`}
           >
-            <div className="flex justify-between items-start mb-4">
-              <div className="flex items-center gap-3">
+            <div className="flex justify-between  items-start mb-4">
+              <div className="flex items-center w-full gap-3">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm ${idx % 2 === 0 ? "bg-indigo-100 text-indigo-600" : "bg-rose-100 text-rose-600"}`}
                 >
                   {m.name.charAt(0)}
                 </div>
-                <div>
+                <div className="flex w-full flex-row justify-between">
                   <h3 className="font-bold text-slate-800">{m.name}</h3>
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  <p className="text-xs rounded-lg p-1 bg-yellow-200 font-semibold text-yellow-700 uppercase tracking-wider">
                     बकाया: ₹{m.due}
                   </p>
                 </div>
@@ -235,7 +237,7 @@ export default function MonthlySavingsEntry({ params }) {
       </div>
 
       {/* Floating Footer */}
-      <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-[#F1F5F9] via-[#F1F5F9]/90 to-transparent">
+      <div className="fixed bottom-0 left-0 right-0 p-12 bg-gradient-to-t from-[#F1F5F9] via-[#F1F5F9]/90 to-transparent">
         <motion.button
           whileTap={{ scale: 0.95 }}
           disabled={totalActual === 0 || saving}
@@ -262,7 +264,7 @@ export default function MonthlySavingsEntry({ params }) {
               initial={{ y: 500 }}
               animate={{ y: 0 }}
               exit={{ y: 500 }}
-              className="fixed bottom-0 left-0 right-0 bg-white rounded-t-[3rem] z-50 p-8 shadow-2xl"
+              className="fixed bottom-12 left-0 right-0 bg-white rounded-t-[3rem] z-50 p-8 shadow-2xl"
             >
               <div className="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-6" />
               <h2 className="text-2xl font-black text-slate-800 mb-6">
