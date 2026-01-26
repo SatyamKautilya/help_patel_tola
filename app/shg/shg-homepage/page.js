@@ -5,6 +5,7 @@ import { Users, MapPin, ChevronLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import mongoose from "mongoose";
+import { useSelector } from "react-redux";
 
 export const MemberRole = Object.freeze({
   PRESIDENT: "अध्यक्ष",
