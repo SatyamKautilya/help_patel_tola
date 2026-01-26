@@ -50,6 +50,9 @@ export async function POST(req) {
 
 			case 'get-shg-by-user-id':
 				return getShgByUserId(body);
+			
+				case 'monthly-contribution-due':
+				return monthlyContributionDue(body);
 			default:
 				return NextResponse.json(
 					{ error: 'Invalid API action' },
@@ -272,3 +275,113 @@ async function openingBalance(data) {
 
 	return NextResponse.json(txn);
 }
+
+async function monthlyContributionDue(data) {
+	try {
+		const { shgId, month } = data;
+
+		// Fetch all active members of the SHG
+		if (!shgId) {
+			return NextResponse.json(
+				{ error: 'shgId is required' },
+				{ status: 400 },
+			);
+		}
+
+		const shgObjectId = shgId;
+
+		/* Month range */
+		const baseDate = month
+			? new Date(`${month}-01`)
+			: new Date();
+
+		const start = new Date(
+			baseDate.getFullYear(),
+			baseDate.getMonth(),
+			1,
+		);
+		const end = new Date(
+			baseDate.getFullYear(),
+			baseDate.getMonth() + 1,
+			0,
+			23,
+			59,
+			59,
+		);
+
+		/* SHG */
+		const shg = await Shg.findById(shgObjectId);
+		if (!shg) {
+			return NextResponse.json(
+				{ error: 'SHG not found' },
+				{ status: 404 },
+			);
+		}
+
+		const expectedPerMember = shg.monthlyContribution;
+
+		/* Members */
+		const members = await ShgMember.find({
+			shgId: shgObjectId,
+			isActive: true,
+		}).select('_id name');
+
+		/* Transactions */
+		const txns = await Transaction.find({
+			shgId: shgObjectId,
+			type: { $in: ['MONTHLY_DEPOSIT', 'LUMP_SUM_CONTRIBUTION'] },
+			date: { $gte: start, $lte: end },
+		}).select('memberId amount');
+
+		/* Aggregate paid per member */
+		const paidMap = {};
+		txns.forEach((tx) => {
+			if (!tx.memberId) return;
+			const key = tx.memberId.toString();
+			paidMap[key] = (paidMap[key] || 0) + tx.amount;
+		});
+
+		/* Build member rows */
+		const memberRows = members.map((m) => {
+			const paid = paidMap[m._id.toString()] || 0;
+			const due = Math.max(expectedPerMember - paid, 0);
+
+			return {
+				memberId: m._id,
+				name: m.name,
+				expected: expectedPerMember,
+				paid,
+				due,
+			};
+		});
+
+		/* Summary */
+		const totalExpected = expectedPerMember * members.length;
+		const totalCollected = Object.values(paidMap).reduce(
+			(a, b) => a + b,
+			0,
+		);
+
+		return NextResponse.json({
+			shgId,
+			month: month || `${baseDate.getFullYear()}-${baseDate.getMonth() + 1}`,
+			monthlyContribution: expectedPerMember,
+			summary: {
+				totalMembers: members.length,
+				totalExpected,
+				totalCollected,
+				totalDue: Math.max(totalExpected - totalCollected, 0),
+			},
+			members: memberRows,
+		});
+	} catch (err) {
+		console.error(err);
+		return NextResponse.json(
+			{ error: 'Internal server error' },
+			{ status: 500 },
+		);
+	}
+}
+
+
+

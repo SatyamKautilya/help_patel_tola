@@ -68,6 +68,7 @@ export default function UserHomePage() {
     const shgs = await data.json();
     return shgs;
   };
+  console.log(shgs)
 
   useEffect(() => {
     const load = async () => {
@@ -91,7 +92,7 @@ export default function UserHomePage() {
         <div className="flex items-center justify-between max-w-2xl mx-auto">
           <div>
             <h1 className="text-xs font-bold tracking-widest text-indigo-600 uppercase">
-              Tamohar
+			  तमोहर
             </h1>
             <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
               मेरे{" "}
@@ -141,7 +142,7 @@ export default function UserHomePage() {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => {
                       router.push(
-                        `/shg/shg-details/${shg._id}/member/passbook`,
+                        `/shg/shg-details/${shg.shgId}/member/passbook`,
                       );
                     }}
                     className="group relative overflow-hidden bg-white/80 backdrop-blur-xl border border-white/60 rounded-[2rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-all cursor-pointer"
@@ -180,7 +181,7 @@ export default function UserHomePage() {
                           onClick={(e) => {
                             e.stopPropagation();
                             router.push(
-                              `/shg/shg-details/${shg._id}/member/passbook`,
+                              `/shg/shg-details/${shg.shgId}/member/passbook`,
                             );
                           }}
                           className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 transition-colors"
@@ -191,11 +192,11 @@ export default function UserHomePage() {
                           whileTap={{ scale: 0.95 }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            router.push(`/shg/shg-details/${shg._id}/manage`);
+                            router.push(`/shg/shg-details/${shg.shgId}/manage`);
                           }}
                           className="px-3 py-1.5 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 transition-colors"
                         >
-                          प्रबंधित करें
+						  समूह संचालन
                         </motion.button>
                       </div>
                     </div>
