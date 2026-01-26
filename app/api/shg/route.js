@@ -76,7 +76,8 @@ export async function getShgByUserId(data) {
 	const memberships = await ShgMember.find({
 		userId: userId,
 		isActive: true,
-	}).select('shgId role');
+	}).select('shgId role ');
+
 
 	if (memberships.length === 0) return NextResponse.json([]);
 
