@@ -63,6 +63,8 @@ export async function POST(req) {
 
       case "save-penalty":
         return saveBulkPenaltyCharges(body);
+      case "member-passbook":
+        return MemberPassbook(body);
       default:
         return NextResponse.json(
           { error: "Invalid API action" },
@@ -112,6 +114,7 @@ export async function getShgByUserId(data) {
     return {
       shgId: shg._id,
       name: shg.name,
+      memberId: membership._id,
       village: shg.village,
       totalMembers: shg.totalMembers || 0,
       role: membership?.role || "MEMBER",
@@ -493,4 +496,51 @@ async function saveBulkPenaltyCharges(data) {
     totalAmount: result.reduce((sum, t) => sum + t.amount, 0),
     transactionIds: result.map((t) => t._id),
   });
+}
+
+async function MemberPassbook(data) {
+  const { shgid, memberId } = data;
+  if (!shgid || !memberId) {
+    throw new Error("shgid and memberId are required");
+  }
+
+  const shgObjectId = new Types.ObjectId(String(shgid));
+  const memberObjectId = new Types.ObjectId(String(memberId));
+  const transactions = await Transaction.find({
+    shgId: shgObjectId,
+    memberId: memberObjectId,
+  }).sort({ date: 1 });
+  // Calculate summary
+  let totalSavings = 0;
+  let totalLoansDisbursed = 0;
+  let totalLoanRepayments = 0;
+  let totalPenalties = 0;
+  transactions.forEach((tx) => {
+    switch (tx.type) {
+      case TransactionType.MONTHLY_DEPOSIT:
+      case TransactionType.LUMP_SUM_CONTRIBUTION:
+        totalSavings += tx.amount;
+        break;
+      case TransactionType.LOAN_DISBURSEMENT:
+        totalLoansDisbursed += tx.amount;
+        break;
+
+      case TransactionType.LOAN_REPAYMENT:
+        totalLoanRepayments += tx.amount;
+        break;
+
+      case TransactionType.PENALTY_CHARGE:
+        totalPenalties += tx.amount;
+        break;
+      default:
+        break;
+    }
+  });
+  const summary = {
+    totalSavings,
+    totalLoansDisbursed,
+    totalLoanRepayments,
+    totalPenalties,
+  };
+  return NextResponse.json({ transactions:transactions.slice(0,20), summary });
 }
