@@ -29,7 +29,7 @@ const actions = [
 		title: 'बचत',
 		desc: 'एंट्री',
 		icon: IndianRupee,
-		href: 'savings',
+		href: 'monthly-entry',
 		color: 'text-indigo-600',
 		bg: 'bg-indigo-50',
 		border: 'border-indigo-200',
@@ -147,7 +147,9 @@ export default function ShgManagerHome({ params }) {
 					{actions.map((a, i) => (
 						<motion.button
 							key={a.href}
-							onClick={() => router.push(`/shg/${shgId}/manage/${a.href}`)}
+							onClick={() =>
+								router.push(`/shg/shg-details/${shgId}/manage/${a.href}`)
+							}
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: i * 0.05 }}
