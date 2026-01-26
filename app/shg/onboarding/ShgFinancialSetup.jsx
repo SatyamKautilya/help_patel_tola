@@ -367,6 +367,13 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 
 				{step === 6 && (
 					<div className='space-y-4'>
+						{saving && (
+							<div className='bg-slate-900/60 border border-slate-700 rounded-xl p-4'>
+								<p className='text-pink-400 font-semibold animate-pulse'>
+									{STATUS_STEPS[statusIndex]}
+								</p>
+							</div>
+						)}
 						<div className='space-y-6'>
 							<div className='bg-slate-800/40 border border-slate-700 rounded-xl p-4'>
 								<p className='text-slate-400 text-sm'>SHG नकद</p>
@@ -435,14 +442,6 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 								</>
 							)}
 						</button>
-					</div>
-				)}
-
-				{saving && (
-					<div className='bg-slate-900/60 border border-slate-700 rounded-xl p-4'>
-						<p className='text-pink-400 font-semibold animate-pulse'>
-							{STATUS_STEPS[statusIndex]}
-						</p>
 					</div>
 				)}
 			</div>

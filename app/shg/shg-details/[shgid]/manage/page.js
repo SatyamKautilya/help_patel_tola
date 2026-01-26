@@ -99,12 +99,12 @@ export default function ShgManagerHome({ params }) {
 					</div>
 				</div>
 
-				<div className='flex items-center gap-2 bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-white shadow-sm'>
-					<ShieldCheck className='w-4 h-4 text-emerald-500' />
-					<span className='text-[10px] font-black text-slate-600 uppercase tracking-widest'>
-						Admin
-					</span>
-				</div>
+				<motion.button
+					whileTap={{ scale: 0.8 }}
+					onClick={() => router.back()}
+					className='absolute  right-6 p-3 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white z-20'>
+					<ChevronLeft className='w-5 h-5 text-slate-600' />
+				</motion.button>
 			</nav>
 
 			<main className='relative z-10 flex-1 flex flex-col px-6 py-4 justify-between'>
@@ -190,12 +190,6 @@ export default function ShgManagerHome({ params }) {
 			</main>
 
 			{/* Back Button - Fixed Bottom Left */}
-			<motion.button
-				whileTap={{ scale: 0.8 }}
-				onClick={() => router.back()}
-				className='absolute bottom-6 left-6 p-3 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white z-20'>
-				<ChevronLeft className='w-5 h-5 text-slate-600' />
-			</motion.button>
 		</div>
 	);
 }

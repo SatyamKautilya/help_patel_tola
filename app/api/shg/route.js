@@ -48,6 +48,8 @@ export async function POST(req) {
 			case 'opening-balance':
 				return openingBalance(body);
 
+			case 'get-shg-by-user-id':
+				return getShgByUserId(body);
 			default:
 				return NextResponse.json(
 					{ error: 'Invalid API action' },
@@ -61,6 +63,49 @@ export async function POST(req) {
 			{ status: 500 },
 		);
 	}
+}
+
+export async function getShgByUserId(data) {
+	const { userId } = data;
+
+	if (!userId) {
+		throw new Error('userId is required');
+	}
+
+	/* 1️⃣ Get active SHG memberships of user */
+	const memberships = await ShgMember.find({
+		userId: userId,
+		isActive: true,
+	}).select('shgId role');
+
+	if (memberships.length === 0) return NextResponse.json([]);
+
+	const shgIds = memberships.map((m) => m.shgId);
+
+	/* 2️⃣ Fetch SHG basic details */
+	const shgs = await Shg.find({
+		_id: { $in: shgIds },
+		status: 'ACTIVE',
+	}).select('name village totalMembers');
+
+	/* 3️⃣ Get active member count per SHG */
+
+	/* 4️⃣ Merge everything */
+	const result = shgs.map((shg) => {
+		const membership = memberships.find(
+			(m) => m.shgId.toString() === shg._id.toString(),
+		);
+
+		return {
+			shgId: shg._id,
+			name: shg.name,
+			village: shg.village,
+			totalMembers: shg.totalMembers || 0,
+			role: membership?.role || 'MEMBER',
+		};
+	});
+
+	return NextResponse.json(result);
 }
 
 async function fetchByMobile(data) {

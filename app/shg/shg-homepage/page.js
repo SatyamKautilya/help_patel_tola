@@ -1,35 +1,36 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Users, ArrowRight, MapPin, Plus, LayoutGrid } from 'lucide-react';
+import { Users, ArrowRight, MapPin, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 
 export default function UserHomePage() {
 	const [shgs, setShgs] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const router = useRouter();
+	// const thisUser = useSelector((state) => state.appContext.user);
+	const user_id = new mongoose.Types.ObjectId(
+		'6972263aaadbfedf49fba70c', // 👈 must be 24-char hex
+	);
+
+	const getShgByUserId = async () => {
+		// Placeholder for actual API call
+		const data = await fetch('/api/shg?name=get-shg-by-user-id', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ userId: user_id }),
+		});
+		const shgs = await data.json();
+		return shgs;
+	};
 
 	useEffect(() => {
 		const load = async () => {
 			try {
-				// Simulated API Call
-				const data = [
-					{
-						_id: '648a1f2b5f3c2a0012345678',
-						name: 'सहयोगी महिला समूह',
-						village: 'पटेल टोला',
-						role: 'सदस्य',
-						membersCount: 15,
-					},
-					{
-						_id: '648a1f2b5f3c2a0098765432',
-						name: 'प्रगति महिला मंडल',
-						village: 'रामपुर',
-						role: 'प्रबंधक',
-						membersCount: 20,
-					},
-				];
+				const data = await getShgByUserId();
+
 				setShgs(data);
 			} catch (e) {
 				console.error(e);
@@ -56,9 +57,12 @@ export default function UserHomePage() {
 							</span>
 						</h2>
 					</div>
-					<div className='h-10 w-10 rounded-full bg-white shadow-sm border border-slate-200 flex items-center justify-center'>
-						<LayoutGrid className='w-5 h-5 text-slate-600' />
-					</div>
+					<motion.button
+						whileTap={{ scale: 0.8 }}
+						onClick={() => router.back()}
+						className='absolute  right-6 p-3 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white z-20'>
+						<ChevronLeft className='w-5 h-5 text-slate-600' />
+					</motion.button>
 				</div>
 			</div>
 
@@ -141,7 +145,7 @@ export default function UserHomePage() {
 													))}
 												</div>
 												<span className='text-sm font-semibold text-slate-600'>
-													{shg.membersCount} सदस्य
+													{shg.totalMembers} सदस्य
 												</span>
 											</div>
 
@@ -167,9 +171,19 @@ export default function UserHomePage() {
 						<h3 className='text-lg font-bold text-slate-800'>
 							कोई समूह नहीं मिला
 						</h3>
-						<p className='text-slate-500 mt-2 max-w-[200px] mx-auto'>
-							आप अभी तक किसी भी समूह का हिस्सा नहीं हैं।
-						</p>
+						<ul>
+							<li className='text-slate-500 mt-2'>
+								• आपका समूह अभी{' '}
+								<b className='text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-rose-500'>
+									{' '}
+									तमोहर
+								</b>{' '}
+								पर नहीं है।
+							</li>
+							<li className='text-slate-500 mt-2'>
+								• या आप अभी तक किसी भी समूह का हिस्सा नहीं हैं।
+							</li>
+						</ul>
 					</motion.div>
 				)}
 			</main>
