@@ -113,35 +113,42 @@ export default function UserHomePage() {
       </div>
 
       <main className="max-w-2xl mx-auto p-6">
-        {/* Search/Filter (Visual Placeholder) */}
-        {!loading && shgs.length > 0 && (
-          <p className="text-sm text-slate-500 mb-6 font-medium">
-            कुल {shgs.length} समूह सक्रिय हैं
-          </p>
-        )}
+       
+          {!loading && shgs.length > 0 && (
+            <p className="text-sm text-slate-500 mb-6 font-medium">
+              कुल {shgs.length} समूह सक्रिय हैं
+            </p>
+          )}
 
-        <div className="grid gap-4">
-          <AnimatePresence>
-            {loading
-              ? Array.from({ length: 3 }).map((_, i) => (
-                  <motion.div
-                    key={`skeleton-${i}`}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="h-32 rounded-3xl bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 animate-pulse border border-slate-300 shadow-md"
-                  />
-                ))
-              : shgs.map((shg, index) => (
-                  <motion.div
-                    key={shg.shgId}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    whileHover={{ y: -5 }}
-                    className="group relative overflow-hidden bg-white rounded-[2.5rem] p-6 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.08)] border border-slate-100 transition-all cursor-pointer"
-                  >
-                    {/* Decorative Background Pattern */}
+          <div className="grid gap-4">
+            <AnimatePresence>
+              {loading ? (
+                <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex flex-col items-center justify-center py-16"
+                >
+            <div className="relative w-16 h-16 mb-6">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                className="w-16 h-16 border-4 border-indigo-200 border-t-indigo-600 rounded-full"
+              />
+            </div>
+            <p className="text-slate-600 font-semibold">आपके समूह लोड हो रहे हैं...</p>
+                </motion.div>
+              ) : (
+                shgs.map((shg, index) => (
+            <motion.div
+              key={shg.shgId}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -5 }}
+              className="group relative overflow-hidden bg-white rounded-[2.5rem] p-6 shadow-[0_10px_40px_-15px_rgba(0,0,0,0.08)] border border-slate-100 transition-all cursor-pointer"
+            >
+              {/* Decorative Background Pattern */}
                     <div
                       className={`absolute top-0 right-0 w-32 h-32 -mr-8 -mt-8 rounded-full opacity-[0.03] transition-transform group-hover:scale-110 ${getRoleColor(shg.role).bg}`}
                     />
@@ -229,7 +236,8 @@ export default function UserHomePage() {
                       </motion.button>
                     </div>
                   </motion.div>
-                ))}
+                ))
+              )}
           </AnimatePresence>
         </div>
 
