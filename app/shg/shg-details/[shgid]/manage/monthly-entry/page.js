@@ -198,19 +198,21 @@ export default function MonthlySavingsEntry({ params }) {
             }`}
           >
             <div className="flex justify-between  items-start mb-4">
-              <div className="flex items-center w-full gap-3">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm ${idx % 2 === 0 ? "bg-indigo-100 text-indigo-600" : "bg-rose-100 text-rose-600"}`}
-                >
-                  {m.name.charAt(0)}
+              {m.due > 0 && (
+                <div className="flex items-center w-full gap-3">
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm ${idx % 2 === 0 ? "bg-indigo-100 text-indigo-600" : "bg-rose-100 text-rose-600"}`}
+                  >
+                    {m.name.charAt(0)}
+                  </div>
+                  <div className="flex w-full flex-row justify-between">
+                    <h3 className="font-bold text-slate-800">{m.name}</h3>
+                    <p className="text-xs rounded-lg p-1 bg-yellow-200 font-semibold text-yellow-700 uppercase tracking-wider">
+                      बकाया: ₹{m.due}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex w-full flex-row justify-between">
-                  <h3 className="font-bold text-slate-800">{m.name}</h3>
-                  <p className="text-xs rounded-lg p-1 bg-yellow-200 font-semibold text-yellow-700 uppercase tracking-wider">
-                    बकाया: ₹{m.due}
-                  </p>
-                </div>
-              </div>
+              )}
               {m.due === 0 && (
                 <div className="flex items-center gap-1 text-emerald-600 font-bold text-xs bg-emerald-50 px-3 py-1 rounded-full">
                   <CheckCircle2 size={12} /> पूर्ण
