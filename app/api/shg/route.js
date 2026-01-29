@@ -12,7 +12,11 @@ import BankLoan from "@/lib/models/shgModels/BankLoan";
 import { connectToDatabase } from "@/lib/mongodb";
 import Users from "@/lib/models/Users";
 import { Types } from "mongoose";
-import { TransactionType, AccountType } from "@/lib/models/enum.js";
+import {
+  TransactionType,
+  AccountType,
+  LoanRepaymentStatus,
+} from "@/lib/models/enum.js";
 
 export async function POST(req) {
   try {
@@ -65,6 +69,11 @@ export async function POST(req) {
         return saveBulkPenaltyCharges(body);
       case "member-passbook":
         return MemberPassbook(body);
+      case "list-active-loans":
+        return ListActiveLoans(body);
+      case "collect-repayment":
+        return collectRepayment(body);
+
       default:
         return NextResponse.json(
           { error: "Invalid API action" },
@@ -542,5 +551,326 @@ async function MemberPassbook(data) {
     totalLoanRepayments,
     totalPenalties,
   };
-  return NextResponse.json({ transactions:transactions.slice(0,20), summary });
+  return NextResponse.json({
+    transactions: transactions.slice(0, 20),
+    summary,
+  });
+}
+
+async function ListActiveLoans(data) {
+  const { shgId } = data;
+  if (!shgId) throw new Error("shgId is required");
+
+  const shgObjectId = new Types.ObjectId(String(shgId));
+  const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+
+  /* ---------------- 1️⃣ Fetch active loans ---------------- */
+  const loans = await Loan.find({
+    shgId: shgObjectId,
+    status: LoanRepaymentStatus.ONGOING,
+  }).lean();
+
+  if (!loans.length) {
+    return NextResponse.json({ loans: [] });
+  }
+
+  /* ---------------- 2️⃣ Fetch members ---------------- */
+  const memberIds = loans.map((l) => l.memberId);
+
+  const members = await ShgMember.find({
+    _id: { $in: memberIds },
+  }).select("_id name");
+
+  const memberMap = Object.fromEntries(
+    members.map((m) => [String(m._id), m.name]),
+  );
+
+  const loanIds = loans.map((l) => l._id);
+
+  /* ---------------- 3️⃣ Aggregate repayments ---------------- */
+  const repaymentAgg = await LoanRepayment.aggregate([
+    {
+      $match: {
+        loanId: { $in: loanIds },
+        isReversed: false,
+      },
+    },
+    {
+      $group: {
+        _id: "$loanId",
+        totalPrincipalPaid: { $sum: "$principalComponent" },
+        totalInterestPaid: { $sum: "$interestComponent" },
+      },
+    },
+  ]);
+
+  const principalPaidMap = Object.fromEntries(
+    repaymentAgg.map((r) => [
+      String(r._id),
+      r.totalPrincipalPaid || 0,
+    ]),
+  );
+
+  /* ---------------- 4️⃣ Interest paid THIS MONTH ---------------- */
+  const interestThisMonthAgg = await LoanRepayment.aggregate([
+    {
+      $match: {
+        loanId: { $in: loanIds },
+        month: currentMonth,
+        isReversed: false,
+      },
+    },
+    {
+      $group: {
+        _id: "$loanId",
+        interestPaidThisMonth: {
+          $sum: "$interestComponent",
+        },
+      },
+    },
+  ]);
+
+  const interestPaidThisMonthMap = Object.fromEntries(
+    interestThisMonthAgg.map((r) => [
+      String(r._id),
+      r.interestPaidThisMonth || 0,
+    ]),
+  );
+
+  /* ---------------- 5️⃣ Enrich loans ---------------- */
+  const enrichedLoans = loans.map((loan) => {
+    const principal = loan.principal;
+
+    const principalPaid =
+      principalPaidMap[String(loan._id)] || 0;
+
+    const outstandingPrincipal = Math.max(
+      principal - principalPaid,
+      0,
+    );
+
+    // Full interest for the month
+    const fullMonthlyInterest =
+      outstandingPrincipal * (loan.interestRate / 100);
+
+    // Interest already paid this month
+    const interestPaidThisMonth =
+      interestPaidThisMonthMap[String(loan._id)] || 0;
+
+    // 🔥 FIX: remaining interest only
+    const remainingMonthlyInterest = Math.max(
+      fullMonthlyInterest - interestPaidThisMonth,
+      0,
+    );
+
+    return {
+      _id: loan._id,
+      memberId: loan.memberId,
+      memberName: memberMap[String(loan.memberId)] || "—",
+
+      principal,
+      interestRate: loan.interestRate,
+
+      outstandingPrincipal,
+      monthlyInterest: Number(
+        remainingMonthlyInterest.toFixed(2),
+      ),
+    };
+  });
+
+  return NextResponse.json({ loans: enrichedLoans });
+}
+
+
+async function collectRepayment(data) {
+  const { shgId, loanId, memberId, amount, principal, interest, receivedBy } =
+    data;
+
+  if (
+    !shgId ||
+    !loanId ||
+    !memberId ||
+    amount == null ||
+    principal == null ||
+    interest == null
+  ) {
+    throw new Error("Missing required fields");
+  }
+
+  const totalAmount = Number(amount);
+  const principalComponent = Number(principal);
+  const interestComponent = Number(interest);
+
+  if (totalAmount <= 0 || principalComponent < 0 || interestComponent < 0) {
+    throw new Error("Invalid repayment values");
+  }
+
+  /* ---------------- 1️⃣ Basic consistency ---------------- */
+  if (
+    Number((principalComponent + interestComponent).toFixed(2)) !==
+    Number(totalAmount.toFixed(2))
+  ) {
+    throw new Error("principal + interest must equal total amount");
+  }
+
+  const currentMonth = new Date().toISOString().slice(0, 7);
+
+  /* ---------------- 2️⃣ Fetch loan ---------------- */
+  const loan = await Loan.findOne({
+    _id: new Types.ObjectId(String(loanId)),
+    shgId: new Types.ObjectId(String(shgId)),
+    memberId: new Types.ObjectId(String(memberId)),
+    status: LoanRepaymentStatus.ONGOING,
+  }).lean();
+
+  if (!loan) {
+    throw new Error("Active loan not found");
+  }
+
+  /* ---------------- 3️⃣ Calculate outstanding principal ---------------- */
+  const principalAgg = await LoanRepayment.aggregate([
+    {
+      $match: {
+        loanId: loan._id,
+        isReversed: false,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalPrincipalPaid: { $sum: "$principalComponent" },
+      },
+    },
+  ]);
+
+  const totalPrincipalPaid =
+    principalAgg[0]?.totalPrincipalPaid || 0;
+
+  const outstandingPrincipal = Math.max(
+    loan.principal - totalPrincipalPaid,
+    0,
+  );
+
+  if (outstandingPrincipal === 0) {
+    throw new Error("Loan already closed");
+  }
+
+  /* ---------------- 4️⃣ Monthly interest calculation ---------------- */
+  const fullMonthlyInterest =
+    outstandingPrincipal * (loan.interestRate / 100);
+
+  /* ---------------- 5️⃣ Interest already paid THIS MONTH ---------------- */
+  const interestMonthAgg = await LoanRepayment.aggregate([
+    {
+      $match: {
+        loanId: loan._id,
+        month: currentMonth,
+        isReversed: false,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        interestPaidThisMonth: { $sum: "$interestComponent" },
+      },
+    },
+  ]);
+
+  const interestPaidThisMonth =
+    interestMonthAgg[0]?.interestPaidThisMonth || 0;
+
+  const remainingInterestThisMonth = Math.max(
+    fullMonthlyInterest - interestPaidThisMonth,
+    0,
+  );
+
+  /* ---------------- 6️⃣ Business validations ---------------- */
+
+  // ❗ Interest cannot exceed remaining interest for this month
+  if (interestComponent > remainingInterestThisMonth) {
+    throw new Error(
+      `Interest exceeds remaining monthly interest ₹${remainingInterestThisMonth.toFixed(
+        2,
+      )}`,
+    );
+  }
+
+  // ❗ Principal cannot exceed outstanding
+  if (principalComponent > outstandingPrincipal) {
+    throw new Error("Principal exceeds outstanding amount");
+  }
+
+  // ❗ If principal is being paid, interest must be fully settled first
+  if (
+    principalComponent > 0 &&
+    remainingInterestThisMonth > 0 &&
+    interestComponent < remainingInterestThisMonth
+  ) {
+    throw new Error("मासिक ब्याज पहले पूरा भरना अनिवार्य है");
+  }
+
+  /* ---------------- 7️⃣ Atomic write ---------------- */
+  const session = await Loan.startSession();
+  session.startTransaction();
+
+  try {
+    const repayment = await LoanRepayment.create(
+      [
+        {
+          loanId: loan._id,
+          shgId: loan.shgId,
+          memberId: loan.memberId,
+
+          amount: totalAmount,
+          principalComponent,
+          interestComponent,
+
+          interestRateApplied: loan.interestRate,
+          interestRuleSource: "DEFAULT",
+
+          month: currentMonth,
+          paymentDate: new Date(),
+          receivedBy: receivedBy || "SYSTEM",
+        },
+      ],
+      { session },
+    );
+
+    await Transaction.create(
+      [
+        {
+          shgId: loan.shgId,
+          fromAccount: AccountType.MEMBER_CASH,
+          toAccount: AccountType.SHG_CASH,
+          amount: totalAmount,
+          type: TransactionType.LOAN_REPAYMENT,
+          memberId: loan.memberId,
+          date: new Date(),
+          meta: { loanId: loan._id },
+        },
+      ],
+      { session },
+    );
+
+    /* ---------------- 8️⃣ Auto-close loan ---------------- */
+    if (principalComponent === outstandingPrincipal) {
+      await Loan.updateOne(
+        { _id: loan._id },
+        {
+          status: LoanRepaymentStatus.CLOSED,
+          closedAt: new Date(),
+        },
+        { session },
+      );
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return NextResponse.json(repayment[0]);
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    throw err;
+  }
 }
