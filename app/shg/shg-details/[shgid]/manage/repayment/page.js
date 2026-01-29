@@ -336,7 +336,7 @@ export default function LoanRepaymentPage({ params }) {
       </main>
 
       {/* Floating Footer Button */}
-      <div className="fixed bottom-0 inset-x-0 p-6 z-50">
+      <div className="fixed bottom-0 inset-x-0 p-14 z-50">
 
         <div className="max-w-2xl z-50 mx-auto">
           {step === "entry" ? (

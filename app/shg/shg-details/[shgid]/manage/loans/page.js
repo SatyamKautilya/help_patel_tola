@@ -122,7 +122,7 @@ export default function BulkLoanPage({ params }) {
   const stepIndex = step === "select" ? 0 : step === "details" ? 1 : 2;
 
   return (
-    <div className="min-h-screen bg-[#fafafa] relative flex flex-col overflow-x-hidden font-sans">
+    <div className="min-h-screen bg-[#fafafa]  bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-rose-100 via-slate-50 to-teal-50 relative flex flex-col overflow-x-hidden font-sans">
       {/* Background Decorative Gradients */}
       <div className="absolute top-[-5%] right-[-10%] w-[60%] h-[30%] bg-indigo-200/40 rounded-full blur-[100px]" />
       <div className="absolute bottom-[-5%] left-[-10%] w-[60%] h-[30%] bg-pink-200/30 rounded-full blur-[100px]" />
@@ -223,7 +223,7 @@ export default function BulkLoanPage({ params }) {
                 const l = loanSettings[id] || {};
                 return (
                   <div key={id} className="relative group overflow-hidden">
-                    <div className="absolute inset-0 bg-white/60 backdrop-blur-md rounded-[2rem] border border-white shadow-sm" />
+                    <div className="absolute inset-0 bg-white/60 backdrop-blur-md  rounded-[2rem] border border-teal-100 shadow-sm" />
                     <div className="relative p-5 space-y-4">
                       <div className="flex justify-between items-center">
                         <p className="font-black text-slate-800 text-lg tracking-tight">{m?.name}</p>
@@ -302,7 +302,7 @@ export default function BulkLoanPage({ params }) {
       </main>
 
       {/* Fixed Bottom Action Bar */}
-      <div className="fixed bottom-0 inset-x-0 p-6 z-50">
+      <div className="fixed bottom-0 inset-x-0 p-14 z-50">
         <div className="absolute inset-0 bg-white/40 backdrop-blur-xl border-t border-white/50" />
         <div className="max-w-2xl mx-auto relative">
           {step === "select" && (

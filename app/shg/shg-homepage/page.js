@@ -185,9 +185,9 @@ export default function UserHomePage() {
                           {shg.name}
                         </h3>
                         <div className="flex items-center gap-1.5">
-                          <div className="flex items-center gap-1 text-slate-400 bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-100">
+                          <div className="flex items-center gap-1 text-slate-80 bg-slate-50 px-2 py-0.5 rounded-lg border border-slate-100">
                             <MapPin className="w-3 h-3" />
-                            <span className="text-[11px] font-bold uppercase tracking-wider">
+                            <span className="text-[15px] font-bold uppercase tracking-wider">
                               {shg.village}
                             </span>
                           </div>
@@ -196,14 +196,7 @@ export default function UserHomePage() {
                     </div>
 
                     {/* Role Badge */}
-                    <div
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 font-black text-[10px] tracking-tighter uppercase shadow-sm ${getRoleColor(shg.role).bg} ${getRoleColor(shg.role).text} ${getRoleColor(shg.role).border}`}
-                    >
-                      <div
-                        className={`w-1.5 h-1.5 rounded-full animate-pulse ${getRoleColor(shg.role).side}`}
-                      />
-                      {MemberRole[shg.role]}
-                    </div>
+                   
                   </div>
 
                   {/* Quick Stats or Info (Optional addition for visual balance) */}
@@ -216,6 +209,14 @@ export default function UserHomePage() {
                         <div className="w-1 h-1 bg-emerald-500 rounded-full" />{" "}
                         सक्रिय समूह
                       </div>
+                    </div>
+                     <div
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 font-black text-[10px] tracking-tighter uppercase shadow-sm ${getRoleColor(shg.role).bg} ${getRoleColor(shg.role).text} ${getRoleColor(shg.role).border}`}
+                    >
+                      <div
+                        className={`w-1.5 h-1.5 rounded-full animate-pulse ${getRoleColor(shg.role).side}`}
+                      />
+                      {MemberRole[shg.role]}
                     </div>
                   </div>
 
