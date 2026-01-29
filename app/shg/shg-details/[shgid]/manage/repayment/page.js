@@ -10,7 +10,6 @@ import {
   AlertCircle,
   Loader2,
   ArrowRight,
-  FileText,
   Edit2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -69,12 +68,21 @@ export default function LoanRepaymentPage({ params }) {
     const pVal = Number(pay.principal || 0);
     const iVal = Number(pay.interest || 0);
 
+    // 1. Interest cannot exceed the monthly due amount
+    if (iVal > loan.monthlyInterest) {
+      return "ब्याज देय राशि से अधिक है";
+    }
+
+    // 2. Interest must be fully paid if any payment is made (Partial interest not allowed)
     if ((pVal > 0 || iVal > 0) && iVal < loan.monthlyInterest) {
       return "मासिक ब्याज पूरा भरना अनिवार्य है";
     }
+
+    // 3. Principal cannot exceed outstanding balance
     if (pVal > loan.outstandingPrincipal) {
       return "मूलधन बकाया से अधिक है";
     }
+
     return null;
   };
 
@@ -83,7 +91,8 @@ export default function LoanRepaymentPage({ params }) {
       const err = getValidationErrors(loan);
       const pay = repayments[loan._id];
       const total = Number(pay?.principal || 0) + Number(pay?.interest || 0);
-      return err && total > 0;
+      // Only count errors if the user has typed something (total > 0) or if they typed invalid interest
+      return err && (total > 0 || (repayments[loan._id]?.interest && Number(repayments[loan._id]?.interest) > loan.monthlyInterest));
     });
   };
 
@@ -215,7 +224,7 @@ export default function LoanRepaymentPage({ params }) {
                           </div>
                           <div className="text-right">
                             <span className="px-2 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-black border border-emerald-100 uppercase">
-                              {loan.interestRate}% Interest
+                              {loan.interestRate}% मासिक ब्याज
                             </span>
                           </div>
                         </div>
@@ -223,14 +232,14 @@ export default function LoanRepaymentPage({ params }) {
                         {/* Input Grid */}
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-tight ml-1">ब्याज (Interest)</label>
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-tight ml-1">ब्याज</label>
                             <div className="relative">
                               <IndianRupee size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" />
                               <input
                                 type="number"
                                 className="pl-9 w-full py-3.5 bg-white/50 border border-slate-100 rounded-2xl font-black text-sm focus:ring-2 focus:ring-emerald-500/10 outline-none transition-all"
                                 value={pay.interest}
-                                placeholder={`Due ${loan.monthlyInterest}`}
+                                placeholder={`देय ₹${loan.monthlyInterest}`}
                                 onChange={(e) => updatePayment(loan._id, "interest", e.target.value)}
                               />
                             </div>
@@ -238,7 +247,7 @@ export default function LoanRepaymentPage({ params }) {
                           </div>
 
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-tight ml-1">मूलधन (Principal)</label>
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-tight ml-1">मूलधन</label>
                             <div className="relative">
                               <IndianRupee size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-600" />
                               <input
@@ -256,7 +265,7 @@ export default function LoanRepaymentPage({ params }) {
                         {/* Dynamic Summary Section */}
                         <div className="pt-2 border-t border-dashed border-slate-200 space-y-2">
                           <div className="flex justify-between text-[11px] font-bold">
-                            <span className="text-slate-500">संग्रह के बाद शेष (Balance):</span>
+                            <span className="text-slate-500">संग्रह के बाद शेष:</span>
                             <span className={`tracking-tight ${remainingBalance === 0 ? "text-emerald-600" : "text-slate-800"}`}>
                               ₹{remainingBalance}
                             </span>
@@ -303,7 +312,7 @@ export default function LoanRepaymentPage({ params }) {
               </div>
 
               <div className="space-y-4">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">विवरण (Details)</p>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">विवरण</p>
                 {activeRepayments.map((loan) => {
                   const pay = repayments[loan._id];
                   return (
@@ -328,8 +337,8 @@ export default function LoanRepaymentPage({ params }) {
 
       {/* Floating Footer Button */}
       <div className="fixed bottom-0 inset-x-0 p-6 z-50">
-       
-        <div className="max-w-2xl mx-auto">
+
+        <div className="max-w-2xl z-50 mx-auto">
           {step === "entry" ? (
              <motion.button
              whileTap={{ scale: 0.96 }}
@@ -337,7 +346,7 @@ export default function LoanRepaymentPage({ params }) {
              onClick={handleReview}
              className="relative w-full bg-slate-900 text-white py-4 rounded-[1.8rem] font-black text-lg flex items-center justify-center gap-3 shadow-xl shadow-slate-200 transition-all disabled:opacity-30 active:bg-black group"
            >
-              रिव्यू करें (Review)
+             समीक्षा करें
                <div className="p-1.5 bg-white/10 rounded-lg group-hover:translate-x-1 transition-transform">
                  <ArrowRight size={18} />
                </div>
@@ -357,7 +366,7 @@ export default function LoanRepaymentPage({ params }) {
                 onClick={submitRepayments}
                 className="flex-[2] bg-emerald-600 text-white py-4 rounded-[1.8rem] font-black text-lg flex items-center justify-center gap-3 shadow-xl shadow-emerald-200 disabled:opacity-50"
               >
-                 {saving ? <Loader2 className="animate-spin" /> : <>जमा करें (Confirm) <CheckCircle2 size={20} /></>}
+                 {saving ? <Loader2 className="animate-spin" /> : <>जमा करें <CheckCircle2 size={20} /></>}
               </motion.button>
             </div>
           )}
