@@ -11,12 +11,13 @@ import LoanRepayment from "@/lib/models/shgModels/LoanRepayment";
 import BankLoan from "@/lib/models/shgModels/BankLoan";
 import { connectToDatabase } from "@/lib/mongodb";
 import Users from "@/lib/models/Users";
-import { Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import {
   TransactionType,
   AccountType,
   LoanRepaymentStatus,
 } from "@/lib/models/enum.js";
+import LumpSumDeposit from "@/lib/models/shgModels/LumpSumDeposit";
 
 export async function POST(req) {
   try {
@@ -73,7 +74,8 @@ export async function POST(req) {
         return ListActiveLoans(body);
       case "collect-repayment":
         return collectRepayment(body);
-
+      case "collect-lump-sum":
+        return lumpSumContribution(body);
       default:
         return NextResponse.json(
           { error: "Invalid API action" },
@@ -230,25 +232,25 @@ async function monthlyDeposit(data) {
 
   return NextResponse.json(txn);
 }
-async function lumpSumContribution(data) {
-  const txns = [];
+// async function lumpSumContribution(data) {
+//   const txns = [];
 
-  for (const memberId of data.memberIds) {
-    txns.push({
-      shgId: data.shgId,
-      fromAccount: `MEMBER_SAVINGS_${memberId}`,
-      toAccount: AccountType.SHG_CASH,
-      amount: data.amountPerMember,
-      type: TransactionType.LUMP_SUM_CONTRIBUTION,
-      memberId,
-      date: new Date(),
-      meta: { reason: data.reason },
-    });
-  }
+//   for (const memberId of data.memberIds) {
+//     txns.push({
+//       shgId: data.shgId,
+//       fromAccount: `MEMBER_SAVINGS_${memberId}`,
+//       toAccount: AccountType.SHG_CASH,
+//       amount: data.amountPerMember,
+//       type: TransactionType.LUMP_SUM_CONTRIBUTION,
+//       memberId,
+//       date: new Date(),
+//       meta: { reason: data.reason },
+//     });
+//   }
 
-  const result = await Transaction.insertMany(txns);
-  return NextResponse.json(result);
-}
+//   const result = await Transaction.insertMany(txns);
+//   return NextResponse.json(result);
+// }
 
 async function createLoan(data) {
   const loan = await Loan.create({
@@ -605,10 +607,7 @@ async function ListActiveLoans(data) {
   ]);
 
   const principalPaidMap = Object.fromEntries(
-    repaymentAgg.map((r) => [
-      String(r._id),
-      r.totalPrincipalPaid || 0,
-    ]),
+    repaymentAgg.map((r) => [String(r._id), r.totalPrincipalPaid || 0]),
   );
 
   /* ---------------- 4️⃣ Interest paid THIS MONTH ---------------- */
@@ -641,13 +640,9 @@ async function ListActiveLoans(data) {
   const enrichedLoans = loans.map((loan) => {
     const principal = loan.principal;
 
-    const principalPaid =
-      principalPaidMap[String(loan._id)] || 0;
+    const principalPaid = principalPaidMap[String(loan._id)] || 0;
 
-    const outstandingPrincipal = Math.max(
-      principal - principalPaid,
-      0,
-    );
+    const outstandingPrincipal = Math.max(principal - principalPaid, 0);
 
     // Full interest for the month
     const fullMonthlyInterest =
@@ -672,15 +667,12 @@ async function ListActiveLoans(data) {
       interestRate: loan.interestRate,
 
       outstandingPrincipal,
-      monthlyInterest: Number(
-        remainingMonthlyInterest.toFixed(2),
-      ),
+      monthlyInterest: Number(remainingMonthlyInterest.toFixed(2)),
     };
   });
 
   return NextResponse.json({ loans: enrichedLoans });
 }
-
 
 async function collectRepayment(data) {
   const { shgId, loanId, memberId, amount, principal, interest, receivedBy } =
@@ -743,21 +735,16 @@ async function collectRepayment(data) {
     },
   ]);
 
-  const totalPrincipalPaid =
-    principalAgg[0]?.totalPrincipalPaid || 0;
+  const totalPrincipalPaid = principalAgg[0]?.totalPrincipalPaid || 0;
 
-  const outstandingPrincipal = Math.max(
-    loan.principal - totalPrincipalPaid,
-    0,
-  );
+  const outstandingPrincipal = Math.max(loan.principal - totalPrincipalPaid, 0);
 
   if (outstandingPrincipal === 0) {
     throw new Error("Loan already closed");
   }
 
   /* ---------------- 4️⃣ Monthly interest calculation ---------------- */
-  const fullMonthlyInterest =
-    outstandingPrincipal * (loan.interestRate / 100);
+  const fullMonthlyInterest = outstandingPrincipal * (loan.interestRate / 100);
 
   /* ---------------- 5️⃣ Interest already paid THIS MONTH ---------------- */
   const interestMonthAgg = await LoanRepayment.aggregate([
@@ -776,8 +763,7 @@ async function collectRepayment(data) {
     },
   ]);
 
-  const interestPaidThisMonth =
-    interestMonthAgg[0]?.interestPaidThisMonth || 0;
+  const interestPaidThisMonth = interestMonthAgg[0]?.interestPaidThisMonth || 0;
 
   const remainingInterestThisMonth = Math.max(
     fullMonthlyInterest - interestPaidThisMonth,
@@ -868,6 +854,77 @@ async function collectRepayment(data) {
     session.endSession();
 
     return NextResponse.json(repayment[0]);
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    throw err;
+  }
+}
+
+async function lumpSumContribution(data) {
+  const { shgId, date, purpose, deposits, receivedBy } = data;
+
+  if (!shgId || !Array.isArray(deposits) || deposits.length === 0) {
+    throw new Error("Invalid request data");
+  }
+
+  const shgObjectId = new Types.ObjectId(String(shgId));
+  const depositDate = date ? new Date(date) : new Date();
+
+  // Basic validation
+  deposits.forEach((d) => {
+    if (!d.memberId || d.amount == null || Number(d.amount) <= 0) {
+      throw new Error("Invalid deposit entry");
+    }
+  });
+
+  const session = await mongoose.connection.startSession();
+
+  session.startTransaction();
+
+  try {
+    /* ---------------- 1️⃣ Create LumpSumDeposit entries ---------------- */
+    const lumpSumDocs = deposits.map((d) => ({
+      shgId: shgObjectId,
+      memberId: new Types.ObjectId(String(d.memberId)),
+      amount: Number(d.amount),
+      purpose,
+      receivedBy: receivedBy || "SYSTEM",
+      createdAt: depositDate,
+      updatedAt: depositDate,
+    }));
+
+    const savedDeposits = await LumpSumDeposit.create(lumpSumDocs, {
+      session,
+      ordered: true,
+    });
+
+    /* ---------------- 2️⃣ Create Transaction entries ---------------- */
+    const transactionDocs = savedDeposits.map((dep) => ({
+      shgId: dep.shgId,
+      fromAccount: AccountType.MEMBER_CASH,
+      toAccount: AccountType.SHG_CASH,
+      amount: dep.amount,
+      type: TransactionType.LUMP_SUM_CONTRIBUTION,
+      memberId: dep.memberId,
+      date: depositDate,
+      source: receivedBy || "SYSTEM",
+      meta: {
+        lumpSumDepositId: dep._id,
+        purpose,
+      },
+    }));
+
+    await Transaction.create(transactionDocs, { session, ordered: true });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return NextResponse.json({
+      success: true,
+      count: savedDeposits.length,
+      totalAmount: savedDeposits.reduce((sum, d) => sum + d.amount, 0),
+    });
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
