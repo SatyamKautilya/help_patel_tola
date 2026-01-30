@@ -61,11 +61,11 @@ export default function UserHomePage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const thisUser = useSelector((state) => state.appContext.user);
-  const user_id = new mongoose.Types.ObjectId(
-    "6972263aaadbfedf49fba70c", // 👈 must be 24-char hex
-  );
+  // const user_id = new mongoose.Types.ObjectId(
+  //   "6972263aaadbfedf49fba70c", // 👈 must be 24-char hex
+  // );
 
-  // const user_id = thisUser?._id;
+  const user_id = thisUser?._id;
 
   const getShgByUserId = async () => {
     // Placeholder for actual API call
@@ -196,7 +196,6 @@ export default function UserHomePage() {
                     </div>
 
                     {/* Role Badge */}
-                   
                   </div>
 
                   {/* Quick Stats or Info (Optional addition for visual balance) */}
@@ -210,7 +209,7 @@ export default function UserHomePage() {
                         सक्रिय समूह
                       </div>
                     </div>
-                     <div
+                    <div
                       className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border-2 font-black text-[10px] tracking-tighter uppercase shadow-sm ${getRoleColor(shg.role).bg} ${getRoleColor(shg.role).text} ${getRoleColor(shg.role).border}`}
                     >
                       <div
