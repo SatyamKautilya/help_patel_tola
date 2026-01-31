@@ -125,6 +125,7 @@ const Page = () => {
 									<div className='flex w-1/6 justify-center items-center'>
 										<Button
 											isIconOnly
+											onPress={() => router.push(card.route)}
 											aria-label='Open'
 											className='
 												h-14 w-14 rounded-full
