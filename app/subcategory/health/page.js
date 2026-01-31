@@ -37,7 +37,7 @@ const Page = () => {
 			id: 'successStory',
 			topicName: 'गर्भावस्था देखभाल',
 			owner: 'मार्गदर्शक',
-			route: '/subcategory/hospitals/pregencycare',
+			route: '/subcategory/hospitals/pregnancy',
 		},
 		{
 			_id: '695509cd909c6634b5eb0647',

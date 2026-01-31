@@ -15,37 +15,37 @@ const Page = () => {
 			id: 'vaccination',
 			title: 'मेरी टीकाकरण जानकारी',
 			owner: 'सुरक्षा',
-			route: '/pregnancy/vaccination',
+			route: 'pregnancy/vaccination',
 		},
 		{
 			id: 'monthly-food',
 			title: 'महीने अनुसार भोजन सलाह',
 			owner: 'पोषण',
-			route: '/pregnancy/monthly-food',
+			route: 'pregnancy/monthly-food',
 		},
 		{
 			id: 'supplements',
 			title: 'आयरन, कैल्शियम व सप्लीमेंट',
 			owner: 'स्वास्थ्य',
-			route: '/pregnancy/supplements',
+			route: 'pregnancy/supplements',
 		},
 		{
 			id: 'doctor-visit',
 			title: 'डॉक्टर जांच समय-सारणी',
 			owner: 'मार्गदर्शन',
-			route: '/pregnancy/doctor-visits',
+			route: 'pregnancy/doctor-visits',
 		},
 		{
 			id: 'danger-signs',
 			title: 'खतरे के संकेत',
 			owner: 'महत्वपूर्ण',
-			route: '/pregnancy/danger-signs',
+			route: 'pregnancy/danger-signs',
 		},
 		{
 			id: 'healthy-habits',
 			title: 'स्वस्थ आदतें',
 			owner: 'देखभाल',
-			route: '/pregnancy/healthy-habits',
+			route: 'pregnancy/healthy-habits',
 		},
 	];
 
