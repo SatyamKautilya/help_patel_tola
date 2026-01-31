@@ -114,7 +114,7 @@ export default function ShgManagerHome({ params }) {
   const router = useRouter();
 
   return (
-    <div className="h-screen overflow-hidden bg-[#fafafa] relative flex flex-col">
+    <div className="h-screen overflow-y-auto bg-[#fafafa] relative flex flex-col">
       {/* Background Decorative Gradients */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[40%] bg-pink-200/40 rounded-full blur-[80px]" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[40%] bg-sky-200/40 rounded-full blur-[80px]" />
