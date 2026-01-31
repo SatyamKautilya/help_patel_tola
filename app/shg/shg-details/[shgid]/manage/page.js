@@ -16,6 +16,7 @@ import {
   Lock,
   Sparkles,
 } from "lucide-react";
+import { useSelector } from "react-redux";
 
 const actions = [
   {
@@ -114,6 +115,8 @@ const actions = [
 export default function ShgManagerHome({ params }) {
   const { shgid } = params;
   const router = useRouter();
+  const thisUser = useSelector((state) => state.appContext.user);
+
 
   return (
     <div className="h-screen overflow-y-auto bg-[#fafafa] relative flex flex-col">
@@ -176,7 +179,7 @@ export default function ShgManagerHome({ params }) {
                 <h2 className="text-3xl font-black text-white tracking-tight leading-none">
                   नमस्ते,{" "}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 to-pink-200">
-                    एडमिन
+                    {thisUser?.hindiName || "सदस्य"}
                   </span>
                 </h2>
                 <p className="text-indigo-100/80 text-sm font-medium mt-2 leading-relaxed max-w-[80%]">
