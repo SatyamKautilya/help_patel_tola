@@ -61,11 +61,11 @@ export default function UserHomePage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const thisUser = useSelector((state) => state.appContext.user);
-  // const user_id = new mongoose.Types.ObjectId(
-  //   "6972263aaadbfedf49fba70c", // 👈 must be 24-char hex
-  // );
+  const user_id = new mongoose.Types.ObjectId(
+    "6972263aaadbfedf49fba70c", // 👈 must be 24-char hex
+  );
 
-  const user_id = thisUser?._id;
+  // const user_id = thisUser?._id;
 
   const getShgByUserId = async () => {
     // Placeholder for actual API call
@@ -167,9 +167,9 @@ export default function UserHomePage() {
                   />
 
                   {/* Side Role Indicator */}
-                  <div
+                  {/* <div
                     className={`absolute left-0 top-8 bottom-8 w-1.5 rounded-r-full shadow-[0_0_15px_rgba(0,0,0,0.1)] ${getRoleColor(shg.role).side}`}
-                  />
+                  /> */}
 
                   <div className="flex justify-between items-start">
                     <div className="flex gap-4">
