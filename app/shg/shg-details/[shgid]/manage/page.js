@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   LayoutDashboard,
   Lock,
+  Sparkles,
 } from "lucide-react";
 
 const actions = [
@@ -27,6 +28,7 @@ const actions = [
     border: "border-indigo-200",
     upcoming: false,
   },
+
   {
     title: "पेनल्टी",
     desc: "एंट्री",
@@ -67,7 +69,7 @@ const actions = [
     border: "border-pink-200",
     upcoming: false,
   },
-    {
+  {
     title: "खर्चा",
     desc: "एंट्री",
     icon: FileText,
@@ -147,36 +149,79 @@ export default function ShgManagerHome({ params }) {
         </motion.button>
       </nav>
 
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="mx-6 mt-8 mb-8"
+      >
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 shadow-2xl shadow-indigo-200">
+          {/* Animated Background Gradients */}
+          <div className="absolute top-[-50%] right-[-10%] w-[80%] h-[150%] bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500 opacity-40 blur-[60px] rounded-full" />
+          <div className="absolute bottom-[-20%] left-[-20%] w-[60%] h-[60%] bg-emerald-500/30 blur-[80px] rounded-full" />
+
+          {/* Glass Overlay */}
+          <div className="absolute inset-0 bg-white/5 backdrop-blur-[1px]" />
+
+          {/* Content Container */}
+          <div className="relative z-10 p-8 flex flex-col justify-between min-h-[180px]">
+            {/* Top Section */}
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] font-black text-white uppercase tracking-widest backdrop-blur-md">
+                    मुख्य डैशबोर्ड
+                  </span>
+                  <Sparkles className="w-4 h-4 text-yellow-300 animate-pulse" />
+                </div>
+                <h2 className="text-3xl font-black text-white tracking-tight leading-none">
+                  नमस्ते,{" "}
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 to-pink-200">
+                    एडमिन
+                  </span>
+                </h2>
+                <p className="text-indigo-100/80 text-sm font-medium mt-2 leading-relaxed max-w-[80%]">
+                  आपके समूह की वित्तीय स्थिति और रिपोर्ट यहाँ देखें।
+                </p>
+              </div>
+
+              <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-md">
+                <LayoutDashboard className="text-white w-6 h-6" />
+              </div>
+            </div>
+
+            {/* Bottom Action Section */}
+            <div className="mt-8">
+              <motion.button
+                whileTap={{ scale: 0.96 }}
+                onClick={() =>
+                  router.push(`/shg/shg-details/${shgid}/manage/dashboard`)
+                }
+                className="group w-full bg-white text-slate-900 p-1.5 pr-2 rounded-[1.8rem] flex items-center justify-between shadow-lg shadow-indigo-900/20"
+              >
+                <div className="flex items-center gap-3 px-4">
+                  <div className="p-2 bg-indigo-100 rounded-full text-indigo-600">
+                    <TrendingUp size={18} />
+                  </div>
+                  <div className="flex flex-col text-left">
+                    <span className="text-sm font-black">डैशबोर्ड खोलें</span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      वित्तीय सारांश
+                    </span>
+                  </div>
+                </div>
+
+                <div className="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                  <ArrowRight size={18} />
+                </div>
+              </motion.button>
+            </div>
+          </div>
+        </div>
+      </motion.div>
       <main className="relative z-10 flex-1 flex flex-col px-6 py-4">
         {/* Greeting & Subtitle */}
 
         {/* Glassmorphism Financial Card (Light & Colorful) */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
-          className="relative group mb-6"
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/60 to-white/30 backdrop-blur-xl rounded-[2.5rem] border border-white/70 shadow-[0_8px_32px_0_rgba(31,38,135,0.1)]" />
-          <div className="relative p-6 flex justify-between items-end gap-4">
-            <div className="space-y-2 flex-1">
-              <p className="text-xs font-bold text-indigo-500 uppercase tracking-widest">
-                कुल उपलब्ध कोष
-              </p>
-              <h3 className="text-3xl font-black text-slate-800 tracking-tighter bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent">
-                ₹45,280
-              </h3>
-            </div>
-            <div className="flex flex-col items-center bg-gradient-to-br from-pink-50 to-rose-50 px-5 py-4 border border-pink-200 rounded-2xl shadow-lg shadow-pink-100/50 hover:shadow-pink-200 transition-shadow">
-              <p className="text-xs font-bold text-pink-600 uppercase tracking-widest">
-                कुल ऋण वितरण
-              </p>
-              <h3 className="text-2xl font-black text-red-400 tracking-tighter mt-1">
-                ₹4,280
-              </h3>
-            </div>
-          </div>
-        </motion.div>
 
         {/* Grid Section - Optimized for height */}
         <div className="grid grid-cols-2 gap-5 h-full mb-16">

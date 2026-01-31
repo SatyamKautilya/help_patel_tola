@@ -76,6 +76,8 @@ export async function POST(req) {
         return collectRepayment(body);
       case "collect-lump-sum":
         return lumpSumContribution(body);
+      case "dashboard-summary":
+        return dashboardSummary(body);
       default:
         return NextResponse.json(
           { error: "Invalid API action" },
@@ -930,4 +932,70 @@ async function lumpSumContribution(data) {
     session.endSession();
     throw err;
   }
+}
+
+async function dashboardSummary(data) {
+  const { shgId } = data;
+  if (!shgId) {
+    throw new Error("shgId is required");
+  }
+
+  const shgObjectId = new Types.ObjectId(String(shgId));
+
+  /* Fetch all transactions for this SHG */
+  const transactions = await Transaction.find({
+    shgId: shgObjectId,
+  }).lean();
+
+  /* Calculate totals */
+  let totalMonthlySavings = 0;
+  let totalLumpSum = 0;
+  let totalInterestCollected = 0;
+  let totalPenalty = 0;
+  let totalLoanGiven = 0;
+  let totalExpense = 0;
+
+  transactions.forEach((tx) => {
+    switch (tx.type) {
+      case TransactionType.MONTHLY_DEPOSIT:
+        totalMonthlySavings += tx.amount;
+        break;
+      case TransactionType.LUMP_SUM_CONTRIBUTION:
+        totalLumpSum += tx.amount;
+        break;
+      case TransactionType.LOAN_REPAYMENT:
+        totalInterestCollected += tx.interestComponent || 0;
+        break;
+      case TransactionType.PENALTY_CHARGE:
+        totalPenalty += tx.amount;
+        break;
+      case TransactionType.LOAN_DISBURSEMENT:
+        totalLoanGiven += tx.amount;
+        break;
+      case TransactionType.BANK_LOAN_RECEIVED:
+        totalExpense += tx.amount;
+        break;
+      default:
+        break;
+    }
+  });
+
+  const totalAvailableCash =
+    totalMonthlySavings +
+    totalLumpSum +
+    totalInterestCollected +
+    totalPenalty -
+    totalLoanGiven -
+    totalExpense;
+
+  return NextResponse.json({
+    totalMonthlySavings,
+    totalLumpSum,
+    totalInterestCollected,
+    totalPenalty,
+    totalLoanGiven,
+    totalExpense,
+    totalAvailableCash,
+    lastUpdated: new Date().toISOString(),
+  });
 }
