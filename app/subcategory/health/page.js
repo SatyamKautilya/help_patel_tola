@@ -33,12 +33,20 @@ const Page = () => {
 			route: '/subcategory/hospitals/treatment',
 		},
 		{
+			_id: '695509cd909c6634b5eb0645',
+			id: 'successStory',
+			topicName: 'गर्भावस्था देखभाल',
+			owner: 'मार्गदर्शक',
+			route: '/subcategory/hospitals/pregnancy',
+		},
+		{
 			_id: '695509cd909c6634b5eb0647',
 			id: 'successStory',
 			topicName: 'सफल ईलाज़ की कहानी',
 			owner: 'प्रेरणादायक',
 			route: '/subcategory/hospitals/casestory',
-		},
+		}
+			
 	];
 	const router = useRouter();
 	// const dispatch = useDispatch();

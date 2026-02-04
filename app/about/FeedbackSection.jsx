@@ -44,7 +44,7 @@ export default function FeedbackSection({ sender }) {
 					'>
 				<CardBody className='gap-4'>
 					<h2 className='text-lg font-semibold text-center text-golden-200'>
-						💬 सत्यम के लिए संदेश
+						💬(सुझाव, प्रश्न, संदेश)
 					</h2>
 
 					{sent ? (
