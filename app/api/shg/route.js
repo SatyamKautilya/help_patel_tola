@@ -11,6 +11,7 @@ import LoanRepayment from '@/lib/models/shgModels/LoanRepayment';
 import BankLoan from '@/lib/models/shgModels/BankLoan';
 import { connectToDatabase } from '@/lib/mongodb';
 import Users from '@/lib/models/Users';
+import mongoose from 'mongoose';
 
 export async function POST(req) {
 	try {
@@ -74,10 +75,11 @@ export async function getShgByUserId(data) {
 
 	/* 1️⃣ Get active SHG memberships of user */
 	const memberships = await ShgMember.find({
-		userId: userId,
+		// userId: new mongoose.Types.ObjectId(userId),
 		isActive: true,
-	}).select('shgId role');
+	});
 
+	console.log(memberships);
 	if (memberships.length === 0) return NextResponse.json([]);
 
 	const shgIds = memberships.map((m) => m.shgId);

@@ -41,7 +41,7 @@ const PatelTola = () => {
 			<div className='mt-4 grid grid-cols-3 gap-3 text-center text-xs'>
 				<div className='rounded-xl bg-green-50 py-2 hover:bg-green-100 transition-colors duration-200'>
 					<p className='font-semibold text-green-700'>आगामी बैठक</p>
-					<p className='text-green-600'>31 जनवरी</p>
+					<p className='text-green-600'>1 मार्च</p>
 				</div>
 				<div className='rounded-xl bg-blue-50 py-2 hover:bg-blue-100 transition-colors duration-200'>
 					<p className='font-semibold text-blue-700'>--</p>

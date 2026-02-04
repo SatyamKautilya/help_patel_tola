@@ -276,7 +276,6 @@ function MembersSummary({ members, onNext }) {
  */
 export default function AddMembersFlow({ onNext }) {
 	const shg = useSelector((state) => state.appContext.shgOnboardingData);
-	console.log(shg, 'shg');
 	const shgId = shg?.shgDetails?._id;
 	const [total, setTotal] = useState(null);
 	const [current, setCurrent] = useState(0);
