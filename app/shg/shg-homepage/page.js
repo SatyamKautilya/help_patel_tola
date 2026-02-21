@@ -77,7 +77,6 @@ export default function UserHomePage() {
 		const shgs = await data.json();
 		return shgs;
 	};
-	console.log(shgs);
 
 	useEffect(() => {
 		const load = async () => {
