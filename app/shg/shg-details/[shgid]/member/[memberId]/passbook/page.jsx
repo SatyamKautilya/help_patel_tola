@@ -32,6 +32,7 @@ export default function MemberPassbookSummary({ params }) {
 		const defaultShgSummary = {
 			totalMonthlySavings: 0,
 			totalLumpSum: 0,
+			totalPrincipalRepaid: 0,
 			totalInterestCollected: 0,
 			totalPenalty: 0,
 			totalLoanGiven: 0,
@@ -93,6 +94,7 @@ export default function MemberPassbookSummary({ params }) {
 	const shgSheet = useMemo(() => {
 		const monthlySavings = Number(shgSummary?.totalMonthlySavings || 0);
 		const lumpSum = Number(shgSummary?.totalLumpSum || 0);
+		const principalRepaid = Number(shgSummary?.totalPrincipalRepaid || 0);
 		const interest = Number(shgSummary?.totalInterestCollected || 0);
 		const penalty = Number(shgSummary?.totalPenalty || 0);
 		const loanGiven = Number(shgSummary?.totalLoanGiven || 0);
@@ -102,6 +104,7 @@ export default function MemberPassbookSummary({ params }) {
 		return {
 			monthlySavings,
 			lumpSum,
+			principalRepaid,
 			interest,
 			penalty,
 			loanGiven,
@@ -209,7 +212,7 @@ export default function MemberPassbookSummary({ params }) {
 							className='bg-white border border-slate-200 rounded-2xl p-5 md:p-6'>
 							<div className='flex items-center justify-between mb-4'>
 								<h2 className='text-base font-bold text-slate-800'>
-									SHG सारांश
+									सारांश स्व सहायता समूह
 								</h2>
 								{shgSummary?.lastUpdated ? (
 									<p className='text-[11px] text-slate-500'>
@@ -277,7 +280,7 @@ export default function MemberPassbookSummary({ params }) {
 									</div>
 
 									<CalcRow
-										label='ऋण वितरण'
+										label='Outstanding Loan'
 										sign='-'
 										amount={shgSheet.loanGiven}
 										tone='minus'

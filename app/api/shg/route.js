@@ -1071,18 +1071,45 @@ async function dashboardSummary(data) {
 
 	const shgObjectId = new Types.ObjectId(String(shgId));
 
-	/* Fetch all transactions for this SHG */
-	const transactions = await Transaction.find({
-		shgId: shgObjectId,
-	}).lean();
+	/* Fetch all transactions, loans and repayments for this SHG */
+	const [transactions, loans, repayments] = await Promise.all([
+		Transaction.find({
+			shgId: shgObjectId,
+		}).lean(),
+		Loan.find({
+			shgId: shgObjectId,
+		})
+			.select('_id principal')
+			.lean(),
+		LoanRepayment.find({
+			shgId: shgObjectId,
+		})
+			.select('principalComponent interestComponent amount')
+			.lean(),
+	]);
 
 	/* Calculate totals */
 	let totalMonthlySavings = 0;
 	let totalLumpSum = 0;
 	let totalInterestCollected = 0;
+	let totalPrincipalRepaid = 0;
 	let totalPenalty = 0;
 	let totalLoanGiven = 0;
 	let totalExpense = 0;
+
+	/* Repayment split: principal reduces outstanding, interest is income */
+	repayments.forEach((repayment) => {
+		const principal = Number(repayment?.principalComponent || 0);
+		const interest = Number(repayment?.interestComponent || 0);
+		if (principal > 0 || interest > 0) {
+			totalPrincipalRepaid += principal;
+			totalInterestCollected += interest;
+			return;
+		}
+		/* Legacy fallback when split components are absent:
+		   keep amount as interest-only to avoid over-reducing outstanding principal. */
+		totalInterestCollected += Number(repayment?.amount || 0);
+	});
 
 	transactions.forEach((tx) => {
 		switch (tx.type) {
@@ -1122,13 +1149,10 @@ async function dashboardSummary(data) {
 				totalLumpSum += tx.amount;
 				break;
 			case TransactionType.LOAN_REPAYMENT:
-				totalInterestCollected += tx.interestComponent || 0;
+				// Loan repayments are accounted via LoanRepayment records above.
 				break;
 			case TransactionType.PENALTY_CHARGE:
 				totalPenalty += tx.amount;
-				break;
-			case TransactionType.LOAN_DISBURSEMENT:
-				totalLoanGiven += tx.amount;
 				break;
 			case TransactionType.BANK_LOAN_RECEIVED:
 				totalExpense += tx.amount;
@@ -1138,20 +1162,32 @@ async function dashboardSummary(data) {
 		}
 	});
 
+	const totalLoanDisbursed = loans.reduce(
+		(sum, loan) => sum + Number(loan?.principal || 0),
+		0,
+	);
+	const totalLoanOutstanding = Math.max(
+		totalLoanDisbursed - totalPrincipalRepaid,
+		0,
+	);
+	totalLoanGiven = totalLoanOutstanding;
+
 	const totalAvailableCash =
 		totalMonthlySavings +
 		totalLumpSum +
 		totalInterestCollected +
 		totalPenalty -
-		totalLoanGiven -
+		totalLoanOutstanding -
 		totalExpense;
 
 	return NextResponse.json({
 		totalMonthlySavings,
 		totalLumpSum,
+		totalPrincipalRepaid,
 		totalInterestCollected,
 		totalPenalty,
 		totalLoanGiven,
+		totalLoanDisbursed,
 		totalExpense,
 		totalAvailableCash,
 		lastUpdated: new Date().toISOString(),
