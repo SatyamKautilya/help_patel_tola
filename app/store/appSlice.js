@@ -38,6 +38,9 @@ const appContextSlice = createSlice({
 				...action.payload,
 			};
 		},
+		resetShgOnboardingData(state) {
+			state.shgOnboardingData = null;
+		},
 	},
 });
 
@@ -48,6 +51,7 @@ export const {
 	setIsPatelTolaMember,
 	setUser,
 	setShgOnboardingData,
+	resetShgOnboardingData,
 } = appContextSlice.actions;
 
 export default appContextSlice.reducer;

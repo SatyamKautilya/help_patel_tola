@@ -62,6 +62,12 @@ export async function POST(req) {
 				return monthlyContributionDue(body);
 			case 'save-monthly-savings':
 				return saveBulkMonthlySavings(body);
+			case 'get-onboarding-draft':
+				return getOnboardingDraft(body);
+			case 'save-onboarding-draft':
+				return saveOnboardingDraft(body);
+			case 'complete-onboarding':
+				return completeOnboarding(body);
 
 			case 'list-members':
 				return allShgMembers(body);
@@ -202,6 +208,9 @@ async function createSHG(data) {
 		formationDate: data.formationDate,
 		totalMembers: data.totalMembers,
 		createdBy: data.createdBy,
+		status: data.status || 'DRAFT',
+		onboardingStep: data.onboardingStep || 1,
+		onboardingDraft: data.onboardingDraft || {},
 	});
 
 	return NextResponse.json(shg);
@@ -219,6 +228,72 @@ async function addMember(data) {
 	});
 
 	return NextResponse.json(member);
+}
+
+async function getOnboardingDraft(data) {
+	const { createdBy } = data;
+	if (!createdBy) {
+		return NextResponse.json({ error: 'createdBy is required' }, { status: 400 });
+	}
+
+	const shg = await Shg.findOne({
+		createdBy,
+		status: 'DRAFT',
+	})
+		.sort({ updatedAt: -1 })
+		.lean();
+
+	if (!shg) {
+		return NextResponse.json({ shg: null, members: [] });
+	}
+
+	const members = await ShgMember.find({ shgId: shg._id, isActive: true })
+		.sort({ createdAt: 1 })
+		.lean();
+
+	return NextResponse.json({ shg, members });
+}
+
+async function saveOnboardingDraft(data) {
+	const { shgId, onboardingStep, onboardingDraft } = data;
+	if (!shgId) {
+		return NextResponse.json({ error: 'shgId is required' }, { status: 400 });
+	}
+
+	const shg = await Shg.findByIdAndUpdate(
+		shgId,
+		{
+			$set: {
+				status: 'DRAFT',
+				onboardingStep: onboardingStep || 1,
+				onboardingDraft: onboardingDraft || {},
+			},
+		},
+		{ new: true },
+	).lean();
+
+	return NextResponse.json({ shg });
+}
+
+async function completeOnboarding(data) {
+	const { shgId } = data;
+	if (!shgId) {
+		return NextResponse.json({ error: 'shgId is required' }, { status: 400 });
+	}
+
+	const shg = await Shg.findByIdAndUpdate(
+		shgId,
+		{
+			$set: {
+				status: 'ACTIVE',
+				onboardingStep: 4,
+			},
+			$unset: { onboardingDraft: '' },
+		},
+		{ new: true },
+	).lean();
+
+	return NextResponse.json({ shg });
 }
 async function monthlyDeposit(data) {
 	const txn = await Transaction.create({

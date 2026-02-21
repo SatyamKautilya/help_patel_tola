@@ -6,12 +6,14 @@ import AddContactModal from '../content_editors/AddContactModal';
 import CaseStory from '../content_editors/CaseStory';
 import TreatmentProcessModal from '../content_editors/TreatmentProcessModal';
 import AddMeetingDetails from '../content_editors/AddMeetingDetails';
+import AddGovtSchemeModal from '../content_editors/AddGovtSchemeModal';
 
 const sectionModals = {
 	contact: AddContactModal,
 	meetingDetails: AddMeetingDetails,
 	treatmentProcess: TreatmentProcessModal,
 	successfulTreatment: CaseStory,
+	govtSchemes: AddGovtSchemeModal,
 };
 
 const ContentPage = () => {
@@ -43,6 +45,13 @@ const ContentPage = () => {
 			icon: <FileText />,
 			desc: 'इलाज़ की प्रेरणात्मक कहानियाँ जोड़े',
 			gradient: 'from-orange-500 to-red-500',
+		},
+		{
+			id: 'govtSchemes',
+			title: 'सरकारी योजनाएं',
+			icon: <FileText />,
+			desc: 'नई सरकारी योजनाओं की जानकारी जोड़ें',
+			gradient: 'from-indigo-500 to-blue-500',
 		},
 	];
 	const [activeModalId, setActiveModalId] = useState(null);

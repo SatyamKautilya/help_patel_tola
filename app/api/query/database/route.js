@@ -105,6 +105,39 @@ export async function GET(request) {
 			console.log(todayUser, 'today user');
 			return NextResponse.json({ todayUser });
 		}
+		if (name === 'today-users-list') {
+			const IST_OFFSET = 5.5 * 60;
+			const nowUTC = new Date();
+			const nowIST = new Date(nowUTC.getTime() + IST_OFFSET * 60 * 1000);
+
+			const startOfISTDay = new Date(
+				nowIST.getFullYear(),
+				nowIST.getMonth(),
+				nowIST.getDate(),
+			);
+			const endOfISTDay = new Date(
+				nowIST.getFullYear(),
+				nowIST.getMonth(),
+				nowIST.getDate() + 1,
+			);
+
+			const startUTC = new Date(
+				startOfISTDay.getTime() - IST_OFFSET * 60 * 1000,
+			);
+			const endUTC = new Date(endOfISTDay.getTime() - IST_OFFSET * 60 * 1000);
+
+			const users = await Users.find({
+				lastSeen: {
+					$gte: startUTC,
+					$lt: endUTC,
+				},
+			})
+				.select('id name hindiName mobileNumber villageName lastSeen')
+				.sort({ lastSeen: -1 })
+				.lean();
+
+			return NextResponse.json({ users });
+		}
 
 		if (name === 'total-feedbacks') {
 			const totalFeedbacks = await Feedback.countDocuments();
@@ -115,6 +148,14 @@ export async function GET(request) {
 				.sort({ createdAt: -1 })
 				.limit(10);
 			return NextResponse.json({ lastTenFeedbacks });
+		}
+		if (name === 'last-ten-users') {
+			const users = await Users.find({})
+				.select('id name hindiName mobileNumber villageName createdAt')
+				.sort({ createdAt: -1 })
+				.limit(10)
+				.lean();
+			return NextResponse.json({ users });
 		}
 		if (name === 'getVillagesList') {
 			const villages = await VillageList.find().sort({ villageName: 1 });

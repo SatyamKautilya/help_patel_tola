@@ -1,460 +1,346 @@
-import { useState } from 'react';
-import {
-	ArrowRight,
-	CheckCircle2,
-	IndianRupeeIcon,
-	Building2,
-	Loader2,
-	Plus,
-	Trash2,
-} from 'lucide-react';
-import { useSelector } from 'react-redux';
-import CashInHand from './shg-finance/CashInHand';
+import { setLoader, setShgOnboardingData } from '@/app/store/appSlice';
+import { ArrowRight, CheckCircle2, Loader2, IndianRupeeIcon } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
-const STATUS_STEPS = [
-	'SHG का प्रारंभिक नकद सेव हो रहा है…',
-	'सदस्यों की बचत दर्ज की जा रही है…',
-	'सदस्य ऋण का रिकॉर्ड बन रहा है…',
-	'बैंक ऋण सेट किए जा रहे हैं…',
-	'नकद और खातों का मिलान हो रहा है…',
-	'वित्तीय सेटअप पूरा हो रहा है…',
-];
+const money = (value) => Number(value || 0);
 
 export default function ShgFinancialSetup({ shgId, onNext }) {
-	const shg = useSelector((state) => state.appContext.shgOnboardingData);
-	const members = shg?.members || [];
+	const dispatch = useDispatch();
+	const onboarding = useSelector((state) => state.appContext.shgOnboardingData);
+	const members = onboarding?.members || [];
+	const existingFinance = onboarding?.financeOpeningData || {};
 
-	const [isExisting, setIsExisting] = useState(false);
 	const [step, setStep] = useState(1);
-
-	const [shgCash, setShgCash] = useState('');
-	const [memberSavings, setMemberSavings] = useState({});
-	const [memberLoans, setMemberLoans] = useState({});
-	const [bankLoans, setBankLoans] = useState([
-		{ id: 1, bankName: '', amount: '', interestRate: '' },
-	]);
-	const [nextBankLoanId, setNextBankLoanId] = useState(2);
-
 	const [saving, setSaving] = useState(false);
-	const [statusIndex, setStatusIndex] = useState(0);
+	const [memberSavings, setMemberSavings] = useState(existingFinance.memberSavings || {});
+	const [totals, setTotals] = useState({
+		totalLoansGiven: existingFinance.totalLoansGiven || '',
+		incomeFromInterest: existingFinance.incomeFromInterest || '',
+		incomeFromPenalty: existingFinance.incomeFromPenalty || '',
+		totalLumpSumPayments: existingFinance.totalLumpSumPayments || '',
+		totalExpenditure: existingFinance.totalExpenditure || '',
+	});
 
-	const nextStep = () => setStep((s) => s + 1);
+	useEffect(() => {
+		setMemberSavings(existingFinance.memberSavings || {});
+		setTotals({
+			totalLoansGiven: existingFinance.totalLoansGiven || '',
+			incomeFromInterest: existingFinance.incomeFromInterest || '',
+			incomeFromPenalty: existingFinance.incomeFromPenalty || '',
+			totalLumpSumPayments: existingFinance.totalLumpSumPayments || '',
+			totalExpenditure: existingFinance.totalExpenditure || '',
+		});
+	}, [shgId, onboarding?.financeOpeningData]);
 
-	const post = async (url, payload) => {
-		const res = await fetch(url, {
+	const totalMemberSavings = useMemo(
+		() =>
+			members.reduce((sum, member) => sum + money(memberSavings[member._id] || 0), 0),
+		[members, memberSavings],
+	);
+
+	const calculatedAvailableCash = useMemo(() => {
+		return (
+			totalMemberSavings +
+			money(totals.incomeFromInterest) +
+			money(totals.incomeFromPenalty) +
+			money(totals.totalLumpSumPayments) -
+			money(totals.totalLoansGiven) -
+			money(totals.totalExpenditure)
+		);
+	}, [totalMemberSavings, totals]);
+
+	const persistFinanceDraft = () => {
+		dispatch(
+			setShgOnboardingData({
+				financeOpeningData: {
+					memberSavings,
+					...totals,
+					totalMemberSavings,
+					calculatedAvailableCash,
+				},
+			}),
+		);
+	};
+
+	const postOpeningBalance = async (payload) => {
+		const res = await fetch('/api/shg?name=opening-balance', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(payload),
 		});
-		if (!res.ok) throw new Error('API failed');
+		if (!res.ok) {
+			throw new Error('Failed to save opening balance entries');
+		}
 		return res.json();
 	};
 
-	const addBankLoan = () => {
-		setBankLoans([
-			...bankLoans,
-			{ id: nextBankLoanId, bankName: '', amount: '', interestRate: '' },
-		]);
-		setNextBankLoanId(nextBankLoanId + 1);
-	};
-
-	const removeBankLoan = (id) => {
-		setBankLoans(bankLoans.filter((loan) => loan.id !== id));
-	};
-
-	const updateBankLoan = (id, field, value) => {
-		setBankLoans(
-			bankLoans.map((loan) =>
-				loan.id === id ? { ...loan, [field]: value } : loan,
-			),
-		);
-	};
-
-	const handleFinance = async () => {
+	const handleSubmit = async () => {
 		try {
 			setSaving(true);
-			setStatusIndex(0);
-
+			dispatch(setLoader(true));
 			const onboardingDate = new Date();
 
-			await post('/api/shg?name=opening-balance', {
-				shgId,
-				fromAccount: 'SYSTEM',
-				toAccount: 'SHG_CASH',
-				amount: Number(shgCash),
-				type: 'OPENING_BALANCE',
-				memberId: null,
-				date: onboardingDate,
-				meta: { note: 'Opening SHG cash (existing SHG)' },
-			});
-			setStatusIndex(1);
+			// Member-wise total savings (bulk, one by one as requested).
+			for (const member of members) {
+				const amount = money(memberSavings[member._id]);
+				if (amount <= 0) continue;
+				await postOpeningBalance({
+					shgId,
+					fromAccount: 'EXTERNAL',
+					toAccount: 'MEMBER_SAVINGS',
+					amount,
+					type: 'OPENING_BALANCE',
+					memberId: member._id,
+					date: onboardingDate,
+					meta: { category: 'TOTAL_SAVINGS_TILL_DATE' },
+				});
+			}
 
-			await Promise.all(
-				Object.entries(memberSavings).map(([memberId, amount]) =>
-					post('/api/shg?name=opening-balance', {
-						shgId,
-						fromAccount: 'SYSTEM',
-						toAccount: `MEMBER_SAVINGS_${memberId}`,
-						amount: Number(amount),
-						type: 'OPENING_BALANCE',
-						memberId,
-						date: onboardingDate,
-						meta: { note: 'Opening member savings' },
-					}),
-				),
-			);
-			setStatusIndex(2);
+			// Aggregate historical totals as onboarding baseline entries.
+			const entries = [
+				{
+					amount: money(totals.totalLoansGiven),
+					fromAccount: 'SHG_CASH',
+					toAccount: 'MEMBER_LOAN',
+					meta: { category: 'TOTAL_LOANS_GIVEN_TILL_DATE' },
+				},
+				{
+					amount: money(totals.incomeFromInterest),
+					fromAccount: 'EXTERNAL',
+					toAccount: 'INTEREST_INCOME',
+					meta: { category: 'TOTAL_INTEREST_INCOME_TILL_DATE' },
+				},
+				{
+					amount: money(totals.incomeFromPenalty),
+					fromAccount: 'EXTERNAL',
+					toAccount: 'SHG_CASH',
+					meta: { category: 'TOTAL_PENALTY_INCOME_TILL_DATE' },
+				},
+				{
+					amount: money(totals.totalLumpSumPayments),
+					fromAccount: 'EXTERNAL',
+					toAccount: 'SHG_CASH',
+					meta: { category: 'TOTAL_LUMP_SUM_PAYMENTS_TILL_DATE' },
+				},
+				{
+					amount: money(totals.totalExpenditure),
+					fromAccount: 'SHG_CASH',
+					toAccount: 'EXTERNAL',
+					meta: { category: 'TOTAL_EXPENDITURE_TILL_DATE' },
+				},
+			];
 
-			await Promise.all(
-				Object.entries(memberLoans).map(async ([memberId, loanData]) => {
-					if (!(loanData.amount > 0)) return;
-					const amount = loanData.amount || 0;
-					const interestRate = loanData.interestRate || 0;
+			for (const entry of entries) {
+				if (entry.amount <= 0) continue;
+				await postOpeningBalance({
+					shgId,
+					fromAccount: entry.fromAccount,
+					toAccount: entry.toAccount,
+					amount: entry.amount,
+					type: 'OPENING_BALANCE',
+					memberId: null,
+					date: onboardingDate,
+					meta: entry.meta,
+				});
+			}
 
-					const loan = await post('/api/shg?name=create-loan', {
-						shgId,
-						memberId,
-						principal: Number(amount),
-						interestRate: Number(interestRate),
-						interestType: 'SIMPLE',
-						issuedDate: onboardingDate,
-						status: 'ONGOING',
-						meta: { note: 'Existing loan onboarded with outstanding only' },
-					});
-
-					await post('/api/shg?name=opening-balance', {
-						shgId,
-						fromAccount: 'SYSTEM',
-						toAccount: `MEMBER_LOAN_${memberId}`,
-						amount: Number(amount),
-						type: 'OPENING_BALANCE',
-						memberId,
-						date: onboardingDate,
-						meta: {
-							loanId: loan._id,
-							note: 'Opening outstanding member loan',
-						},
-					});
-				}),
-			);
-			setStatusIndex(3);
-
-			/* 4️⃣ Multiple bank loans */
-			await Promise.all(
-				bankLoans
-					.filter((loan) => loan.amount)
-					.map(async (bankLoan) => {
-						const bankLoanRes = await post('/api/shg?name=bank-loan', {
-							shgId,
-							bankName: bankLoan.bankName,
-							principal: Number(bankLoan.amount),
-							interestRate: bankLoan.interestRate
-								? Number(bankLoan.interestRate)
-								: 0,
-							tenureMonths: null,
-							issuedDate: onboardingDate,
-							status: 'ONGOING',
-							meta: { note: 'Existing bank loan onboarded' },
-						});
-
-						await post('/api/shg?name=opening-balance', {
-							shgId,
-							fromAccount: 'SYSTEM',
-							toAccount: 'BANK_LOAN',
-							amount: Number(bankLoan.amount),
-							type: 'OPENING_BALANCE',
-							memberId: null,
-							date: onboardingDate,
-							meta: {
-								bankLoanId: bankLoanRes._id,
-								note: 'Opening bank loan liability',
-							},
-						});
-					}),
-			);
-			setStatusIndex(4);
-
-			setStatusIndex(5);
-			setTimeout(onNext, 900);
-		} catch (e) {
-			console.error(e);
-			alert('सेव करते समय समस्या आई। कृपया पुनः प्रयास करें।');
+			persistFinanceDraft();
+			onNext();
+		} catch (error) {
+			console.error(error);
+			alert('वित्तीय ऑनबोर्डिंग सेव नहीं हो पाया। कृपया पुनः प्रयास करें।');
+		} finally {
+			dispatch(setLoader(false));
 			setSaving(false);
 		}
 	};
 
 	return (
-		<>
-			<div className='bg-slate-800/50 p-6 border-b border-slate-700/50'>
-				<div className='flex items-center gap-3'>
-					<div className='bg-indigo-500/10 p-2 rounded-lg'>
-						<IndianRupeeIcon className='w-6 h-6 text-pink-400' />
-					</div>
-					<div>
-						<h2 className='text-xl font-bold text-white'>वित्तीय सेटअप</h2>
-						<p className='text-sm text-slate-400'>प्रारंभिक वित्तीय जानकारी</p>
-					</div>
+		<div className='space-y-6'>
+			<div className='flex items-center gap-3'>
+				<div className='bg-indigo-500/10 p-2 rounded-lg'>
+					<IndianRupeeIcon className='w-6 h-6 text-pink-400' />
+				</div>
+				<div>
+					<h2 className='text-2xl font-bold text-white'>SHG वित्तीय ऑनबोर्डिंग</h2>
+					<p className='text-sm text-slate-400'>
+						एकमुश्त प्रारंभिक आंकड़े भरें। यह स्क्रीन लैपटॉप उपयोग के लिए बनाई गई है।
+					</p>
 				</div>
 			</div>
 
-			<div className='p-6 space-y-6'>
-				{step === 1 && (
-					<>
-						<label className='flex items-center gap-3 p-4 bg-slate-800/30 border border-slate-700 rounded-xl cursor-pointer'>
-							<input
-								type='checkbox'
-								className='w-5 h-5 accent-pink-500'
-								checked={isExisting}
-								onChange={() => {
-									setIsExisting(!isExisting);
-									setStep(1);
-								}}
-							/>
-							<span className='font-medium text-slate-200'>
-								क्या यह एक मौजूदा SHG है?
-							</span>
-						</label>
-
-						{isExisting && (
-							<button
-								onClick={nextStep}
-								className='w-full bg-gradient-to-r from-indigo-600 to-pink-600 py-2 rounded-lg'>
-								आगे बढ़ें
-							</button>
-						)}
-					</>
-				)}
-
-				{step === 2 && (
-					<CashInHand setShgCash={setShgCash} nextStep={nextStep} />
-				)}
-
-				{step === 3 && (
-					<div className='space-y-4'>
-						<p className='font-semibold text-indigo-400'>सदस्यों की जमा बचत</p>
-						{members.map((m, i) => (
-							<div key={m._id} className='flex items-center gap-3'>
-								{i + 1}){' '}
-								<span className='w-1/2 font-bold text-slate-300'>{m.name}</span>
-								<input
-									type='number'
-									placeholder='₹'
-									className='w-1/2 bg-slate-950 border border-slate-700 rounded-lg p-2'
-									onChange={(e) =>
-										setMemberSavings({
-											...memberSavings,
-											[m._id]: e.target.value,
-										})
-									}
-								/>
-							</div>
-						))}
-						<button
-							onClick={nextStep}
-							className='w-full bg-gradient-to-r from-indigo-600 to-pink-600 py-2 rounded-lg'>
-							आगे बढ़ें
-						</button>
-					</div>
-				)}
-
-				{step === 4 && (
-					<div className='space-y-4'>
-						<p className='font-semibold text-indigo-400'>सदस्य पर ऋण</p>
-						{members.map((m) => (
-							<div key={m._id} className='flex gap-3'>
-								<span className='w-1/2 font-bold text-slate-300'>{m.name}</span>
-								<input
-									type='number'
-									placeholder='₹ बकाया'
-									className='w-1/2 bg-slate-950 border border-slate-700 rounded-lg p-2'
-									onChange={(e) =>
-										setMemberLoans({
-											...memberLoans,
-											[m._id]: {
-												amount: e.target.value,
-												interestRate: memberLoans[m._id]?.interestRate || 0,
-											},
-										})
-									}
-								/>
-								<input
-									type='number'
-									placeholder='ब्याज दर (%)'
-									className='w-1/2 bg-slate-950 border border-slate-700 rounded-lg p-2'
-									onChange={(e) =>
-										setMemberLoans({
-											...memberLoans,
-											[m._id]: {
-												amount: memberLoans[m._id]?.amount || 0,
-												interestRate: e.target.value,
-											},
-										})
-									}
-								/>
-							</div>
-						))}
-						<button
-							onClick={nextStep}
-							className='w-full bg-gradient-to-r from-indigo-600 to-pink-600 py-2 rounded-lg'>
-							आगे बढ़ें
-						</button>
-					</div>
-				)}
-
-				{step === 5 && (
-					<div className='space-y-4'>
-						<div className='flex justify-between items-center'>
-							<p className='font-semibold text-indigo-400'>
-								बैंक से लिए ऋण (यदि हों)
-							</p>
-							<button
-								onClick={addBankLoan}
-								className='flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 px-3 py-1 rounded-lg text-sm'>
-								<Plus className='w-4 h-4' /> जोड़ें
-							</button>
-						</div>
-
-						{bankLoans.map((loan) => (
-							<div
-								key={loan.id}
-								className='space-y-3 p-4 bg-slate-800/30 rounded-lg'>
-								<div className='relative'>
-									<Building2 className='absolute left-3 top-3 w-5 h-5 text-slate-500' />
+			{step === 1 ? (
+				<div className='grid grid-cols-1 xl:grid-cols-2 gap-6'>
+					<div className='space-y-4 bg-slate-900/40 border border-slate-700 rounded-xl p-5'>
+						<h3 className='text-lg font-semibold text-indigo-300'>
+							सदस्यों की कुल बचत (एक-एक करके)
+						</h3>
+						<p className='text-xs text-slate-400'>
+							सुझाव: यदि किसी सदस्य की बचत नहीं है तो 0 दर्ज करें।
+						</p>
+						<div className='space-y-3 max-h-[420px] overflow-y-auto pr-2'>
+							{members.map((member, index) => (
+								<div
+									key={member._id}
+									className='grid grid-cols-12 items-center gap-3 bg-slate-800/50 rounded-lg px-3 py-2'>
+									<span className='col-span-1 text-slate-500 text-sm'>{index + 1}</span>
+									<span className='col-span-7 text-slate-200 text-sm font-medium'>
+										{member.name}
+									</span>
 									<input
-										placeholder='बैंक का नाम'
-										className='w-full bg-slate-950 border border-slate-700 rounded-lg py-2.5 pl-10'
-										value={loan.bankName}
+										type='number'
+										min='0'
+										value={memberSavings[member._id] || ''}
 										onChange={(e) =>
-											updateBankLoan(loan.id, 'bankName', e.target.value)
+											setMemberSavings((prev) => ({
+												...prev,
+												[member._id]: e.target.value,
+											}))
 										}
+										placeholder='0'
+										className='col-span-4 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-right text-white'
 									/>
 								</div>
-								<input
-									type='number'
-									placeholder='₹ बकाया'
-									className='w-full bg-slate-950 border border-slate-700 rounded-lg py-2.5 p-3'
-									value={loan.amount}
-									onChange={(e) =>
-										updateBankLoan(loan.id, 'amount', e.target.value)
-									}
-								/>
-								<input
-									type='number'
-									placeholder='ब्याज दर (%)'
-									className='w-full bg-slate-950 border border-slate-700 rounded-lg py-2.5 p-3'
-									value={loan.interestRate}
-									onChange={(e) =>
-										updateBankLoan(loan.id, 'interestRate', e.target.value)
-									}
-								/>
-								{bankLoans.length > 1 && (
-									<button
-										onClick={() => removeBankLoan(loan.id)}
-										className='flex items-center gap-2 text-red-400 hover:text-red-300 text-sm'>
-										<Trash2 className='w-4 h-4' /> हटाएं
-									</button>
-								)}
-							</div>
-						))}
-
-						<button
-							onClick={nextStep}
-							className='w-full bg-gradient-to-r from-indigo-600 to-pink-600 py-2 rounded-lg'>
-							समीक्षा करें
-						</button>
-					</div>
-				)}
-
-				{step === 6 && (
-					<div className='space-y-4'>
-						{saving && (
-							<div className='bg-slate-900/60 border border-slate-700 rounded-xl p-4'>
-								<p className='text-pink-400 font-semibold animate-pulse'>
-									{STATUS_STEPS[statusIndex]}
-								</p>
-							</div>
-						)}
-						<div className='space-y-6'>
-							<div className='bg-slate-800/40 border border-slate-700 rounded-xl p-4'>
-								<p className='text-slate-400 text-sm'>SHG नकद</p>
-								<p className='text-2xl font-bold text-pink-400'>
-									₹ {shgCash || '0'}
-								</p>
-							</div>
-
-							<div className='bg-slate-800/40 border border-slate-700 rounded-xl p-4'>
-								<p className='text-indigo-400 font-semibold mb-3'>
-									सदस्यों की जमा बचत
-								</p>
-								{members.map((m) => (
-									<div
-										key={m._id}
-										className='flex justify-between text-slate-300 py-2 border-b border-slate-700 last:border-0'>
-										<span>{m.name}</span>
-										<span>₹ {memberSavings[m._id] || '0'}</span>
-									</div>
-								))}
-							</div>
-
-							<div className='bg-slate-800/40 border border-slate-700 rounded-xl p-4'>
-								<p className='text-indigo-400 font-semibold mb-3'>
-									सदस्य पर ऋण
-								</p>
-								{members.map((m) => (
-									<div
-										key={m._id}
-										className='flex justify-between text-slate-300 py-2 border-b border-slate-700 last:border-0'>
-										<span>{m.name}</span>
-										<span>₹ {memberLoans[m._id]?.amount || '0'}</span>
-									</div>
-								))}
-							</div>
-
-							{bankLoans.some((l) => l.amount) && (
-								<div className='bg-slate-800/40 border border-slate-700 rounded-xl p-4'>
-									<p className='text-indigo-400 font-semibold mb-3'>बैंक ऋण</p>
-									{bankLoans
-										.filter((l) => l.amount)
-										.map((loan) => (
-											<div
-												key={loan.id}
-												className='flex justify-between text-slate-300 py-2 border-b border-slate-700 last:border-0'>
-												<span>{loan.bankName || 'बैंक'}</span>
-												<span>₹ {loan.amount}</span>
-											</div>
-										))}
-								</div>
-							)}
+							))}
 						</div>
+					</div>
+
+					<div className='space-y-4 bg-slate-900/40 border border-slate-700 rounded-xl p-5'>
+						<h3 className='text-lg font-semibold text-indigo-300'>Bulk totals till date</h3>
+						<p className='text-xs text-slate-400'>
+							ये कुल एकमुश्त आंकड़े हैं, पुराने लेन-देन की एंट्री अलग से नहीं चाहिए।
+						</p>
+						<div className='space-y-3'>
+							<Field
+								label='कुल दिए गए ऋण'
+								value={totals.totalLoansGiven}
+								onChange={(value) =>
+									setTotals((prev) => ({ ...prev, totalLoansGiven: value }))
+								}
+							/>
+							<Field
+								label='ब्याज से आय'
+								value={totals.incomeFromInterest}
+								onChange={(value) =>
+									setTotals((prev) => ({ ...prev, incomeFromInterest: value }))
+								}
+							/>
+							<Field
+								label='जुर्माना से आय'
+								value={totals.incomeFromPenalty}
+								onChange={(value) =>
+									setTotals((prev) => ({ ...prev, incomeFromPenalty: value }))
+								}
+							/>
+							<Field
+								label='कुल लंपसम भुगतान'
+								value={totals.totalLumpSumPayments}
+								onChange={(value) =>
+									setTotals((prev) => ({ ...prev, totalLumpSumPayments: value }))
+								}
+							/>
+							<Field
+								label='कुल व्यय'
+								value={totals.totalExpenditure}
+								onChange={(value) =>
+									setTotals((prev) => ({ ...prev, totalExpenditure: value }))
+								}
+							/>
+						</div>
+
+						<div className='bg-slate-950 border border-slate-700 rounded-lg p-4 space-y-2 mt-4'>
+							<Row label='सदस्य कुल बचत' value={totalMemberSavings} />
+							<Row
+								label='गणना अनुसार उपलब्ध नकद'
+								value={calculatedAvailableCash}
+								highlight
+							/>
+						</div>
+					</div>
+
+					<div className='xl:col-span-2 flex justify-end gap-3'>
 						<button
-							onClick={handleFinance}
-							disabled={saving}
-							className='w-full bg-gradient-to-r from-indigo-600 to-pink-600 py-3 rounded-xl font-semibold flex justify-center gap-2'>
-							{saving ? (
-								<>
-									<Loader2 className='animate-spin w-5 h-5' />
-									सेव हो रहा है…
-								</>
-							) : (
-								<>
-									<CheckCircle2 className='w-5 h-5' />
-									पुष्टि करें और सेव करें
-								</>
-							)}
+							onClick={() => {
+								persistFinanceDraft();
+								setStep(2);
+							}}
+							aria-label='Review financial onboarding totals'
+							className='px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-600 text-white font-semibold flex items-center gap-2'>
+							समीक्षा करें <ArrowRight className='w-5 h-5' />
 						</button>
 					</div>
-				)}
-			</div>
-
-			{!isExisting && (
-				<div className='p-6'>
-					<button
-						onClick={onNext}
-						className='w-full bg-gradient-to-r from-indigo-600 to-pink-500 py-3 rounded-xl font-semibold flex justify-center gap-2'>
-						आगे बढ़ें <ArrowRight className='w-5 h-5' />
-					</button>
 				</div>
-			)}
-		</>
+			) : null}
+
+			{step === 2 ? (
+				<div className='space-y-5 bg-slate-900/40 border border-slate-700 rounded-xl p-6'>
+					<h3 className='text-xl font-semibold text-white'>प्रारंभिक कुल राशि की समीक्षा</h3>
+					<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+						<Row label='सदस्य कुल बचत' value={totalMemberSavings} />
+						<Row label='कुल दिए गए ऋण' value={money(totals.totalLoansGiven)} />
+						<Row label='ब्याज से आय' value={money(totals.incomeFromInterest)} />
+						<Row label='जुर्माना से आय' value={money(totals.incomeFromPenalty)} />
+						<Row
+							label='कुल लंपसम भुगतान'
+							value={money(totals.totalLumpSumPayments)}
+						/>
+						<Row label='कुल व्यय' value={money(totals.totalExpenditure)} />
+					</div>
+					<div className='border-t border-slate-700 pt-4'>
+						<Row
+							label='गणना अनुसार उपलब्ध नकद'
+							value={calculatedAvailableCash}
+							highlight
+						/>
+					</div>
+
+					<div className='flex justify-end gap-3'>
+						<button
+							onClick={() => setStep(1)}
+							disabled={saving}
+							aria-label='Go back to edit financial values'
+							className='px-5 py-2.5 rounded-lg border border-slate-600 text-slate-200'>
+							वापस
+						</button>
+						<button
+							onClick={handleSubmit}
+							disabled={saving}
+							aria-label='Save financial onboarding and continue'
+							className='px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex items-center gap-2'>
+							{saving ? <Loader2 className='animate-spin w-4 h-4' /> : <CheckCircle2 className='w-4 h-4' />}
+							{saving ? 'सेव हो रहा है...' : 'सेव करें और आगे बढ़ें'}
+						</button>
+					</div>
+				</div>
+			) : null}
+		</div>
+	);
+}
+
+function Field({ label, value, onChange }) {
+	return (
+		<div className='space-y-1'>
+			<label className='text-xs uppercase tracking-wide text-slate-400'>{label}</label>
+			<input
+				type='number'
+				min='0'
+				value={value}
+				onChange={(e) => onChange(e.target.value)}
+				placeholder='0'
+				className='w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white'
+			/>
+		</div>
+	);
+}
+
+function Row({ label, value, highlight = false }) {
+	return (
+		<div className='flex items-center justify-between bg-slate-800/50 rounded-lg px-4 py-3'>
+			<span className='text-slate-300 text-sm'>{label}</span>
+			<span className={`font-semibold ${highlight ? 'text-pink-400' : 'text-white'}`}>
+				Rs. {Number(value || 0).toLocaleString('en-IN')}
+			</span>
+		</div>
 	);
 }

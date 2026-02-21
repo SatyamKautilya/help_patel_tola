@@ -9,7 +9,6 @@ import StatusPage from './sections/StatusPage';
 import ContentPage from './sections/ContentPage';
 import NotificationSender from './sections/NotificationSender';
 import RequestList from './sections/RequestList';
-import OnboardingFlow from '../shg/onboarding/OnboardingFlow';
 import AccessControl from './sections/AccessControl';
 import { getRolesForVillage, hasPermission } from '@/lib/roles';
 
@@ -36,6 +35,10 @@ const AdminDashboard = () => {
 	}, []);
 
 	const currentUser = authUser || (legacyUser?.isAdmin ? legacyUser : null);
+	const isSuperAdmin =
+		!!currentUser?.isAdmin ||
+		(Array.isArray(currentUser?.userGroups) &&
+			currentUser.userGroups.includes('super_admin'));
 
 	const allVillageCodes = useMemo(() => {
 		const tagged = Array.isArray(currentUser?.taggedVillage)
@@ -214,9 +217,26 @@ const AdminDashboard = () => {
 				className='w-full max-w-4xl px-2 sm:px-0'>
 				{activeTab === 'status' ? <StatusPage /> : null}
 				{activeTab === 'content' ? <ContentPage /> : null}
-				{activeTab === 'notification' ? <NotificationSender /> : null}
+				{activeTab === 'notification' ? (
+					<NotificationSender
+						selectedVillage={selectedVillage}
+						isSuperAdmin={isSuperAdmin}
+					/>
+				) : null}
 				{activeTab === 'approval' ? <RequestList /> : null}
-				{activeTab === 'onboarding' ? <OnboardingFlow /> : null}
+				{activeTab === 'onboarding' ? (
+					<div className='bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 md:p-8 space-y-4'>
+						<h3 className='text-2xl font-bold text-white'>SHG Onboarding</h3>
+						<p className='text-slate-300 text-sm'>
+							Open dedicated full-screen onboarding page for better laptop workflow.
+						</p>
+						<button
+							onClick={() => router.push('/shg/onboarding')}
+							className='px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-semibold'>
+							Open SHG Onboarding Workspace
+						</button>
+					</div>
+				) : null}
 				{activeTab === 'access' ? <AccessControl /> : null}
 			</motion.div>
 		</div>
