@@ -4,38 +4,67 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
 import StatusPage from './sections/StatusPage';
 import ContentPage from './sections/ContentPage';
 import NotificationSender from './sections/NotificationSender';
 import RequestList from './sections/RequestList';
 import OnboardingFlow from '../shg/onboarding/OnboardingFlow';
-
-const PERMISSIONS = {
-	view_stats: ['super_admin'],
-	manage_approvals: ['super_admin', 'approver'],
-	edit_content: ['super_admin', 'content_editor'],
-	send_notifications: ['super_admin', 'notification_sender'],
-	onboard_shgs: ['super_admin', 'shg_onboarder'],
-};
-
-const hasAccess = (userGroups, action) => {
-	const allowedGroups = PERMISSIONS[action] || [];
-	return userGroups.some((group) => allowedGroups.includes(group));
-};
+import AccessControl from './sections/AccessControl';
+import { getRolesForVillage, hasPermission } from '@/lib/roles';
 
 const AdminDashboard = () => {
-	const thisUser = useSelector((state) => state.appContext.user);
-	const userGroups = thisUser?.userGroups || [];
-	// const userGroups = ['shg_onboarder'];
+	const router = useRouter();
+	const legacyUser = useSelector((state) => state.appContext.user);
+	const [authUser, setAuthUser] = useState(null);
+	const [authReady, setAuthReady] = useState(false);
+	const [selectedVillage, setSelectedVillage] = useState('');
+	const [activeTab, setActiveTab] = useState('');
 
-	/** ✅ tabs are DERIVED, not state */
+	useEffect(() => {
+		const checkAuth = async () => {
+			try {
+				const res = await fetch('/api/auth/me', { cache: 'no-store' });
+				if (res.ok) {
+					const data = await res.json();
+					setAuthUser(data?.user || null);
+				}
+			} catch {}
+			setAuthReady(true);
+		};
+		checkAuth();
+	}, []);
+
+	const currentUser = authUser || (legacyUser?.isAdmin ? legacyUser : null);
+
+	const allVillageCodes = useMemo(() => {
+		const tagged = Array.isArray(currentUser?.taggedVillage)
+			? currentUser.taggedVillage
+			: [];
+		const roleVillages = Array.isArray(currentUser?.villageRoles)
+			? currentUser.villageRoles.map((entry) => entry.villageCode)
+			: [];
+		return Array.from(new Set([...tagged, ...roleVillages].filter(Boolean)));
+	}, [currentUser]);
+
+	useEffect(() => {
+		if (!selectedVillage && allVillageCodes.length) {
+			setSelectedVillage(allVillageCodes[0]);
+		}
+	}, [allVillageCodes, selectedVillage]);
+
+	const roles = useMemo(
+		() => getRolesForVillage(currentUser, selectedVillage),
+		[currentUser, selectedVillage],
+	);
+
 	const tabs = useMemo(() => {
 		return [
 			{ key: 'status', label: 'System Status', permission: 'view_stats' },
 			{ key: 'content', label: 'Content Manager', permission: 'edit_content' },
 			{
 				key: 'notification',
-				label: 'नोटिफ़िकेशन',
+				label: 'Notification',
 				permission: 'send_notifications',
 			},
 			{ key: 'approval', label: 'Requests', permission: 'manage_approvals' },
@@ -44,36 +73,50 @@ const AdminDashboard = () => {
 				label: 'SHG Onboarding',
 				permission: 'onboard_shgs',
 			},
-		].filter((tab) => hasAccess(userGroups, tab.permission));
-	}, [userGroups]);
+			{
+				key: 'access',
+				label: 'Access Control',
+				permission: 'manage_access',
+			},
+		].filter((tab) => hasPermission(roles, tab.permission));
+	}, [roles]);
 
-	/** ✅ single source of truth */
-	const [activeTab, setActiveTab] = useState('');
-
-	/** ✅ ensure valid active tab */
 	useEffect(() => {
 		if (tabs.length === 0) return;
-
 		setActiveTab((prev) =>
-			tabs.some((t) => t.key === prev) ? prev : tabs[0].key,
+			tabs.some((tab) => tab.key === prev) ? prev : tabs[0].key,
 		);
 	}, [tabs]);
 
-	/** ✅ derive index instead of storing */
-	const tabIndex = tabs.findIndex((t) => t.key === activeTab);
+	useEffect(() => {
+		if (!authReady) return;
+		if (authUser || legacyUser?.isAdmin) return;
+		router.replace('/admin/login');
+	}, [authReady, authUser, legacyUser, router]);
+
+	const tabIndex = tabs.findIndex((tab) => tab.key === activeTab);
 	const currentTab = tabs[tabIndex];
 
 	const handlePrevTab = () => {
-		if (tabIndex > 0) {
-			setActiveTab(tabs[tabIndex - 1].key);
-		}
+		if (tabIndex > 0) setActiveTab(tabs[tabIndex - 1].key);
+	};
+	const handleNextTab = () => {
+		if (tabIndex < tabs.length - 1) setActiveTab(tabs[tabIndex + 1].key);
 	};
 
-	const handleNextTab = () => {
-		if (tabIndex < tabs.length - 1) {
-			setActiveTab(tabs[tabIndex + 1].key);
-		}
+	const onLogout = async () => {
+		await fetch('/api/auth/logout', { method: 'POST' });
+		router.push('/admin/login');
+		router.refresh();
 	};
+
+	if (!currentUser) {
+		return (
+			<div className='min-h-screen bg-slate-950 text-white flex items-center justify-center'>
+				<p>Checking session...</p>
+			</div>
+		);
+	}
 
 	if (tabs.length === 0) {
 		return (
@@ -84,7 +127,7 @@ const AdminDashboard = () => {
 					className='text-center'>
 					<h1 className='text-3xl font-bold mb-4'>Access Denied</h1>
 					<p className='text-slate-400'>
-						You don't have permission to access the admin dashboard.
+						No permissions for this village selection.
 					</p>
 				</motion.div>
 			</div>
@@ -92,19 +135,38 @@ const AdminDashboard = () => {
 	}
 
 	return (
-		<div className='min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-white p-4 sm:p-6 md:p-10  pt-6 lg:pt-0 pb-1 flex flex-col items-center'>
-			{/* Header */}
+		<div className='min-h-screen bg-gradient-to-br from-[#0a0a0a] via-[#1a1a2e] to-[#0a0a0a] text-white p-4 sm:p-6 md:p-10 pt-6 lg:pt-0 pb-1 flex flex-col items-center'>
 			<motion.div
 				initial={{ opacity: 0, y: -20 }}
 				animate={{ opacity: 1, y: 0 }}
-				className='mb-2 lg:mb-2 pt-4 text-center'>
+				className='mb-4 pt-4 text-center'>
 				<h1 className='text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2'>
 					Tamohar Control Center
 				</h1>
+				<div className='flex flex-wrap justify-center gap-2 mt-3'>
+					{allVillageCodes.length ? (
+						<select
+							value={selectedVillage}
+							onChange={(e) => setSelectedVillage(e.target.value)}
+							className='rounded-lg bg-black/30 border border-white/20 px-3 py-2 text-sm'>
+							{allVillageCodes.map((code) => (
+								<option key={code} value={code}>
+									{code}
+								</option>
+							))}
+						</select>
+					) : null}
+					{authUser ? (
+						<button
+							onClick={onLogout}
+							className='rounded-lg bg-red-600/20 border border-red-400/30 px-3 py-2 text-sm'>
+							Logout
+						</button>
+					) : null}
+				</div>
 			</motion.div>
 
-			{/* Tab Navigation */}
-			{tabs.length > 1 && (
+			{tabs.length > 1 ? (
 				<motion.div
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
@@ -118,10 +180,9 @@ const AdminDashboard = () => {
 						/>
 					))}
 				</motion.div>
-			)}
+			) : null}
 
-			{/* Mobile Tab Navigation */}
-			{tabs.length > 1 && (
+			{tabs.length > 1 ? (
 				<motion.div
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
@@ -142,7 +203,7 @@ const AdminDashboard = () => {
 						<ArrowRight size={20} />
 					</button>
 				</motion.div>
-			)}
+			) : null}
 
 			<motion.div
 				key={activeTab}
@@ -151,11 +212,12 @@ const AdminDashboard = () => {
 				exit={{ opacity: 0, y: -10 }}
 				transition={{ duration: 0.3 }}
 				className='w-full max-w-4xl px-2 sm:px-0'>
-				{activeTab === 'status' && <StatusPage />}
-				{activeTab === 'content' && <ContentPage />}
-				{activeTab === 'notification' && <NotificationSender />}
-				{activeTab === 'approval' && <RequestList />}
-				{activeTab === 'onboarding' && <OnboardingFlow />}
+				{activeTab === 'status' ? <StatusPage /> : null}
+				{activeTab === 'content' ? <ContentPage /> : null}
+				{activeTab === 'notification' ? <NotificationSender /> : null}
+				{activeTab === 'approval' ? <RequestList /> : null}
+				{activeTab === 'onboarding' ? <OnboardingFlow /> : null}
+				{activeTab === 'access' ? <AccessControl /> : null}
 			</motion.div>
 		</div>
 	);

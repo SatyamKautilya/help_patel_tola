@@ -27,7 +27,7 @@ const Health = () => {
 				</span>
 			</div>
 			<div className=' h-[150px] w-full flex flex-col justify-start	 items-end space-y-2 '>
-				<Button
+				{/* <Button
 					onPress={() => {
 						router.push('/subcategory/hospitals');
 					}}
@@ -45,7 +45,7 @@ const Health = () => {
 					}
 					color='success'>
 					आयुष्मान अस्पताल देखें
-				</Button>
+				</Button> */}
 			</div>
 		</section>
 	);

@@ -320,6 +320,8 @@ export async function POST(request) {
 								userGroups: existingUserByMobile.userGroups || [],
 								taggedVillage: existingUserByMobile.taggedVillage || [],
 								isAdmin: existingUserByMobile.isAdmin || false,
+								passwordHash: existingUserByMobile.passwordHash || '',
+								villageRoles: existingUserByMobile.villageRoles || [],
 								villageName: existingUserByMobile.villageName || '',
 							},
 						},

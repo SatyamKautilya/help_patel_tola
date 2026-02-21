@@ -153,28 +153,26 @@ export default function HomePage() {
 							viewport={{ once: true }}>
 							<Suvichar />
 						</motion.div>
-						{thisUser?.isAdmin && (
+						<motion.div
+							initial={{ opacity: 0, y: 20, scale: 0.95 }}
+							animate={{ opacity: 1, y: 0, scale: 1 }}
+							transition={{
+								duration: 0.5,
+								ease: 'easeOut',
+								delay: 0.2,
+							}}
+							whileInView='visible'
+							viewport={{ once: true }}>
 							<motion.div
-								initial={{ opacity: 0, y: 20, scale: 0.95 }}
-								animate={{ opacity: 1, y: 0, scale: 1 }}
-								transition={{
-									duration: 0.5,
-									ease: 'easeOut',
-									delay: 0.2,
-								}}
-								whileInView='visible'
-								viewport={{ once: true }}>
-								<motion.div
-									whileHover={{ scale: 1.02 }}
-									whileTap={{ scale: 0.98 }}
-									onClickCapture={() => router.push('/admin')}
-									className='w-full p-4 rounded-2xl bg-white/10 backdrop-blur-md text-white font-bold shadow-lg hover:shadow-xl hover:bg-white/20 transition-all duration-300 cursor-pointer border border-white/30'>
-									<div className='text-center'>
-										<p className='text-lg font-bold mb-1'>🔐 Admin Login</p>
-									</div>
-								</motion.div>
+								whileHover={{ scale: 1.02 }}
+								whileTap={{ scale: 0.98 }}
+								onClickCapture={() => router.push('/admin/login')}
+								className='w-full p-4 rounded-2xl bg-white/10 backdrop-blur-md text-white font-bold shadow-lg hover:shadow-xl hover:bg-white/20 transition-all duration-300 cursor-pointer border border-white/30'>
+								<div className='text-center'>
+									<p className='text-lg font-bold mb-1'>🔐 Login</p>
+								</div>
 							</motion.div>
-						)}
+						</motion.div>
 						{thisUser?.taggedVillage?.length ? (
 							<motion.div
 								variants={sectionVariant}
