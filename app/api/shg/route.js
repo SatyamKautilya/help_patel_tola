@@ -604,7 +604,9 @@ async function MemberPassbook(data) {
 	const transactions = await Transaction.find({
 		shgId: shgObjectId,
 		memberId: memberObjectId,
-	}).sort({ date: 1 });
+	}).sort({ date: -1 });
+	const sixMonthsAgo = new Date();
+	sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 	// Calculate summary
 	let totalSavings = 0;
 	let totalLoansDisbursed = 0;
@@ -638,7 +640,7 @@ async function MemberPassbook(data) {
 		totalPenalties,
 	};
 	return NextResponse.json({
-		transactions: transactions.slice(0, 20),
+		transactions: transactions.filter((tx) => new Date(tx.date) >= sixMonthsAgo),
 		summary,
 	});
 }
