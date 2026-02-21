@@ -330,13 +330,14 @@ async function monthlyDeposit(data) {
 // }
 
 async function createLoan(data) {
+	const issuedDate = data.issuedDate ? new Date(data.issuedDate) : new Date();
 	const loan = await Loan.create({
 		shgId: data.shgId,
 		memberId: data.memberId,
 		principal: data.principal,
 		interestRate: data.interestRate,
 		tenureMonths: data.tenureMonths,
-		issuedDate: new Date(),
+		issuedDate,
 		approvedBy: data.approvedBy,
 	});
 
@@ -347,7 +348,7 @@ async function createLoan(data) {
 		amount: data.principal,
 		type: TransactionType.LOAN_DISBURSEMENT,
 		memberId: data.memberId,
-		date: new Date(),
+		date: issuedDate,
 		meta: { loanId: loan._id },
 	});
 
@@ -356,6 +357,8 @@ async function createLoan(data) {
 
 async function loanRepayment(data) {
 	const loan = await Loan.findById(data.loanId);
+	const paymentDate = data.paymentDate ? new Date(data.paymentDate) : new Date();
+	const month = data.month || paymentDate.toISOString().slice(0, 7);
 	const repayment = await LoanRepayment.create({
 		loanId: data.loanId,
 		shgId: data.shgId,
@@ -363,7 +366,8 @@ async function loanRepayment(data) {
 		amount: data.amount,
 		principalComponent: data.principal,
 		interestComponent: data.interest,
-		paymentDate: new Date(),
+		month,
+		paymentDate,
 		receivedBy: data.receivedBy,
 	});
 
@@ -374,7 +378,7 @@ async function loanRepayment(data) {
 		amount: data.amount,
 		type: TransactionType.LOAN_REPAYMENT,
 		memberId: data.memberId,
-		date: new Date(),
+		date: paymentDate,
 		meta: { loanId: data.loanId },
 	});
 

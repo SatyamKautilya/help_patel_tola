@@ -14,18 +14,19 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 	const [step, setStep] = useState(1);
 	const [saving, setSaving] = useState(false);
 	const [memberSavings, setMemberSavings] = useState(existingFinance.memberSavings || {});
+	const [memberLoans, setMemberLoans] = useState(existingFinance.memberLoans || {});
 	const [totals, setTotals] = useState({
-		totalLoansGiven: existingFinance.totalLoansGiven || '',
 		incomeFromInterest: existingFinance.incomeFromInterest || '',
 		incomeFromPenalty: existingFinance.incomeFromPenalty || '',
 		totalLumpSumPayments: existingFinance.totalLumpSumPayments || '',
 		totalExpenditure: existingFinance.totalExpenditure || '',
 	});
+	const [error, setError] = useState('');
 
 	useEffect(() => {
 		setMemberSavings(existingFinance.memberSavings || {});
+		setMemberLoans(existingFinance.memberLoans || {});
 		setTotals({
-			totalLoansGiven: existingFinance.totalLoansGiven || '',
 			incomeFromInterest: existingFinance.incomeFromInterest || '',
 			incomeFromPenalty: existingFinance.incomeFromPenalty || '',
 			totalLumpSumPayments: existingFinance.totalLumpSumPayments || '',
@@ -39,24 +40,46 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 		[members, memberSavings],
 	);
 
+	const totalLoansIssued = useMemo(
+		() =>
+			members.reduce(
+				(sum, member) => sum + money(memberLoans[member._id]?.totalIssued || 0),
+				0,
+			),
+		[members, memberLoans],
+	);
+
+	const totalPrincipalPaid = useMemo(
+		() =>
+			members.reduce(
+				(sum, member) => sum + money(memberLoans[member._id]?.totalPrincipalPaid || 0),
+				0,
+			),
+		[members, memberLoans],
+	);
+
 	const calculatedAvailableCash = useMemo(() => {
 		return (
 			totalMemberSavings +
 			money(totals.incomeFromInterest) +
 			money(totals.incomeFromPenalty) +
-			money(totals.totalLumpSumPayments) -
-			money(totals.totalLoansGiven) -
+			money(totals.totalLumpSumPayments) +
+			totalPrincipalPaid -
+			totalLoansIssued -
 			money(totals.totalExpenditure)
 		);
-	}, [totalMemberSavings, totals]);
+	}, [totalMemberSavings, totals, totalLoansIssued, totalPrincipalPaid]);
 
 	const persistFinanceDraft = () => {
 		dispatch(
 			setShgOnboardingData({
 				financeOpeningData: {
 					memberSavings,
+					memberLoans,
 					...totals,
 					totalMemberSavings,
+					totalLoansIssued,
+					totalPrincipalPaid,
 					calculatedAvailableCash,
 				},
 			}),
@@ -69,19 +92,79 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(payload),
 		});
-		if (!res.ok) {
-			throw new Error('Failed to save opening balance entries');
-		}
+		if (!res.ok) throw new Error('Failed to save opening balance entries');
 		return res.json();
 	};
 
+	const createLoanWithRepayment = async (memberId, loanInfo, onboardingDate) => {
+		const totalIssued = money(loanInfo?.totalIssued);
+		const totalPaid = money(loanInfo?.totalPrincipalPaid);
+		if (totalIssued <= 0) return;
+
+		const issuedDate = loanInfo?.issuedDate || onboardingDate;
+		const loanResp = await fetch('/api/shg?name=create-loan', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				shgId,
+				memberId,
+				principal: totalIssued,
+				interestRate: 0,
+				interestType: 'NONE',
+				issuedDate,
+				approvedBy: 'ONBOARDING',
+			}),
+		});
+		if (!loanResp.ok) {
+			throw new Error('सदस्य ऋण एंट्री बनाने में त्रुटि हुई');
+		}
+		const loan = await loanResp.json();
+
+		if (totalPaid > 0) {
+			const repayResp = await fetch('/api/shg?name=loan-repayment', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					loanId: loan._id,
+					shgId,
+					memberId,
+					amount: totalPaid,
+					principal: totalPaid,
+					interest: 0,
+					paymentDate: onboardingDate,
+					receivedBy: 'ONBOARDING',
+				}),
+			});
+			if (!repayResp.ok) {
+				throw new Error('मूलधन भुगतान एंट्री बनाने में त्रुटि हुई');
+			}
+		}
+	};
+
+	const validateLoans = () => {
+		for (const member of members) {
+			const issued = money(memberLoans[member._id]?.totalIssued);
+			const paid = money(memberLoans[member._id]?.totalPrincipalPaid);
+			if (paid > issued) {
+				return `${member.name} का चुकाया मूलधन, जारी ऋण से अधिक है।`;
+			}
+		}
+		return '';
+	};
+
 	const handleSubmit = async () => {
+		const validationMessage = validateLoans();
+		if (validationMessage) {
+			setError(validationMessage);
+			return;
+		}
+
 		try {
+			setError('');
 			setSaving(true);
 			dispatch(setLoader(true));
 			const onboardingDate = new Date();
 
-			// Member-wise total savings (bulk, one by one as requested).
 			for (const member of members) {
 				const amount = money(memberSavings[member._id]);
 				if (amount <= 0) continue;
@@ -97,14 +180,15 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 				});
 			}
 
-			// Aggregate historical totals as onboarding baseline entries.
+			for (const member of members) {
+				await createLoanWithRepayment(
+					member._id,
+					memberLoans[member._id] || {},
+					onboardingDate,
+				);
+			}
+
 			const entries = [
-				{
-					amount: money(totals.totalLoansGiven),
-					fromAccount: 'SHG_CASH',
-					toAccount: 'MEMBER_LOAN',
-					meta: { category: 'TOTAL_LOANS_GIVEN_TILL_DATE' },
-				},
 				{
 					amount: money(totals.incomeFromInterest),
 					fromAccount: 'EXTERNAL',
@@ -147,8 +231,8 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 
 			persistFinanceDraft();
 			onNext();
-		} catch (error) {
-			console.error(error);
+		} catch (saveError) {
+			console.error(saveError);
 			alert('वित्तीय ऑनबोर्डिंग सेव नहीं हो पाया। कृपया पुनः प्रयास करें।');
 		} finally {
 			dispatch(setLoader(false));
@@ -176,10 +260,7 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 						<h3 className='text-lg font-semibold text-indigo-300'>
 							सदस्यों की कुल बचत (एक-एक करके)
 						</h3>
-						<p className='text-xs text-slate-400'>
-							सुझाव: यदि किसी सदस्य की बचत नहीं है तो 0 दर्ज करें।
-						</p>
-						<div className='space-y-3 max-h-[420px] overflow-y-auto pr-2'>
+						<div className='space-y-3 max-h-[280px] overflow-y-auto pr-2'>
 							{members.map((member, index) => (
 								<div
 									key={member._id}
@@ -207,18 +288,74 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 					</div>
 
 					<div className='space-y-4 bg-slate-900/40 border border-slate-700 rounded-xl p-5'>
-						<h3 className='text-lg font-semibold text-indigo-300'>Bulk totals till date</h3>
+						<h3 className='text-lg font-semibold text-indigo-300'>सदस्यवार ऋण विवरण</h3>
 						<p className='text-xs text-slate-400'>
-							ये कुल एकमुश्त आंकड़े हैं, पुराने लेन-देन की एंट्री अलग से नहीं चाहिए।
+							प्रत्येक सदस्य के लिए: कुल जारी, जारी तिथि, और कुल मूलधन चुकाया भरें।
 						</p>
-						<div className='space-y-3'>
-							<Field
-								label='कुल दिए गए ऋण'
-								value={totals.totalLoansGiven}
-								onChange={(value) =>
-									setTotals((prev) => ({ ...prev, totalLoansGiven: value }))
-								}
-							/>
+						<div className='space-y-3 max-h-[280px] overflow-y-auto pr-2'>
+							{members.map((member) => (
+								<div
+									key={member._id}
+									className='grid grid-cols-1 md:grid-cols-12 gap-2 bg-slate-800/50 rounded-lg px-3 py-3'>
+									<span className='md:col-span-3 text-slate-200 text-sm font-medium'>
+										{member.name}
+									</span>
+									<input
+										type='number'
+										min='0'
+										value={memberLoans[member._id]?.totalIssued || ''}
+										onChange={(e) =>
+											setMemberLoans((prev) => ({
+												...prev,
+												[member._id]: {
+													...(prev[member._id] || {}),
+													totalIssued: e.target.value,
+												},
+											}))
+										}
+										placeholder='कुल जारी'
+										className='md:col-span-3 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white'
+									/>
+									<input
+										type='date'
+										value={memberLoans[member._id]?.issuedDate || ''}
+										onChange={(e) =>
+											setMemberLoans((prev) => ({
+												...prev,
+												[member._id]: {
+													...(prev[member._id] || {}),
+													issuedDate: e.target.value,
+												},
+											}))
+										}
+										className='md:col-span-3 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white'
+									/>
+									<input
+										type='number'
+										min='0'
+										value={memberLoans[member._id]?.totalPrincipalPaid || ''}
+										onChange={(e) =>
+											setMemberLoans((prev) => ({
+												...prev,
+												[member._id]: {
+													...(prev[member._id] || {}),
+													totalPrincipalPaid: e.target.value,
+												},
+											}))
+										}
+										placeholder='कुल मूलधन चुकाया'
+										className='md:col-span-3 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white'
+									/>
+								</div>
+							))}
+						</div>
+					</div>
+
+					<div className='xl:col-span-2 bg-slate-900/40 border border-slate-700 rounded-xl p-5'>
+						<h3 className='text-lg font-semibold text-indigo-300 mb-3'>
+							अन्य एकमुश्त आंकड़े (आज तक)
+						</h3>
+						<div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
 							<Field
 								label='ब्याज से आय'
 								value={totals.incomeFromInterest}
@@ -248,9 +385,13 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 								}
 							/>
 						</div>
+					</div>
 
-						<div className='bg-slate-950 border border-slate-700 rounded-lg p-4 space-y-2 mt-4'>
+					<div className='xl:col-span-2'>
+						<div className='bg-slate-950 border border-slate-700 rounded-lg p-4 space-y-2'>
 							<Row label='सदस्य कुल बचत' value={totalMemberSavings} />
+							<Row label='कुल जारी ऋण' value={totalLoansIssued} />
+							<Row label='कुल मूलधन चुकाया' value={totalPrincipalPaid} />
 							<Row
 								label='गणना अनुसार उपलब्ध नकद'
 								value={calculatedAvailableCash}
@@ -259,13 +400,18 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 						</div>
 					</div>
 
+					{error ? (
+						<div className='xl:col-span-2'>
+							<p className='text-sm text-red-300'>{error}</p>
+						</div>
+					) : null}
+
 					<div className='xl:col-span-2 flex justify-end gap-3'>
 						<button
 							onClick={() => {
 								persistFinanceDraft();
 								setStep(2);
 							}}
-							aria-label='Review financial onboarding totals'
 							className='px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-pink-600 text-white font-semibold flex items-center gap-2'>
 							समीक्षा करें <ArrowRight className='w-5 h-5' />
 						</button>
@@ -278,7 +424,8 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 					<h3 className='text-xl font-semibold text-white'>प्रारंभिक कुल राशि की समीक्षा</h3>
 					<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
 						<Row label='सदस्य कुल बचत' value={totalMemberSavings} />
-						<Row label='कुल दिए गए ऋण' value={money(totals.totalLoansGiven)} />
+						<Row label='कुल जारी ऋण' value={totalLoansIssued} />
+						<Row label='कुल मूलधन चुकाया' value={totalPrincipalPaid} />
 						<Row label='ब्याज से आय' value={money(totals.incomeFromInterest)} />
 						<Row label='जुर्माना से आय' value={money(totals.incomeFromPenalty)} />
 						<Row
@@ -286,27 +433,19 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 							value={money(totals.totalLumpSumPayments)}
 						/>
 						<Row label='कुल व्यय' value={money(totals.totalExpenditure)} />
-					</div>
-					<div className='border-t border-slate-700 pt-4'>
-						<Row
-							label='गणना अनुसार उपलब्ध नकद'
-							value={calculatedAvailableCash}
-							highlight
-						/>
+						<Row label='गणना अनुसार उपलब्ध नकद' value={calculatedAvailableCash} highlight />
 					</div>
 
 					<div className='flex justify-end gap-3'>
 						<button
 							onClick={() => setStep(1)}
 							disabled={saving}
-							aria-label='Go back to edit financial values'
 							className='px-5 py-2.5 rounded-lg border border-slate-600 text-slate-200'>
 							वापस
 						</button>
 						<button
 							onClick={handleSubmit}
 							disabled={saving}
-							aria-label='Save financial onboarding and continue'
 							className='px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex items-center gap-2'>
 							{saving ? <Loader2 className='animate-spin w-4 h-4' /> : <CheckCircle2 className='w-4 h-4' />}
 							{saving ? 'सेव हो रहा है...' : 'सेव करें और आगे बढ़ें'}
