@@ -33,7 +33,10 @@ export async function GET(request) {
 		if (check === 'isPatelTolaMember') {
 			const assetId = searchParams.get('assetId');
 
-			const userDetails = await Users.findOne({ id: assetId }).lean();
+			const userDetails = await Users.findOne({
+				id: assetId,
+				isActive: true,
+			}).lean();
 
 			const belongsToPatelTola =
 				Array.isArray(userDetails?.userGroups) &&
@@ -63,7 +66,7 @@ export async function GET(request) {
 			return NextResponse.json({ feedback });
 		}
 		if (name === 'total-users') {
-			const totalUsers = await Users.countDocuments();
+			const totalUsers = await Users.countDocuments({ isActive: true });
 			return NextResponse.json({ totalUsers });
 		}
 		if (name === 'today-users') {
@@ -97,6 +100,7 @@ export async function GET(request) {
 			const endUTC = new Date(endOfISTDay.getTime() - IST_OFFSET * 60 * 1000);
 
 			const todayUser = await Users.countDocuments({
+				isActive: true,
 				lastSeen: {
 					$gte: startUTC,
 					$lt: endUTC,
@@ -127,6 +131,7 @@ export async function GET(request) {
 			const endUTC = new Date(endOfISTDay.getTime() - IST_OFFSET * 60 * 1000);
 
 			const users = await Users.find({
+				isActive: true,
 				lastSeen: {
 					$gte: startUTC,
 					$lt: endUTC,
@@ -150,7 +155,7 @@ export async function GET(request) {
 			return NextResponse.json({ lastTenFeedbacks });
 		}
 		if (name === 'last-ten-users') {
-			const users = await Users.find({})
+			const users = await Users.find({ isActive: true })
 				.select('id name hindiName mobileNumber villageName createdAt')
 				.sort({ createdAt: -1 })
 				.limit(10)
@@ -347,9 +352,15 @@ export async function POST(request) {
 				// Look up user by mobile number
 				const existingUserByMobile = await Users.findOne({
 					mobileNumber: mobileNumber,
+					isActive: true,
+					id: { $ne: assetId },
 				}).lean();
 
 				if (existingUserByMobile) {
+					await Users.updateOne(
+						{ id: existingUserByMobile.id },
+						{ $set: { isActive: false } },
+					);
 					// Copy content from existing user and update the new user with assetId
 					await Users.findOneAndUpdate(
 						{ id: assetId },
@@ -364,6 +375,7 @@ export async function POST(request) {
 								passwordHash: existingUserByMobile.passwordHash || '',
 								villageRoles: existingUserByMobile.villageRoles || [],
 								villageName: existingUserByMobile.villageName || '',
+								isActive: true,
 							},
 						},
 						{ new: true, upsert: true },
@@ -373,7 +385,11 @@ export async function POST(request) {
 					await Users.findOneAndUpdate(
 						{ id: assetId },
 						{
-							$set: { mobileNumber: mobileNumber, hindiName: hindiName },
+							$set: {
+								mobileNumber: mobileNumber,
+								hindiName: hindiName,
+								isActive: true,
+							},
 							$push: { taggedVillage: villageCode },
 						},
 						{ new: true },
@@ -399,7 +415,7 @@ export async function POST(request) {
 					{ status: 400 },
 				);
 			}
-			const user = await Users.findOne({ id: assetId }).lean();
+			const user = await Users.findOne({ id: assetId, isActive: true }).lean();
 			return NextResponse.json({ user });
 		}
 		if (name === 'get-contacts') {

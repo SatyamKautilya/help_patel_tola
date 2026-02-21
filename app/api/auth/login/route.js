@@ -26,7 +26,7 @@ export async function POST(request) {
 			);
 		}
 
-		const user = await Users.findOne({ mobileNumber }).lean();
+		const user = await Users.findOne({ mobileNumber, isActive: true }).lean();
 		if (!user?.passwordHash || !verifyPassword(password, user.passwordHash)) {
 			return NextResponse.json(
 				{ error: 'Invalid mobile number or password' },

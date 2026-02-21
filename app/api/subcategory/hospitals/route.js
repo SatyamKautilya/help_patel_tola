@@ -138,6 +138,23 @@ export async function POST(request) {
 				);
 			}
 
+			const normalizedMobile = String(content.mobileNumber || '').trim();
+			let existingUserByMobile = null;
+			if (normalizedMobile) {
+				existingUserByMobile = await Users.findOne({
+					mobileNumber: normalizedMobile,
+					isActive: true,
+					id: { $ne: content.appInstanceId },
+				}).lean();
+			}
+
+			if (existingUserByMobile?.id) {
+				await Users.updateOne(
+					{ id: existingUserByMobile.id },
+					{ $set: { isActive: false } },
+				);
+			}
+
 			const user = await Users.findOneAndUpdate(
 				{ id: content.appInstanceId }, // search condition
 				{
@@ -145,6 +162,18 @@ export async function POST(request) {
 						name: content.name,
 						villageName: content.villageName,
 						lastSeen: content.lastSeen,
+						mobileNumber: normalizedMobile,
+						isActive: true,
+						...(existingUserByMobile
+							? {
+									userGroups: existingUserByMobile.userGroups || [],
+									taggedVillage: existingUserByMobile.taggedVillage || [],
+									isAdmin: existingUserByMobile.isAdmin || false,
+									hindiName: existingUserByMobile.hindiName || '',
+									passwordHash: existingUserByMobile.passwordHash || '',
+									villageRoles: existingUserByMobile.villageRoles || [],
+								}
+							: {}),
 					},
 				},
 				{

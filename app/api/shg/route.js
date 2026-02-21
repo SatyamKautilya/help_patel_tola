@@ -195,7 +195,10 @@ export async function saveBulkMonthlySavings(payload) {
 }
 
 async function fetchByMobile(data) {
-	const user = await Users.findOne({ mobileNumber: data.mobile })?.lean();
+	const user = await Users.findOne({
+		mobileNumber: data.mobile,
+		isActive: true,
+	})?.lean();
 	return NextResponse.json(user);
 }
 async function createSHG(data) {

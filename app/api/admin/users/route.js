@@ -28,7 +28,7 @@ export async function GET() {
 		}
 
 		const [users, villages] = await Promise.all([
-			Users.find({})
+			Users.find({ isActive: true })
 				.sort({ updatedAt: -1 })
 				.select('-passwordHash')
 				.lean(),
@@ -80,7 +80,7 @@ export async function POST(request) {
 			new Set(villageRoles.map((entry) => entry.villageCode).filter(Boolean)),
 		);
 
-		const updates = {
+		let updates = {
 			id,
 			name: String(body?.name || '').trim() || mobileNumber,
 			mobileNumber,
@@ -88,11 +88,52 @@ export async function POST(request) {
 			userGroups: Array.isArray(body?.userGroups) ? body.userGroups : [],
 			villageRoles,
 			taggedVillage,
+			isActive: true,
 		};
 
 		const password = String(body?.password || '').trim();
 		if (password) {
 			updates.passwordHash = createPasswordHash(password);
+		}
+
+		const existingActiveByMobile = await Users.findOne({
+			mobileNumber,
+			isActive: true,
+			id: { $ne: id },
+		})
+			.select(
+				'id userGroups villageRoles taggedVillage isAdmin passwordHash hindiName villageName name',
+			)
+			.lean();
+		if (existingActiveByMobile?.id) {
+			const hasProvidedGroups = Array.isArray(body?.userGroups);
+			const hasProvidedVillageRoles = Array.isArray(body?.villageRoles);
+			if (!hasProvidedGroups) {
+				updates.userGroups = existingActiveByMobile.userGroups || [];
+			}
+			if (!hasProvidedVillageRoles) {
+				updates.villageRoles = existingActiveByMobile.villageRoles || [];
+				updates.taggedVillage = existingActiveByMobile.taggedVillage || [];
+			}
+			if (!body?.isAdmin) {
+				updates.isAdmin = !!existingActiveByMobile.isAdmin;
+			}
+			if (!password && existingActiveByMobile.passwordHash) {
+				updates.passwordHash = existingActiveByMobile.passwordHash;
+			}
+			if (!body?.name) {
+				updates.name =
+					existingActiveByMobile.name ||
+					existingActiveByMobile.hindiName ||
+					updates.name;
+			}
+			if (!body?.villageName && existingActiveByMobile.villageName) {
+				updates.villageName = existingActiveByMobile.villageName;
+			}
+			await Users.updateOne(
+				{ id: existingActiveByMobile.id },
+				{ $set: { isActive: false } },
+			);
 		}
 
 		const user = await Users.findOneAndUpdate(
