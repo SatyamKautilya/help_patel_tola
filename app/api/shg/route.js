@@ -420,15 +420,23 @@ async function openingBalance(data) {
 	// 	throw new Error('Opening balance already set for this SHG');
 	// }
 
+	const fromAccount = AccountType[data.fromAccount] || data.fromAccount;
+	const toAccount = AccountType[data.toAccount] || data.toAccount;
+	const txnDate = data?.date ? new Date(data.date) : new Date();
+	const txnMeta = {
+		note: 'Onboarding opening balance',
+		...(data?.meta || {}),
+	};
+
 	const txn = await Transaction.create({
 		shgId: data.shgId,
-		fromAccount: AccountType[data.fromAccount],
-		toAccount: AccountType[data.toAccount],
+		fromAccount,
+		toAccount,
 		amount: data.amount,
 		type: TransactionType.OPENING_BALANCE,
 		memberId: data.memberId || null,
-		date: new Date(),
-		meta: { note: 'Onboarding opening balance' },
+		date: txnDate,
+		meta: txnMeta,
 	});
 
 	return NextResponse.json(txn);
@@ -636,6 +644,16 @@ async function MemberPassbook(data) {
 		switch (tx.type) {
 			case TransactionType.MONTHLY_DEPOSIT:
 				totalMonthlySavingsPaid += tx.amount;
+				break;
+			case TransactionType.OPENING_BALANCE:
+				// Include onboarding initial member savings in savings totals.
+				if (
+					String(tx.toAccount || '') === 'MEMBER_SAVINGS' ||
+					tx?.meta?.category === 'TOTAL_SAVINGS_TILL_DATE' ||
+					tx?.memberId
+				) {
+					totalMonthlySavingsPaid += tx.amount;
+				}
 				break;
 			case TransactionType.LOAN_DISBURSEMENT:
 				totalLoansDisbursed += tx.amount;
@@ -1070,6 +1088,35 @@ async function dashboardSummary(data) {
 		switch (tx.type) {
 			case TransactionType.MONTHLY_DEPOSIT:
 				totalMonthlySavings += tx.amount;
+				break;
+			case TransactionType.OPENING_BALANCE:
+				// Include onboarding initial data buckets saved via OPENING_BALANCE.
+				if (
+					tx?.meta?.category === 'TOTAL_SAVINGS_TILL_DATE' ||
+					String(tx.toAccount || '') === AccountType.MEMBER_SAVINGS
+				) {
+					totalMonthlySavings += tx.amount;
+				} else if (
+					tx?.meta?.category === 'TOTAL_INTEREST_INCOME_TILL_DATE' ||
+					String(tx.toAccount || '') === AccountType.INTEREST_INCOME
+				) {
+					totalInterestCollected += tx.amount;
+				} else if (tx?.meta?.category === 'TOTAL_PENALTY_INCOME_TILL_DATE') {
+					totalPenalty += tx.amount;
+				} else if (
+					tx?.meta?.category === 'TOTAL_LUMP_SUM_PAYMENTS_TILL_DATE' ||
+					(String(tx.fromAccount || '') === AccountType.EXTERNAL &&
+						String(tx.toAccount || '') === AccountType.SHG_CASH)
+				) {
+					// Fallback for older onboarding rows where category was not persisted.
+					totalLumpSum += tx.amount;
+				} else if (
+					tx?.meta?.category === 'TOTAL_EXPENDITURE_TILL_DATE' ||
+					(String(tx.fromAccount || '') === AccountType.SHG_CASH &&
+						String(tx.toAccount || '') === AccountType.EXTERNAL)
+				) {
+					totalExpense += tx.amount;
+				}
 				break;
 			case TransactionType.LUMP_SUM_CONTRIBUTION:
 				totalLumpSum += tx.amount;

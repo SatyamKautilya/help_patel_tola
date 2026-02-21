@@ -172,7 +172,7 @@ export default function ShgManagerHome({ params }) {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[10px] font-black text-white uppercase tracking-widest backdrop-blur-md">
-                    मुख्य डैशबोर्ड
+                    मुख्य पैनल
                   </span>
                   <Sparkles className="w-4 h-4 text-yellow-300 animate-pulse" />
                 </div>
@@ -192,32 +192,6 @@ export default function ShgManagerHome({ params }) {
               </div>
             </div>
 
-            {/* Bottom Action Section */}
-            <div className="mt-8">
-              <motion.button
-                whileTap={{ scale: 0.96 }}
-                onClick={() =>
-                  router.push(`/shg/shg-details/${shgid}/manage/dashboard`)
-                }
-                className="group w-full bg-white text-slate-900 p-1.5 pr-2 rounded-[1.8rem] flex items-center justify-between shadow-lg shadow-indigo-900/20"
-              >
-                <div className="flex items-center gap-3 px-4">
-                  <div className="p-2 bg-indigo-100 rounded-full text-indigo-600">
-                    <TrendingUp size={18} />
-                  </div>
-                  <div className="flex flex-col text-left">
-                    <span className="text-sm font-black">डैशबोर्ड खोलें</span>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                      वित्तीय सारांश
-                    </span>
-                  </div>
-                </div>
-
-                <div className="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center text-white group-hover:scale-110 transition-transform">
-                  <ArrowRight size={18} />
-                </div>
-              </motion.button>
-            </div>
           </div>
         </div>
       </motion.div>
