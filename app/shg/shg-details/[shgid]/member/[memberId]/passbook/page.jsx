@@ -17,6 +17,8 @@ export default function MemberPassbookSummary({ params }) {
   useEffect(() => {
     const defaultSummary = {
       totalSavings: 0,
+      totalMonthlySavingsPaid: 0,
+      lumpSumShare: 0,
       totalLoansDisbursed: 0,
       totalLoanRepayments: 0,
     };
@@ -143,6 +145,17 @@ export default function MemberPassbookSummary({ params }) {
                   value={remainingLoan}
                   valueClass="text-rose-700"
                   tint="bg-rose-50 border-rose-100"
+                />
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <SummaryRow
+                  label="मासिक बचत (अब तक)"
+                  value={formatMoney(summary?.totalMonthlySavingsPaid)}
+                />
+                <SummaryRow
+                  label="लंपसम हिस्सा"
+                  value={formatMoney(summary?.lumpSumShare)}
                 />
               </div>
 

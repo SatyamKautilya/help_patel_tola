@@ -601,22 +601,41 @@ async function MemberPassbook(data) {
 
 	const shgObjectId = new Types.ObjectId(String(shgid));
 	const memberObjectId = new Types.ObjectId(String(memberId));
-	const transactions = await Transaction.find({
-		shgId: shgObjectId,
-		memberId: memberObjectId,
-	}).sort({ date: -1 });
+	const [transactions, shgLumpSumAgg, activeMemberCount] = await Promise.all([
+		Transaction.find({
+			shgId: shgObjectId,
+			memberId: memberObjectId,
+		}).sort({ date: -1 }),
+		Transaction.aggregate([
+			{
+				$match: {
+					shgId: shgObjectId,
+					type: TransactionType.LUMP_SUM_CONTRIBUTION,
+				},
+			},
+			{
+				$group: {
+					_id: null,
+					totalLumpSum: { $sum: '$amount' },
+				},
+			},
+		]),
+		ShgMember.countDocuments({ shgId: shgObjectId, isActive: true }),
+	]);
+
 	const sixMonthsAgo = new Date();
 	sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
 	// Calculate summary
-	let totalSavings = 0;
+	let totalMonthlySavingsPaid = 0;
 	let totalLoansDisbursed = 0;
 	let totalLoanRepayments = 0;
 	let totalPenalties = 0;
+
 	transactions.forEach((tx) => {
 		switch (tx.type) {
 			case TransactionType.MONTHLY_DEPOSIT:
-			case TransactionType.LUMP_SUM_CONTRIBUTION:
-				totalSavings += tx.amount;
+				totalMonthlySavingsPaid += tx.amount;
 				break;
 			case TransactionType.LOAN_DISBURSEMENT:
 				totalLoansDisbursed += tx.amount;
@@ -633,8 +652,16 @@ async function MemberPassbook(data) {
 				break;
 		}
 	});
+
+	const totalShgLumpSum = Number(shgLumpSumAgg?.[0]?.totalLumpSum || 0);
+	const perMemberLumpSumShare =
+		activeMemberCount > 0 ? totalShgLumpSum / activeMemberCount : 0;
+	const totalSavings = totalMonthlySavingsPaid + perMemberLumpSumShare;
+
 	const summary = {
-		totalSavings,
+		totalSavings: Number(totalSavings.toFixed(2)),
+		totalMonthlySavingsPaid: Number(totalMonthlySavingsPaid.toFixed(2)),
+		lumpSumShare: Number(perMemberLumpSumShare.toFixed(2)),
 		totalLoansDisbursed,
 		totalLoanRepayments,
 		totalPenalties,
