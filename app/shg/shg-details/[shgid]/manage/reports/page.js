@@ -44,34 +44,25 @@ function formatMoney(value) {
 }
 
 async function triggerServerJpegDownload(blob, fileName) {
-	const dataUrl = await new Promise((resolve, reject) => {
-		const reader = new FileReader();
-		reader.onloadend = () => resolve(reader.result);
-		reader.onerror = () => reject(new Error('JPEG पढ़ने में त्रुटि'));
-		reader.readAsDataURL(blob);
+	const prepareResp = await fetch('/api/download-jpeg', {
+		method: 'POST',
+		headers: {
+			'Content-Type': blob.type || 'image/jpeg',
+			'x-file-name': fileName,
+		},
+		body: blob,
 	});
 
-	const form = document.createElement('form');
-	form.method = 'POST';
-	form.action = '/api/download-jpeg';
-	form.target = '_self';
-	form.style.display = 'none';
+	if (!prepareResp.ok) {
+		throw new Error('डाउनलोड तैयार नहीं हो सका');
+	}
 
-	const inputData = document.createElement('input');
-	inputData.type = 'hidden';
-	inputData.name = 'dataUrl';
-	inputData.value = String(dataUrl || '');
-
-	const inputName = document.createElement('input');
-	inputName.type = 'hidden';
-	inputName.name = 'fileName';
-	inputName.value = fileName;
-
-	form.appendChild(inputData);
-	form.appendChild(inputName);
-	document.body.appendChild(form);
-	form.submit();
-	setTimeout(() => form.remove(), 0);
+	const prepared = await prepareResp.json();
+	const url = prepared?.downloadUrl;
+	if (!url) {
+		throw new Error('डाउनलोड URL नहीं मिला');
+	}
+	window.location.assign(url);
 }
 
 async function canvasToCompressedJpegBlob(canvas, quality = 0.82) {
