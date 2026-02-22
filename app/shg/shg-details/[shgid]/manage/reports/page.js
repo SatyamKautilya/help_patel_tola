@@ -43,6 +43,18 @@ function formatMoney(value) {
 	})}`;
 }
 
+function directDownloadBlob(blob, fileName) {
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = fileName;
+	a.setAttribute('download', fileName);
+	document.body.appendChild(a);
+	a.click();
+	a.remove();
+	setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
 export default function ReportsPage({ params }) {
 	const { shgid } = params;
 	const router = useRouter();
@@ -157,11 +169,13 @@ export default function ReportsPage({ params }) {
 				scale: 2,
 				useCORS: true,
 			});
-			const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.95);
-			const a = document.createElement('a');
-			a.href = jpegDataUrl;
-			a.download = `snapshot-${previewMonth || month}.jpg`;
-			a.click();
+			const blob = await new Promise((resolve) =>
+				canvas.toBlob(resolve, 'image/jpeg', 0.95),
+			);
+			if (!blob) {
+				throw new Error('JPEG फाइल नहीं बन पाई');
+			}
+			directDownloadBlob(blob, `snapshot-${previewMonth || month}.jpg`);
 		} catch (e) {
 			setMessage({
 				type: 'error',

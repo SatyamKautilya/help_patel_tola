@@ -4,6 +4,7 @@ import './globals.css';
 import GlobalLoader from './homepage/GlobalLoader';
 import { Providers } from './providers';
 import ReduxProvider from './store/ReduxProvider';
+import RouteChangeLoader from '@/components/RouteChangeLoader';
 
 const GA_ID = 'G-D91NZNMNBB';
 
@@ -36,6 +37,7 @@ export default function RootLayout({ children }) {
 			<body className='app-gradient border-3 h-full min-h-screen flex flex-col'>
 				<ReduxProvider>
 					<GlobalLoader />
+					<RouteChangeLoader />
 					<AnalyticsTracker />
 					<Providers>{children}</Providers>
 				</ReduxProvider>
