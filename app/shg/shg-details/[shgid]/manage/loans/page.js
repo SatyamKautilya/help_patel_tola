@@ -119,213 +119,12 @@ export default function BulkLoanPage({ params }) {
     return true;
   };
 
-  const buildProposalHtml = (member, loan) => {
-    const reason = String(loan.reason || "").trim();
-    const amount = Number(loan.principal || 0).toLocaleString("hi-IN");
-    const rate = Number(loan.interestRate || 0);
-    const escapeHtml = (value = "") =>
-      String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#39;");
-
-    const memberSignRows = (members || [])
-      .map(
-        (m, idx) => `
-          <tr>
-            <td class="center">${idx + 1}</td>
-            <td>${escapeHtml(m.name || "-")}</td>
-            <td class="sig"></td>
-          </tr>`,
-      )
-      .join("");
-
-    const objectiveText = `सदस्य ${member.name || "-"} को आवश्यक कार्य हेतु ऋण प्रदान करना।`;
-    const discussionText = `कारण: ${reason} | मांग: ₹${amount} | प्रस्तावित मासिक ब्याज दर: ${rate}%`;
-    const resolutionText = `समूह सर्वसम्मति से सदस्य ${member.name || "-"} को ₹${amount} का ऋण ${rate}% मासिक ब्याज दर पर स्वीकृत करता है।`;
-
-    return `
-<!doctype html>
-<html lang="hi">
-<head>
-  <meta charset="UTF-8" />
-  <title>Prastav-${escapeHtml(member.name || "member")}-${todayLabel}</title>
-  <style>
-    body { font-family: "Noto Sans Devanagari", "Mangal", sans-serif; margin: 36px; color: #0f172a; }
-    .box { border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; }
-    h1 { margin: 0; font-size: 26px; text-align: center; }
-    .meta { margin: 8px 0 18px; text-align: center; color: #334155; font-size: 14px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { border: 1px solid #94a3b8; padding: 10px; vertical-align: top; font-size: 14px; }
-    th { background: #f1f5f9; text-align: left; }
-    .sign-table { margin-top: 16px; }
-    .sign-table th, .sign-table td { font-size: 13px; }
-    .center { text-align: center; }
-    .sig { width: 180px; height: 36px; }
-    .foot { margin-top: 14px; font-size: 12px; color: #475569; }
-  </style>
-</head>
-<body>
-  <div class="box">
-    <h1>${escapeHtml(shgName || "SHG")} - प्रस्ताव</h1>
-    <div class="meta">दिनांक: ${todayLabel}</div>
-
-    <table>
-      <thead>
-        <tr>
-          <th>उद्देश्य</th>
-          <th>चर्चा</th>
-          <th>प्रस्ताव / संकल्प</th>
-          <th>सदस्य हस्ताक्षर सूची</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>${escapeHtml(objectiveText)}</td>
-          <td>${escapeHtml(discussionText)}</td>
-          <td>${escapeHtml(resolutionText)}</td>
-          <td>नीचे तालिका में सदस्य हस्ताक्षर किए जाएंगे।</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <table class="sign-table">
-      <thead>
-        <tr>
-          <th class="center" style="width:52px;">क्रम</th>
-          <th>सदस्य का नाम</th>
-          <th style="width:180px;">हस्ताक्षर</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${memberSignRows || '<tr><td colspan="3" class="center">सदस्य उपलब्ध नहीं</td></tr>'}
-      </tbody>
-    </table>
-
-    <div class="foot">नोट: यह प्रस्ताव SHG बैठक में पारित करने हेतु तैयार किया गया है।</div>
-  </div>
-</body>
-</html>`;
-  };
-
-  const printProposal = (member, loan) => {
-    if (!member || !loan) return;
-
-    const reason = String(loan.reason || "").trim();
-    if (!reason) {
-      setUiMessage({ type: "error", text: "कृपया ऋण का कारण भरें" });
-      return;
-    }
-
-    const win = window.open("", "_blank", "width=900,height=1000");
-    if (!win) {
-      setUiMessage({ type: "error", text: "पॉप-अप ब्लॉक है, कृपया अनुमति दें" });
-      return;
-    }
-
-    win.document.write(buildProposalHtml(member, loan));
-    win.document.close();
-    win.focus();
-    win.print();
-  };
-
-  const toAscii = (value = "") => String(value).replace(/[^\x20-\x7E]/g, "?");
-
-  const escapePdfText = (value = "") =>
-    String(value).replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
-
-  const buildSimplePdf = (lines) => {
-    const safeLines = lines.map((line) => toAscii(line));
-    const textCommands = safeLines
-      .map((line, idx) => `1 0 0 1 40 ${800 - idx * 14} Tm (${escapePdfText(line)}) Tj`)
-      .join("\n");
-    const content = `BT\n/F1 10 Tf\n${textCommands}\nET`;
-
-    const encoder = new TextEncoder();
-    const byteLength = (str) => encoder.encode(str).length;
-
-    const objects = [];
-    objects.push("1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj");
-    objects.push("2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj");
-    objects.push(
-      "3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >> endobj",
-    );
-    objects.push("4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj");
-    objects.push(`5 0 obj << /Length ${byteLength(content)} >> stream\n${content}\nendstream endobj`);
-
-    let pdf = "%PDF-1.4\n";
-    const offsets = [0];
-    for (const obj of objects) {
-      offsets.push(byteLength(pdf));
-      pdf += `${obj}\n`;
-    }
-    const xrefStart = byteLength(pdf);
-    pdf += `xref\n0 ${objects.length + 1}\n`;
-    pdf += "0000000000 65535 f \n";
-    for (let i = 1; i <= objects.length; i += 1) {
-      pdf += `${String(offsets[i]).padStart(10, "0")} 00000 n \n`;
-    }
-    pdf += `trailer << /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
-    return encoder.encode(pdf);
-  };
-
-  const downloadProposal = (member, loan) => {
-    if (!member || !loan) return;
-
-    const reason = String(loan.reason || "").trim();
-    if (!reason) {
-      setUiMessage({ type: "error", text: "कृपया ऋण का कारण भरें" });
-      return;
-    }
-
-    const amount = Number(loan.principal || 0).toLocaleString("en-IN");
-    const rate = Number(loan.interestRate || 0);
-    const lines = [
-      "एसएचजी प्रस्ताव (ऋण प्रस्ताव)",
-      `समूह: ${shgName || "SHG"}`,
-      `दिनांक: ${todayLabel}`,
-      `सदस्य: ${member.name || "-"}`,
-      `ऋण राशि: रु ${amount}`,
-      `मासिक ब्याज दर: ${rate}%`,
-      `कारण: ${reason}`,
-      "",
-      "संकल्प:",
-      `${member.name || "सदस्य"} के लिए ऋण समूह की सर्वसम्मति से स्वीकृत किया जाता है।`,
-      "",
-      "टिप्पणी: यह प्रस्ताव स्वचालित रूप से तैयार किया गया दस्तावेज है।",
-    ];
-    const pdfBytes = buildSimplePdf(lines);
-    const blob = new Blob([pdfBytes], { type: "application/pdf" });
-    saveBlobWithFallback(
-      blob,
-      `Prastav-${member.name || "sadasya"}-${todayLabel}.pdf`,
-      "application/pdf",
-    );
-  };
-
-  const saveBlobWithFallback = async (blob, fileName, mimeType) => {
-    try {
-      if (
-        typeof navigator !== "undefined" &&
-        navigator.share &&
-        navigator.canShare
-      ) {
-        const file = new File([blob], fileName, { type: mimeType });
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: fileName });
-          return;
-        }
-      }
-    } catch {
-      // Ignore share errors and continue with normal download.
-    }
-
+  const directDownloadBlob = (blob, fileName) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = fileName;
+    a.setAttribute("download", fileName);
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -497,10 +296,9 @@ export default function BulkLoanPage({ params }) {
       return;
     }
 
-    await saveBlobWithFallback(
+    directDownloadBlob(
       blob,
       `Prastav-${member.name || "sadasya"}-${todayLabel}.jpg`,
-      "image/jpeg",
     );
   };
 
@@ -728,26 +526,11 @@ export default function BulkLoanPage({ params }) {
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => printProposal(m, l)}
-                          className="text-xs px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold hover:bg-indigo-100 transition-colors"
-                        >
-                          प्रस्ताव PDF
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => downloadProposal(m, l)}
-                          className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold hover:bg-emerald-100 transition-colors"
-                        >
-                          <Download size={13} />
-                          प्रस्ताव PDF डाउनलोड
-                        </button>
-                        <button
-                          type="button"
                           onClick={() => downloadProposalJpeg(m, l)}
                           className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl bg-sky-50 text-sky-700 border border-sky-200 font-semibold hover:bg-sky-100 transition-colors"
                         >
                           <Download size={13} />
-                          प्रस्ताव JPEG डाउनलोड
+                          प्रस्ताव डाउनलोड (JPEG)
                         </button>
                       </div>
                     </div>

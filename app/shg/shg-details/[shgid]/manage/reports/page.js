@@ -18,13 +18,15 @@ import HindiMonthYearPicker from '@/components/HindiMonthYearPicker';
 let html2canvasLoaderPromise = null;
 
 function loadHtml2canvas() {
-	if (typeof window === 'undefined') return Promise.reject(new Error('Window unavailable'));
+	if (typeof window === 'undefined')
+		return Promise.reject(new Error('Window unavailable'));
 	if (window.html2canvas) return Promise.resolve(window.html2canvas);
 	if (html2canvasLoaderPromise) return html2canvasLoaderPromise;
 
 	html2canvasLoaderPromise = new Promise((resolve, reject) => {
 		const script = document.createElement('script');
-		script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+		script.src =
+			'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
 		script.async = true;
 		script.onload = () => resolve(window.html2canvas);
 		script.onerror = () => reject(new Error('html2canvas लोड नहीं हुआ'));
@@ -89,7 +91,11 @@ export default function ReportsPage({ params }) {
 		return data?.snapshot;
 	};
 
-	const openReportPreview = async ({ targetMonth, targetPdfUrl, snapshotData }) => {
+	const openReportPreview = async ({
+		targetMonth,
+		targetPdfUrl,
+		snapshotData,
+	}) => {
 		setLoadingSnapshot(true);
 		setMessage(null);
 		try {
@@ -99,7 +105,10 @@ export default function ReportsPage({ params }) {
 			setPreviewMonth(targetMonth);
 			setShowReportModal(true);
 		} catch (e) {
-			setMessage({ type: 'error', text: e.message || 'रिपोर्ट डेटा लोड नहीं हुआ।' });
+			setMessage({
+				type: 'error',
+				text: e.message || 'रिपोर्ट डेटा लोड नहीं हुआ।',
+			});
 		} finally {
 			setLoadingSnapshot(false);
 		}
@@ -128,7 +137,10 @@ export default function ReportsPage({ params }) {
 				snapshotData: data?.snapshot || null,
 			});
 		} catch (e) {
-			setMessage({ type: 'error', text: e.message || 'रिपोर्ट जनरेट नहीं हुई।' });
+			setMessage({
+				type: 'error',
+				text: e.message || 'रिपोर्ट जनरेट नहीं हुई।',
+			});
 		} finally {
 			setLoading(false);
 		}
@@ -151,7 +163,10 @@ export default function ReportsPage({ params }) {
 			a.download = `snapshot-${previewMonth || month}.jpg`;
 			a.click();
 		} catch (e) {
-			setMessage({ type: 'error', text: e.message || 'JPEG डाउनलोड नहीं हुआ।' });
+			setMessage({
+				type: 'error',
+				text: e.message || 'JPEG डाउनलोड नहीं हुआ।',
+			});
 		} finally {
 			setDownloadingJpeg(false);
 		}
@@ -166,9 +181,12 @@ export default function ReportsPage({ params }) {
 			<div className='max-w-4xl mx-auto space-y-6'>
 				<div className='flex items-center justify-between'>
 					<div>
-						<h1 className='text-2xl font-black text-slate-900'>मासिक स्नैपशॉट रिपोर्ट</h1>
+						<h1 className='text-2xl font-black text-slate-900'>
+							मासिक स्नैपशॉट रिपोर्ट
+						</h1>
 						<p className='text-sm text-slate-600 mt-1'>
-							हर SHG के लिए महीने का स्नैपशॉट जनरेट करें, रिपोर्ट देखें और JPEG/PDF डाउनलोड करें।
+							हर SHG के लिए महीने का स्नैपशॉट जनरेट करें, रिपोर्ट देखें और
+							JPEG/PDF डाउनलोड करें।
 						</p>
 					</div>
 					<button
@@ -204,9 +222,6 @@ export default function ReportsPage({ params }) {
 							{loading ? 'जनरेट हो रहा है...' : 'अभी जनरेट करें'}
 						</button>
 					</div>
-					<p className='text-xs text-slate-500'>
-						रिपोर्ट path: <code>shg-snapshots/&lt;shgId&gt;/&lt;YYYY-MM&gt;/snapshot.pdf</code>
-					</p>
 				</div>
 
 				<div className='bg-white/85 border border-slate-200 rounded-2xl p-5'>
@@ -222,7 +237,9 @@ export default function ReportsPage({ params }) {
 					{loadingList ? (
 						<p className='text-sm text-slate-500'>लोड हो रहा है...</p>
 					) : snapshots.length === 0 ? (
-						<p className='text-sm text-slate-600'>अभी तक कोई स्नैपशॉट सेव नहीं है।</p>
+						<p className='text-sm text-slate-600'>
+							अभी तक कोई स्नैपशॉट सेव नहीं है।
+						</p>
 					) : (
 						<div className='space-y-2'>
 							{snapshots.map((snap) => (
@@ -232,7 +249,8 @@ export default function ReportsPage({ params }) {
 									<div>
 										<p className='font-semibold text-slate-900'>{snap.month}</p>
 										<p className='text-xs text-slate-600 mt-1'>
-											Generated: {new Date(snap.generatedAt).toLocaleString('hi-IN')}
+											Generated:{' '}
+											{new Date(snap.generatedAt).toLocaleString('hi-IN')}
 										</p>
 									</div>
 									<div className='text-right max-w-[58%]'>
@@ -289,8 +307,12 @@ export default function ReportsPage({ params }) {
 							className='max-w-5xl mx-auto bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden'>
 							<div className='px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3'>
 								<div>
-									<h3 className='text-lg font-bold text-slate-900'>स्नैपशॉट रिपोर्ट</h3>
-									<p className='text-xs text-slate-500'>HTML preview और JPEG/PDF डाउनलोड</p>
+									<h3 className='text-lg font-bold text-slate-900'>
+										स्नैपशॉट रिपोर्ट
+									</h3>
+									<p className='text-xs text-slate-500'>
+										HTML preview और JPEG/PDF डाउनलोड
+									</p>
 								</div>
 								<div className='flex items-center gap-2'>
 									<button
@@ -323,35 +345,76 @@ export default function ReportsPage({ params }) {
 										ref={reportRef}
 										className='bg-white text-slate-900 rounded-xl border border-slate-200 p-6 space-y-5'>
 										<div className='border border-slate-300 rounded-lg p-4'>
-											<h4 className='text-xl font-black text-center'>मासिक SHG रिपोर्ट</h4>
+											<h4 className='text-xl font-black text-center'>
+												मासिक SHG रिपोर्ट
+											</h4>
 											<div className='mt-2 text-sm flex flex-wrap items-center justify-between gap-2'>
-												<p>समूह: <span className='font-semibold'>{snapshotPreview?.shgName || '-'}</span></p>
-												<p>माह: <span className='font-semibold'>{snapshotPreview?.month || previewMonth || '-'}</span></p>
-												<p>Generated: <span className='font-semibold'>{new Date(snapshotPreview?.generatedAt || Date.now()).toLocaleString('hi-IN')}</span></p>
+												<p>
+													समूह:{' '}
+													<span className='font-semibold'>
+														{snapshotPreview?.shgName || '-'}
+													</span>
+												</p>
+												<p>
+													माह:{' '}
+													<span className='font-semibold'>
+														{snapshotPreview?.month || previewMonth || '-'}
+													</span>
+												</p>
+												<p>
+													Generated:{' '}
+													<span className='font-semibold'>
+														{new Date(
+															snapshotPreview?.generatedAt || Date.now(),
+														).toLocaleString('hi-IN')}
+													</span>
+												</p>
 											</div>
 										</div>
 
 										<div>
-											<h5 className='text-base font-bold mb-2'>सदस्य-वार विवरण</h5>
+											<h5 className='text-base font-bold mb-2'>
+												सदस्य-वार विवरण
+											</h5>
 											<div className='overflow-x-auto'>
 												<table className='w-full border-collapse text-sm'>
 													<thead>
 														<tr className='bg-slate-100'>
-															<th className='border border-slate-300 p-2 text-left'>क्र.</th>
-															<th className='border border-slate-300 p-2 text-left'>सदस्य</th>
-															<th className='border border-slate-300 p-2 text-left'>बचत</th>
-															<th className='border border-slate-300 p-2 text-left'>लम्पसम</th>
-															<th className='border border-slate-300 p-2 text-left'>बकाया ऋण</th>
+															<th className='border border-slate-300 p-2 text-left'>
+																क्र.
+															</th>
+															<th className='border border-slate-300 p-2 text-left'>
+																सदस्य
+															</th>
+															<th className='border border-slate-300 p-2 text-left'>
+																बचत
+															</th>
+															<th className='border border-slate-300 p-2 text-left'>
+																लम्पसम
+															</th>
+															<th className='border border-slate-300 p-2 text-left'>
+																बकाया ऋण
+															</th>
 														</tr>
 													</thead>
 													<tbody>
 														{members.map((m, idx) => (
 															<tr key={`${m.memberId || m.name || idx}-${idx}`}>
-																<td className='border border-slate-300 p-2'>{idx + 1}</td>
-																<td className='border border-slate-300 p-2'>{m.name || '-'}</td>
-																<td className='border border-slate-300 p-2'>{formatMoney(m.savings)}</td>
-																<td className='border border-slate-300 p-2'>{formatMoney(m.lumpSum)}</td>
-																<td className='border border-slate-300 p-2'>{formatMoney(m.outstandingLoan)}</td>
+																<td className='border border-slate-300 p-2'>
+																	{idx + 1}
+																</td>
+																<td className='border border-slate-300 p-2'>
+																	{m.name || '-'}
+																</td>
+																<td className='border border-slate-300 p-2'>
+																	{formatMoney(m.savings)}
+																</td>
+																<td className='border border-slate-300 p-2'>
+																	{formatMoney(m.lumpSum)}
+																</td>
+																<td className='border border-slate-300 p-2'>
+																	{formatMoney(m.outstandingLoan)}
+																</td>
 															</tr>
 														))}
 													</tbody>
@@ -360,20 +423,59 @@ export default function ReportsPage({ params }) {
 										</div>
 
 										<div>
-											<h5 className='text-base font-bold mb-2'>SHG कुल सारांश</h5>
+											<h5 className='text-base font-bold mb-2'>
+												SHG कुल सारांश
+											</h5>
 											<div className='grid grid-cols-1 md:grid-cols-2 gap-2 text-sm'>
-												<div className='border border-slate-300 p-2 flex items-center justify-between'><span>कुल बचत</span><span className='font-semibold'>{formatMoney(totals.totalSavings)}</span></div>
-												<div className='border border-slate-300 p-2 flex items-center justify-between'><span>कुल लम्पसम</span><span className='font-semibold'>{formatMoney(totals.totalLumpSum)}</span></div>
-												<div className='border border-slate-300 p-2 flex items-center justify-between'><span>कुल ब्याज</span><span className='font-semibold'>{formatMoney(totals.totalInterest)}</span></div>
-												<div className='border border-slate-300 p-2 flex items-center justify-between'><span>कुल दंड</span><span className='font-semibold'>{formatMoney(totals.totalPenalty)}</span></div>
-												<div className='border border-slate-300 p-2 flex items-center justify-between'><span>कुल बकाया ऋण</span><span className='font-semibold'>{formatMoney(totals.totalOutstandingLoan)}</span></div>
-												<div className='border border-slate-300 p-2 flex items-center justify-between'><span>कुल खर्च</span><span className='font-semibold'>{formatMoney(totals.totalExpense)}</span></div>
-												<div className='border border-slate-300 p-2 flex items-center justify-between md:col-span-2 bg-emerald-50'><span className='font-bold'>उपलब्ध नकद</span><span className='font-black'>{formatMoney(totals.totalAvailableCash)}</span></div>
+												<div className='border border-slate-300 p-2 flex items-center justify-between'>
+													<span>कुल बचत</span>
+													<span className='font-semibold'>
+														{formatMoney(totals.totalSavings)}
+													</span>
+												</div>
+												<div className='border border-slate-300 p-2 flex items-center justify-between'>
+													<span>कुल लम्पसम</span>
+													<span className='font-semibold'>
+														{formatMoney(totals.totalLumpSum)}
+													</span>
+												</div>
+												<div className='border border-slate-300 p-2 flex items-center justify-between'>
+													<span>कुल ब्याज</span>
+													<span className='font-semibold'>
+														{formatMoney(totals.totalInterest)}
+													</span>
+												</div>
+												<div className='border border-slate-300 p-2 flex items-center justify-between'>
+													<span>कुल दंड</span>
+													<span className='font-semibold'>
+														{formatMoney(totals.totalPenalty)}
+													</span>
+												</div>
+												<div className='border border-slate-300 p-2 flex items-center justify-between'>
+													<span>कुल बकाया ऋण</span>
+													<span className='font-semibold'>
+														{formatMoney(totals.totalOutstandingLoan)}
+													</span>
+												</div>
+												<div className='border border-slate-300 p-2 flex items-center justify-between'>
+													<span>कुल खर्च</span>
+													<span className='font-semibold'>
+														{formatMoney(totals.totalExpense)}
+													</span>
+												</div>
+												<div className='border border-slate-300 p-2 flex items-center justify-between md:col-span-2 bg-emerald-50'>
+													<span className='font-bold'>उपलब्ध नकद</span>
+													<span className='font-black'>
+														{formatMoney(totals.totalAvailableCash)}
+													</span>
+												</div>
 											</div>
 										</div>
 									</div>
 								) : (
-									<p className='text-sm text-slate-600'>रिपोर्ट डेटा उपलब्ध नहीं है।</p>
+									<p className='text-sm text-slate-600'>
+										रिपोर्ट डेटा उपलब्ध नहीं है।
+									</p>
 								)}
 							</div>
 						</motion.div>
