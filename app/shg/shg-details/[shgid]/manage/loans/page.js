@@ -221,7 +221,7 @@ export default function BulkLoanPage({ params }) {
 
     const win = window.open("", "_blank", "width=900,height=1000");
     if (!win) {
-      setUiMessage({ type: "error", text: "पॉप-अप ब्लॉक है, कृपया Allow करें" });
+      setUiMessage({ type: "error", text: "पॉप-अप ब्लॉक है, कृपया अनुमति दें" });
       return;
     }
 
@@ -283,30 +283,225 @@ export default function BulkLoanPage({ params }) {
     const amount = Number(loan.principal || 0).toLocaleString("en-IN");
     const rate = Number(loan.interestRate || 0);
     const lines = [
-      "SHG PRASTAV (Loan Proposal)",
-      `SHG: ${shgName || "SHG"}`,
-      `Date: ${todayLabel}`,
-      `Member: ${member.name || "-"}`,
-      `Loan Amount: Rs. ${amount}`,
-      `Monthly Interest Rate: ${rate}%`,
-      `Reason: ${reason}`,
+      "एसएचजी प्रस्ताव (ऋण प्रस्ताव)",
+      `समूह: ${shgName || "SHG"}`,
+      `दिनांक: ${todayLabel}`,
+      `सदस्य: ${member.name || "-"}`,
+      `ऋण राशि: रु ${amount}`,
+      `मासिक ब्याज दर: ${rate}%`,
+      `कारण: ${reason}`,
       "",
-      "Resolution:",
-      `Loan for ${member.name || "member"} is approved by group consensus.`,
+      "संकल्प:",
+      `${member.name || "सदस्य"} के लिए ऋण समूह की सर्वसम्मति से स्वीकृत किया जाता है।`,
       "",
-      "Note: This is a generated proposal document.",
+      "टिप्पणी: यह प्रस्ताव स्वचालित रूप से तैयार किया गया दस्तावेज है।",
     ];
     const pdfBytes = buildSimplePdf(lines);
     const blob = new Blob([pdfBytes], { type: "application/pdf" });
-    const url = URL.createObjectURL(blob);
+    saveBlobWithFallback(
+      blob,
+      `Prastav-${member.name || "sadasya"}-${todayLabel}.pdf`,
+      "application/pdf",
+    );
+  };
 
+  const saveBlobWithFallback = async (blob, fileName, mimeType) => {
+    try {
+      if (
+        typeof navigator !== "undefined" &&
+        navigator.share &&
+        navigator.canShare
+      ) {
+        const file = new File([blob], fileName, { type: mimeType });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: fileName });
+          return;
+        }
+      }
+    } catch {
+      // Ignore share errors and continue with normal download.
+    }
+
+    const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Prastav-${member.name || "member"}-${todayLabel}.pdf`;
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
     a.remove();
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  };
+
+  const wrapCanvasText = (ctx, text, maxWidth) => {
+    const words = String(text || "").split(/\s+/).filter(Boolean);
+    const lines = [];
+    let current = "";
+    words.forEach((word) => {
+      const test = current ? `${current} ${word}` : word;
+      if (ctx.measureText(test).width <= maxWidth) {
+        current = test;
+      } else {
+        if (current) lines.push(current);
+        current = word;
+      }
+    });
+    if (current) lines.push(current);
+    return lines.length ? lines : [""];
+  };
+
+  const drawTextBlock = (ctx, text, x, y, maxWidth, lineHeight = 24) => {
+    const lines = wrapCanvasText(ctx, text, maxWidth);
+    lines.forEach((line, idx) => {
+      ctx.fillText(line, x, y + idx * lineHeight);
+    });
+    return y + lines.length * lineHeight;
+  };
+
+  const downloadProposalJpeg = async (member, loan) => {
+    if (!member || !loan) return;
+
+    const reason = String(loan.reason || "").trim();
+    if (!reason) {
+      setUiMessage({ type: "error", text: "कृपया ऋण का कारण भरें" });
+      return;
+    }
+
+    const amount = Number(loan.principal || 0).toLocaleString("hi-IN");
+    const rate = Number(loan.interestRate || 0);
+
+    const objectiveText = `सदस्य ${member.name || "-"} को आवश्यक कार्य हेतु ऋण प्रदान करना।`;
+    const discussionText = `कारण: ${reason} | मांग: ₹${amount} | प्रस्तावित मासिक ब्याज दर: ${rate}%`;
+    const resolutionText = `समूह सर्वसम्मति से सदस्य ${member.name || "-"} को ₹${amount} का ऋण ${rate}% मासिक ब्याज दर पर स्वीकृत करता है।`;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 1240;
+    canvas.height = 1754;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      setUiMessage({ type: "error", text: "JPEG बनाने में त्रुटि हुई" });
+      return;
+    }
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#0f172a";
+    ctx.strokeStyle = "#334155";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(40, 40, 1160, 1674);
+
+    ctx.font = "700 44px 'Noto Sans Devanagari', 'Mangal', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(`${shgName || "SHG"} - प्रस्ताव`, 620, 105);
+
+    ctx.font = "500 26px 'Noto Sans Devanagari', 'Mangal', sans-serif";
+    ctx.fillText(`दिनांक: ${todayLabel}`, 620, 145);
+    ctx.textAlign = "left";
+
+    const tableX = 70;
+    const tableY = 185;
+    const tableW = 1100;
+    const tableH = 380;
+    ctx.strokeRect(tableX, tableY, tableW, tableH);
+
+    const colW = Math.floor(tableW / 4);
+    for (let i = 1; i < 4; i += 1) {
+      ctx.beginPath();
+      ctx.moveTo(tableX + colW * i, tableY);
+      ctx.lineTo(tableX + colW * i, tableY + tableH);
+      ctx.stroke();
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(tableX, tableY + 58);
+    ctx.lineTo(tableX + tableW, tableY + 58);
+    ctx.stroke();
+
+    const headers = ["उद्देश्य", "चर्चा", "प्रस्ताव / संकल्प", "सदस्य हस्ताक्षर सूची"];
+    ctx.font = "700 24px 'Noto Sans Devanagari', 'Mangal', sans-serif";
+    headers.forEach((h, idx) => {
+      ctx.fillText(h, tableX + colW * idx + 14, tableY + 38);
+    });
+
+    ctx.font = "500 22px 'Noto Sans Devanagari', 'Mangal', sans-serif";
+    drawTextBlock(ctx, objectiveText, tableX + 14, tableY + 92, colW - 28, 30);
+    drawTextBlock(ctx, discussionText, tableX + colW + 14, tableY + 92, colW - 28, 30);
+    drawTextBlock(ctx, resolutionText, tableX + colW * 2 + 14, tableY + 92, colW - 28, 30);
+    drawTextBlock(
+      ctx,
+      "नीचे तालिका में सभी सदस्य हस्ताक्षर करेंगे।",
+      tableX + colW * 3 + 14,
+      tableY + 92,
+      colW - 28,
+      30,
+    );
+
+    const signY = 620;
+    const signW = 1100;
+    const signX = 70;
+    const rowH = 44;
+    const headerH = 48;
+    const rowsToShow = Math.min(Math.max((members || []).length, 1), 18);
+    const signH = headerH + rowH * rowsToShow;
+
+    ctx.strokeRect(signX, signY, signW, signH);
+    const signCols = [80, 620, 400];
+    let runningX = signX;
+    signCols.forEach((w) => {
+      runningX += w;
+      ctx.beginPath();
+      ctx.moveTo(runningX, signY);
+      ctx.lineTo(runningX, signY + signH);
+      ctx.stroke();
+    });
+    ctx.beginPath();
+    ctx.moveTo(signX, signY + headerH);
+    ctx.lineTo(signX + signW, signY + headerH);
+    ctx.stroke();
+
+    ctx.font = "700 22px 'Noto Sans Devanagari', 'Mangal', sans-serif";
+    ctx.fillText("क्रम", signX + 18, signY + 30);
+    ctx.fillText("सदस्य का नाम", signX + 95, signY + 30);
+    ctx.fillText("हस्ताक्षर", signX + 95 + 620, signY + 30);
+
+    ctx.font = "500 20px 'Noto Sans Devanagari', 'Mangal', sans-serif";
+    for (let i = 0; i < rowsToShow; i += 1) {
+      const yy = signY + headerH + rowH * i;
+      if (i > 0) {
+        ctx.beginPath();
+        ctx.moveTo(signX, yy);
+        ctx.lineTo(signX + signW, yy);
+        ctx.stroke();
+      }
+      const name = members?.[i]?.name || "";
+      ctx.fillText(String(i + 1), signX + 24, yy + 28);
+      ctx.fillText(name || "-", signX + 95, yy + 28);
+    }
+
+    ctx.font = "500 20px 'Noto Sans Devanagari', 'Mangal', sans-serif";
+    ctx.fillStyle = "#334155";
+    drawTextBlock(
+      ctx,
+      "नोट: यह प्रस्ताव SHG बैठक में पारित करने हेतु तैयार किया गया है।",
+      70,
+      signY + signH + 60,
+      1050,
+      28,
+    );
+
+    const blob = await new Promise((resolve) =>
+      canvas.toBlob(resolve, "image/jpeg", 0.95),
+    );
+    if (!blob) {
+      setUiMessage({ type: "error", text: "JPEG बनाने में त्रुटि हुई" });
+      return;
+    }
+
+    await saveBlobWithFallback(
+      blob,
+      `Prastav-${member.name || "sadasya"}-${todayLabel}.jpg`,
+      "image/jpeg",
+    );
   };
 
   const submitLoans = async () => {
@@ -481,7 +676,7 @@ export default function BulkLoanPage({ params }) {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
                           <label className="text-[10px] font-black text-slate-400 ml-1 uppercase">
-                            राशि (Principal)
+                            राशि (मूलधन)
                           </label>
                           <div className="relative">
                             <IndianRupee
@@ -500,7 +695,7 @@ export default function BulkLoanPage({ params }) {
 
                         <div className="space-y-1.5">
                           <label className="text-[10px] font-black text-slate-400 ml-1 uppercase">
-                            ब्याज % (Monthly)
+                            ब्याज % (मासिक)
                           </label>
                           <div className="relative">
                             <Percent
@@ -544,7 +739,15 @@ export default function BulkLoanPage({ params }) {
                           className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold hover:bg-emerald-100 transition-colors"
                         >
                           <Download size={13} />
-                          प्रस्ताव डाउनलोड
+                          प्रस्ताव PDF डाउनलोड
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => downloadProposalJpeg(m, l)}
+                          className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl bg-sky-50 text-sky-700 border border-sky-200 font-semibold hover:bg-sky-100 transition-colors"
+                        >
+                          <Download size={13} />
+                          प्रस्ताव JPEG डाउनलोड
                         </button>
                       </div>
                     </div>

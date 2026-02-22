@@ -96,6 +96,8 @@ export async function POST(req) {
 				return generateShgSnapshot(body);
 			case 'list-shg-snapshots':
 				return listShgSnapshots(body);
+			case 'get-shg-snapshot-data':
+				return getShgSnapshotData(body);
 			case 'generate-monthly-snapshots':
 				return generateMonthlySnapshots(body);
 			case 'list-revertable-transactions':
@@ -124,7 +126,7 @@ export async function getShgByUserId(data) {
 		throw new Error('userId is required');
 	}
 
-	/* 1️⃣ Get active SHG memberships of user */
+	/* 1ï¸âƒ£ Get active SHG memberships of user */
 	let memberships = await ShgMember.find({
 		userId: userId,
 		isActive: true,
@@ -142,15 +144,15 @@ export async function getShgByUserId(data) {
 
 	const shgIds = memberships.map((m) => m.shgId);
 
-	/* 2️⃣ Fetch SHG basic details */
+	/* 2ï¸âƒ£ Fetch SHG basic details */
 	const shgs = await Shg.find({
 		_id: { $in: shgIds },
 		status: 'ACTIVE',
 	}).select('name village totalMembers');
 
-	/* 3️⃣ Get active member count per SHG */
+	/* 3ï¸âƒ£ Get active member count per SHG */
 
-	/* 4️⃣ Merge everything */
+	/* 4ï¸âƒ£ Merge everything */
 	const result = shgs.map((shg) => {
 		const membership = memberships.find(
 			(m) => m.shgId.toString() === shg._id.toString(),
@@ -855,7 +857,7 @@ async function ListActiveLoans(data) {
 	const shgObjectId = new Types.ObjectId(String(shgId));
 	const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
 
-	/* ---------------- 1️⃣ Fetch active loans ---------------- */
+	/* ---------------- 1ï¸âƒ£ Fetch active loans ---------------- */
 	const loans = await Loan.find({
 		shgId: shgObjectId,
 		status: LoanRepaymentStatus.ONGOING,
@@ -865,7 +867,7 @@ async function ListActiveLoans(data) {
 		return NextResponse.json({ loans: [] });
 	}
 
-	/* ---------------- 2️⃣ Fetch members ---------------- */
+	/* ---------------- 2ï¸âƒ£ Fetch members ---------------- */
 	const memberIds = loans.map((l) => l.memberId);
 
 	const members = await ShgMember.find({
@@ -878,7 +880,7 @@ async function ListActiveLoans(data) {
 
 	const loanIds = loans.map((l) => l._id);
 
-	/* ---------------- 3️⃣ Aggregate repayments ---------------- */
+	/* ---------------- 3ï¸âƒ£ Aggregate repayments ---------------- */
 	const repaymentAgg = await LoanRepayment.aggregate([
 		{
 			$match: {
@@ -899,7 +901,7 @@ async function ListActiveLoans(data) {
 		repaymentAgg.map((r) => [String(r._id), r.totalPrincipalPaid || 0]),
 	);
 
-	/* ---------------- 4️⃣ Interest paid THIS MONTH ---------------- */
+	/* ---------------- 4ï¸âƒ£ Interest paid THIS MONTH ---------------- */
 	const interestThisMonthAgg = await LoanRepayment.aggregate([
 		{
 			$match: {
@@ -925,7 +927,7 @@ async function ListActiveLoans(data) {
 		]),
 	);
 
-	/* ---------------- 5️⃣ Enrich loans ---------------- */
+	/* ---------------- 5ï¸âƒ£ Enrich loans ---------------- */
 	const enrichedLoans = loans.map((loan) => {
 		const principal = loan.principal;
 
@@ -941,7 +943,7 @@ async function ListActiveLoans(data) {
 		const interestPaidThisMonth =
 			interestPaidThisMonthMap[String(loan._id)] || 0;
 
-		// 🔥 FIX: remaining interest only
+		// ðŸ”¥ FIX: remaining interest only
 		const remainingMonthlyInterest = Math.max(
 			fullMonthlyInterest - interestPaidThisMonth,
 			0,
@@ -950,7 +952,7 @@ async function ListActiveLoans(data) {
 		return {
 			_id: loan._id,
 			memberId: loan.memberId,
-			memberName: memberMap[String(loan.memberId)] || '—',
+			memberName: memberMap[String(loan.memberId)] || '-',
 
 			principal,
 			interestRate: loan.interestRate,
@@ -986,7 +988,7 @@ async function collectRepayment(data) {
 		throw new Error('Invalid repayment values');
 	}
 
-	/* ---------------- 1️⃣ Basic consistency ---------------- */
+	/* ---------------- 1ï¸âƒ£ Basic consistency ---------------- */
 	if (
 		Number((principalComponent + interestComponent).toFixed(2)) !==
 		Number(totalAmount.toFixed(2))
@@ -996,7 +998,7 @@ async function collectRepayment(data) {
 
 	const currentMonth = new Date().toISOString().slice(0, 7);
 
-	/* ---------------- 2️⃣ Fetch loan ---------------- */
+	/* ---------------- 2ï¸âƒ£ Fetch loan ---------------- */
 	const loan = await Loan.findOne({
 		_id: new Types.ObjectId(String(loanId)),
 		shgId: new Types.ObjectId(String(shgId)),
@@ -1008,7 +1010,7 @@ async function collectRepayment(data) {
 		throw new Error('Active loan not found');
 	}
 
-	/* ---------------- 3️⃣ Calculate outstanding principal ---------------- */
+	/* ---------------- 3ï¸âƒ£ Calculate outstanding principal ---------------- */
 	const principalAgg = await LoanRepayment.aggregate([
 		{
 			$match: {
@@ -1032,10 +1034,10 @@ async function collectRepayment(data) {
 		throw new Error('Loan already closed');
 	}
 
-	/* ---------------- 4️⃣ Monthly interest calculation ---------------- */
+	/* ---------------- 4ï¸âƒ£ Monthly interest calculation ---------------- */
 	const fullMonthlyInterest = outstandingPrincipal * (loan.interestRate / 100);
 
-	/* ---------------- 5️⃣ Interest already paid THIS MONTH ---------------- */
+	/* ---------------- 5ï¸âƒ£ Interest already paid THIS MONTH ---------------- */
 	const interestMonthAgg = await LoanRepayment.aggregate([
 		{
 			$match: {
@@ -1059,32 +1061,32 @@ async function collectRepayment(data) {
 		0,
 	);
 
-	/* ---------------- 6️⃣ Business validations ---------------- */
+	/* ---------------- 6ï¸âƒ£ Business validations ---------------- */
 
-	// ❗ Interest cannot exceed remaining interest for this month
+	// â— Interest cannot exceed remaining interest for this month
 	if (interestComponent > remainingInterestThisMonth) {
 		throw new Error(
-			`Interest exceeds remaining monthly interest ₹${remainingInterestThisMonth.toFixed(
+			`Interest exceeds remaining monthly interest Rs ${remainingInterestThisMonth.toFixed(
 				2,
 			)}`,
 		);
 	}
 
-	// ❗ Principal cannot exceed outstanding
+	// â— Principal cannot exceed outstanding
 	if (principalComponent > outstandingPrincipal) {
 		throw new Error('Principal exceeds outstanding amount');
 	}
 
-	// ❗ If principal is being paid, interest must be fully settled first
+	// â— If principal is being paid, interest must be fully settled first
 	if (
 		principalComponent > 0 &&
 		remainingInterestThisMonth > 0 &&
 		interestComponent < remainingInterestThisMonth
 	) {
-		throw new Error('मासिक ब्याज पहले पूरा भरना अनिवार्य है');
+		throw new Error('Monthly interest must be fully paid first');
 	}
 
-	/* ---------------- 7️⃣ Atomic write ---------------- */
+	/* ---------------- 7ï¸âƒ£ Atomic write ---------------- */
 	const session = await Loan.startSession();
 	session.startTransaction();
 
@@ -1127,7 +1129,7 @@ async function collectRepayment(data) {
 			{ session },
 		);
 
-		/* ---------------- 8️⃣ Auto-close loan ---------------- */
+		/* ---------------- 8ï¸âƒ£ Auto-close loan ---------------- */
 		if (principalComponent === outstandingPrincipal) {
 			await Loan.updateOne(
 				{ _id: loan._id },
@@ -1172,7 +1174,7 @@ async function lumpSumContribution(data) {
 	session.startTransaction();
 
 	try {
-		/* ---------------- 1️⃣ Create LumpSumDeposit entries ---------------- */
+		/* ---------------- 1ï¸âƒ£ Create LumpSumDeposit entries ---------------- */
 		const lumpSumDocs = deposits.map((d) => ({
 			shgId: shgObjectId,
 			memberId: new Types.ObjectId(String(d.memberId)),
@@ -1188,7 +1190,7 @@ async function lumpSumContribution(data) {
 			ordered: true,
 		});
 
-		/* ---------------- 2️⃣ Create Transaction entries ---------------- */
+		/* ---------------- 2ï¸âƒ£ Create Transaction entries ---------------- */
 		const transactionDocs = savedDeposits.map((dep) => ({
 			shgId: dep.shgId,
 			fromAccount: AccountType.MEMBER_CASH,
@@ -1472,21 +1474,154 @@ function toPdfText(value) {
 		.replace(/\)/g, '\\)');
 }
 
-function buildSimplePdf(lines) {
-	const textCommands = lines
-		.map((line, idx) => `1 0 0 1 40 ${800 - idx * 14} Tm (${toPdfText(line)}) Tj`)
-		.join('\n');
-	const content = `BT\n/F1 10 Tf\n${textCommands}\nET`;
+function toAscii(value = '') {
+	return String(value).replace(/[^\x20-\x7E]/g, '?');
+}
 
+function toUtf16Hex(value) {
+	const str = String(value ?? '');
+	let hex = 'FEFF';
+	for (let i = 0; i < str.length; i += 1) {
+		hex += str.charCodeAt(i).toString(16).padStart(4, '0').toUpperCase();
+	}
+	return hex;
+}
+
+function pdfTextUnicode({ x, y, size = 10, font = 'F2', text = '' }) {
+	return `BT 0 0 0 rg /${font} ${size} Tf 1 0 0 1 ${x} ${y} Tm <${toUtf16Hex(text)}> Tj ET`;
+}
+
+function pdfTextAscii({ x, y, size = 10, font = 'F1', text = '' }) {
+	return `BT 0 0 0 rg /${font} ${size} Tf 1 0 0 1 ${x} ${y} Tm (${toPdfText(toAscii(text))}) Tj ET`;
+}
+
+function buildSnapshotOnePagePdf(snapshot) {
+	const pageWidth = 595;
+	const pageHeight = 842;
+	const left = 34;
+	const right = pageWidth - 34;
+	let y = pageHeight - 44;
+
+	const commands = [];
+	const line = (x1, y1, x2, y2) => commands.push(`${x1} ${y1} m ${x2} ${y2} l S`);
+	const rect = (x, yy, w, h) => commands.push(`${x} ${yy} ${w} ${h} re S`);
+	const textH = (x, yy, text, size = 10) =>
+		commands.push(pdfTextUnicode({ x, y: yy, text, size, font: 'F2' }));
+	const textA = (x, yy, text, size = 10) =>
+		commands.push(pdfTextAscii({ x, y: yy, text, size, font: 'F1' }));
+
+	commands.push('0.15 0.15 0.2 RG');
+	commands.push('0.98 0.98 0.99 rg');
+	commands.push(`${left} ${y - 38} ${right - left} 52 re f`);
+	commands.push('0.2 0.2 0.25 RG');
+	rect(left, y - 38, right - left, 52);
+	textH(left + 12, y - 10, '\u092e\u093e\u0938\u093f\u0915 SHG \u0930\u093f\u092a\u094b\u0930\u094d\u091f', 14);
+	textH(left + 12, y - 26, `\u0938\u092e\u0942\u0939: ${snapshot.shgName || '-'}`, 10);
+	textH(right - 170, y - 26, `\u092e\u093e\u0939: ${snapshot.month}`, 10);
+	textA(right - 170, y - 40, `Generated: ${new Date(snapshot.generatedAt).toLocaleString('en-IN')}`, 8);
+	y -= 56;
+
+	textH(left, y - 4, '\u0938\u0926\u0938\u094d\u092f-\u0935\u093e\u0930 \u0938\u093e\u0930\u093e\u0902\u0936', 11);
+	y -= 14;
+	const mTableTop = y;
+	const mRowH = 16;
+	const mCols = [left, left + 36, left + 236, left + 338, left + 442, right];
+	const mHead = [
+		'\u0915\u094d\u0930.',
+		'\u0938\u0926\u0938\u094d\u092f',
+		'\u092c\u091a\u0924',
+		'\u0932\u092e\u094d\u092a\u0938\u092e',
+		'\u092c\u0915\u093e\u092f\u093e \u090b\u0923',
+	];
+	const visibleMembers = snapshot.memberWise.slice(0, 12);
+	const mRows = visibleMembers.length + 1;
+	const mTableHeight = mRows * mRowH;
+
+	rect(left, mTableTop - mTableHeight, right - left, mTableHeight);
+	for (let i = 1; i < mCols.length - 1; i += 1) line(mCols[i], mTableTop, mCols[i], mTableTop - mTableHeight);
+	for (let r = 1; r < mRows; r += 1) line(left, mTableTop - r * mRowH, right, mTableTop - r * mRowH);
+	commands.push('0.95 0.97 1 rg');
+	commands.push(`${left} ${mTableTop - mRowH} ${right - left} ${mRowH} re f`);
+	commands.push('0.2 0.2 0.25 RG');
+
+	for (let i = 0; i < mHead.length; i += 1) {
+		textH(mCols[i] + 4, mTableTop - 12, mHead[i], 9);
+	}
+	visibleMembers.forEach((m, idx) => {
+		const yy = mTableTop - (idx + 1) * mRowH - 12;
+		textA(mCols[0] + 5, yy, String(idx + 1), 8);
+		textH(mCols[1] + 4, yy, String(m.name || '-'), 8);
+		textA(mCols[2] + 4, yy, `Rs ${Number(m.savings || 0).toFixed(2)}`, 8);
+		textA(mCols[3] + 4, yy, `Rs ${Number(m.lumpSum || 0).toFixed(2)}`, 8);
+		textA(mCols[4] + 4, yy, `Rs ${Number(m.outstandingLoan || 0).toFixed(2)}`, 8);
+	});
+	y = mTableTop - mTableHeight - 18;
+
+	if (snapshot.memberWise.length > visibleMembers.length) {
+		textH(
+			left,
+			y,
+			`\u0928\u094b\u091f: \u0915\u0941\u0932 ${snapshot.memberWise.length} \u0938\u0926\u0938\u094d\u092f, PDF \u092e\u0947\u0902 \u092a\u0939\u0932\u0947 ${visibleMembers.length} \u0926\u0930\u094d\u0936\u093e\u090f \u0917\u090f\u0964`,
+			8,
+		);
+		y -= 14;
+	}
+
+	textH(
+		left,
+		y,
+		'\u0938\u092e\u0942\u0939 \u0915\u093e \u0915\u0941\u0932 \u0935\u093f\u0924\u094d\u0924\u0940\u092f \u0938\u093e\u0930\u093e\u0902\u0936',
+		11,
+	);
+	y -= 14;
+	const totals = [
+		['\u0915\u0941\u0932 \u092c\u091a\u0924', snapshot.shgTotals.totalSavings],
+		['\u0915\u0941\u0932 \u0932\u092e\u094d\u092a\u0938\u092e', snapshot.shgTotals.totalLumpSum],
+		['\u0915\u0941\u0932 \u092c\u094d\u092f\u093e\u091c', snapshot.shgTotals.totalInterest],
+		['\u0915\u0941\u0932 \u0926\u0902\u0921', snapshot.shgTotals.totalPenalty],
+		['\u0915\u0941\u0932 \u092c\u0915\u093e\u092f\u093e \u090b\u0923', snapshot.shgTotals.totalOutstandingLoan],
+		['\u0915\u0941\u0932 \u0916\u0930\u094d\u091a', snapshot.shgTotals.totalExpense],
+		['\u0909\u092a\u0932\u092c\u094d\u0927 \u0928\u0915\u0926', snapshot.shgTotals.totalAvailableCash],
+	];
+	const tTop = y;
+	const tRowH = 18;
+	const tCols = [left, left + 350, right];
+	const tHeight = totals.length * tRowH;
+	rect(left, tTop - tHeight, right - left, tHeight);
+	line(tCols[1], tTop, tCols[1], tTop - tHeight);
+	for (let r = 1; r < totals.length; r += 1) line(left, tTop - r * tRowH, right, tTop - r * tRowH);
+	totals.forEach((t, idx) => {
+		const yy = tTop - idx * tRowH - 12;
+		textH(left + 5, yy, t[0], 9);
+		textA(tCols[1] + 5, yy, `Rs ${Number(t[1] || 0).toFixed(2)}`, 9);
+	});
+	y = tTop - tHeight - 14;
+	textH(
+		left,
+		y,
+		'\u092f\u0939 \u0930\u093f\u092a\u094b\u0930\u094d\u091f \u092e\u093e\u0938\u093f\u0915 \u0938\u094d\u0928\u0948\u092a\u0936\u0949\u091f \u0939\u0947\u0924\u0941 \u0938\u094d\u0935\u091a\u093e\u0932\u093f\u0924 \u0930\u0942\u092a \u0938\u0947 \u0924\u0948\u092f\u093e\u0930 \u0915\u0940 \u0917\u0908 \u0939\u0948\u0964',
+		8,
+	);
+
+	const content = commands.join('\n');
 	const objects = [];
 	objects.push('1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj');
 	objects.push('2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj');
 	objects.push(
-		'3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >> endobj',
+		'3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 6 0 R >> >> /Contents 5 0 R >> endobj',
 	);
 	objects.push('4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj');
 	objects.push(
 		`5 0 obj << /Length ${Buffer.byteLength(content, 'utf8')} >> stream\n${content}\nendstream endobj`,
+	);
+	objects.push(
+		'6 0 obj << /Type /Font /Subtype /Type0 /BaseFont /Mangal /Encoding /Identity-H /DescendantFonts [7 0 R] >> endobj',
+	);
+	objects.push(
+		'7 0 obj << /Type /Font /Subtype /CIDFontType2 /BaseFont /Mangal /CIDSystemInfo << /Registry (Adobe) /Ordering (Identity) /Supplement 0 >> /FontDescriptor 8 0 R /DW 1000 /CIDToGIDMap /Identity >> endobj',
+	);
+	objects.push(
+		'8 0 obj << /Type /FontDescriptor /FontName /Mangal /Flags 32 /ItalicAngle 0 /Ascent 880 /Descent -120 /CapHeight 700 /StemV 80 /MissingWidth 500 >> endobj',
 	);
 
 	let pdf = '%PDF-1.4\n';
@@ -1651,31 +1786,7 @@ async function saveSnapshotToDummyCloud(snapshot) {
 	const folder = path.join(baseDir, String(snapshot.shgId), snapshot.month);
 	await fs.mkdir(folder, { recursive: true });
 
-	const lines = [
-		`SHG Snapshot Report`,
-		`SHG: ${snapshot.shgName} (${snapshot.shgId})`,
-		`Village: ${snapshot.village || '-'}`,
-		`Month: ${snapshot.month}`,
-		`Generated At: ${snapshot.generatedAt}`,
-		``,
-		`Member Wise`,
-		`Name | Savings | Lump Sum | Outstanding Loan`,
-		...snapshot.memberWise.map(
-			(m) =>
-				`${m.name} | ${m.savings.toFixed(2)} | ${m.lumpSum.toFixed(2)} | ${m.outstandingLoan.toFixed(2)}`,
-		),
-		``,
-		`SHG Totals`,
-		`Total Savings: ${snapshot.shgTotals.totalSavings.toFixed(2)}`,
-		`Total Lump Sum: ${snapshot.shgTotals.totalLumpSum.toFixed(2)}`,
-		`Total Interest: ${snapshot.shgTotals.totalInterest.toFixed(2)}`,
-		`Total Penalty: ${snapshot.shgTotals.totalPenalty.toFixed(2)}`,
-		`Total Outstanding Loan: ${snapshot.shgTotals.totalOutstandingLoan.toFixed(2)}`,
-		`Total Expense: ${snapshot.shgTotals.totalExpense.toFixed(2)}`,
-		`Total Available Cash: ${snapshot.shgTotals.totalAvailableCash.toFixed(2)}`,
-	];
-
-	const pdfBuffer = buildSimplePdf(lines);
+	const pdfBuffer = buildSnapshotOnePagePdf(snapshot);
 	const pdfPath = path.join(folder, 'snapshot.pdf');
 	const jsonPath = path.join(folder, 'snapshot.json');
 	await fs.writeFile(pdfPath, pdfBuffer);
@@ -1717,31 +1828,7 @@ async function saveSnapshotMetadata({ snapshot, storage, triggerType }) {
 
 async function saveSnapshotToCloudStorage(snapshot, { triggerType = 'ON_DEMAND' } = {}) {
 	const blobBasePath = `shg-snapshots/${snapshot.shgId}/${snapshot.month}`;
-	const lines = [
-		`SHG Snapshot Report`,
-		`SHG: ${snapshot.shgName} (${snapshot.shgId})`,
-		`Village: ${snapshot.village || '-'}`,
-		`Month: ${snapshot.month}`,
-		`Generated At: ${snapshot.generatedAt}`,
-		``,
-		`Member Wise`,
-		`Name | Savings | Lump Sum | Outstanding Loan`,
-		...snapshot.memberWise.map(
-			(m) =>
-				`${m.name} | ${m.savings.toFixed(2)} | ${m.lumpSum.toFixed(2)} | ${m.outstandingLoan.toFixed(2)}`,
-		),
-		``,
-		`SHG Totals`,
-		`Total Savings: ${snapshot.shgTotals.totalSavings.toFixed(2)}`,
-		`Total Lump Sum: ${snapshot.shgTotals.totalLumpSum.toFixed(2)}`,
-		`Total Interest: ${snapshot.shgTotals.totalInterest.toFixed(2)}`,
-		`Total Penalty: ${snapshot.shgTotals.totalPenalty.toFixed(2)}`,
-		`Total Outstanding Loan: ${snapshot.shgTotals.totalOutstandingLoan.toFixed(2)}`,
-		`Total Expense: ${snapshot.shgTotals.totalExpense.toFixed(2)}`,
-		`Total Available Cash: ${snapshot.shgTotals.totalAvailableCash.toFixed(2)}`,
-	];
-
-	const pdfBuffer = buildSimplePdf(lines);
+	const pdfBuffer = buildSnapshotOnePagePdf(snapshot);
 	const jsonBuffer = Buffer.from(JSON.stringify(snapshot, null, 2), 'utf8');
 	const hasBlobToken = Boolean(
 		process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_BLOB_READ_WRITE_TOKEN,
@@ -1771,6 +1858,7 @@ async function saveSnapshotToCloudStorage(snapshot, { triggerType = 'ON_DEMAND' 
 			pdfBlobPath,
 			jsonBlobPath,
 			cloudUrl: pdfUpload.url,
+			downloadUrl: pdfUpload.downloadUrl,
 			jsonCloudUrl: jsonUpload.url,
 		};
 	} else {
@@ -1792,7 +1880,13 @@ async function generateShgSnapshot(data) {
 		const storage = await saveSnapshotToCloudStorage(snapshot, {
 			triggerType: 'ON_DEMAND',
 		});
-		return NextResponse.json({ success: true, snapshot, storage });
+		const proxyUrl = `/api/shg/snapshot-pdf?shgId=${encodeURIComponent(String(shgId))}&month=${encodeURIComponent(String(snapshot.month))}`;
+		const responseStorage = {
+			...storage,
+			proxyUrl,
+			cloudUrl: null,
+		};
+		return NextResponse.json({ success: true, snapshot, storage: responseStorage });
 	} catch (error) {
 		return NextResponse.json(
 			{ error: error.message || 'Failed to generate snapshot' },
@@ -1819,7 +1913,8 @@ async function listShgSnapshots(data) {
 			snapshots: reports.map((r) => ({
 				month: r.month,
 				generatedAt: r.generatedAt,
-				cloudUrl: r.cloudUrl,
+				cloudUrl: null,
+				proxyUrl: `/api/shg/snapshot-pdf?shgId=${encodeURIComponent(String(shgId))}&month=${encodeURIComponent(String(r.month))}`,
 				storageProvider: r.storageProvider,
 				path: r.cloudPath,
 			})),
@@ -1841,6 +1936,7 @@ async function listShgSnapshots(data) {
 					month: d.name,
 					generatedAt: dataObj.generatedAt,
 					cloudUrl: `dummy://shg-snapshots/${shgId}/${d.name}/snapshot.pdf`,
+					proxyUrl: null,
 					storageProvider: 'dummy-cloud',
 					path: `shg-snapshots/${shgId}/${d.name}/snapshot.pdf`,
 				});
@@ -1853,6 +1949,37 @@ async function listShgSnapshots(data) {
 	} catch {
 		return NextResponse.json({ snapshots: [] });
 	}
+}
+
+async function getShgSnapshotData(data) {
+	const { shgId, month } = data || {};
+	if (!shgId || !month) {
+		return NextResponse.json(
+			{ error: 'shgId and month are required' },
+			{ status: 400 },
+		);
+	}
+
+	const report = await SnapshotReport.findOne({
+		shgId: new Types.ObjectId(String(shgId)),
+		month: String(month),
+	})
+		.select('snapshot month generatedAt')
+		.lean();
+
+	if (!report?.snapshot) {
+		return NextResponse.json(
+			{ error: 'Snapshot not found for selected month' },
+			{ status: 404 },
+		);
+	}
+
+	return NextResponse.json({
+		success: true,
+		month: report.month,
+		generatedAt: report.generatedAt,
+		snapshot: report.snapshot,
+	});
 }
 
 async function generateMonthlySnapshots(data) {
@@ -2022,3 +2149,4 @@ async function dashboardSummary(data) {
 		lastUpdated: new Date().toISOString(),
 	});
 }
+

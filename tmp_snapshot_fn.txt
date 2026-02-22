@@ -1,0 +1,124 @@
+function buildSnapshotOnePagePdf(snapshot) {
+	const pageWidth = 595;
+	const pageHeight = 842;
+	const left = 34;
+	const right = pageWidth - 34;
+	let y = pageHeight - 44;
+
+	const commands = [];
+	const line = (x1, y1, x2, y2) => commands.push(`${x1} ${y1} m ${x2} ${y2} l S`);
+	const rect = (x, yy, w, h) => commands.push(`${x} ${yy} ${w} ${h} re S`);
+	const textH = (x, yy, text, size = 10) =>
+		commands.push(pdfTextUnicode({ x, y: yy, text, size, font: 'F2' }));
+	const textA = (x, yy, text, size = 10) =>
+		commands.push(pdfTextAscii({ x, y: yy, text, size, font: 'F1' }));
+
+	commands.push('0.15 0.15 0.2 RG');
+	commands.push('0.98 0.98 0.99 rg');
+	commands.push(`${left} ${y - 38} ${right - left} 52 re f`);
+	commands.push('0.2 0.2 0.25 RG');
+	rect(left, y - 38, right - left, 52);
+	textH(left + 12, y - 10, 'मासिक SHG रिपोर्ट', 14);
+	textH(left + 12, y - 26, `समूह: ${snapshot.shgName || '-'}`, 10);
+	textH(right - 170, y - 26, `माह: ${snapshot.month}`, 10);
+	textA(right - 170, y - 40, `Generated: ${new Date(snapshot.generatedAt).toLocaleString('en-IN')}`, 8);
+	y -= 56;
+
+	textH(left, y - 4, 'सदस्य-वार सारांश', 11);
+	y -= 14;
+	const mTableTop = y;
+	const mRowH = 16;
+	const mCols = [left, left + 36, left + 236, left + 338, left + 442, right];
+	const mHead = ['क्र.', 'सदस्य', 'बचत', 'लम्पसम', 'बकाया ऋण'];
+	const visibleMembers = snapshot.memberWise.slice(0, 12);
+	const mRows = visibleMembers.length + 1;
+	const mTableHeight = mRows * mRowH;
+
+	rect(left, mTableTop - mTableHeight, right - left, mTableHeight);
+	for (let i = 1; i < mCols.length - 1; i += 1) line(mCols[i], mTableTop, mCols[i], mTableTop - mTableHeight);
+	for (let r = 1; r < mRows; r += 1) line(left, mTableTop - r * mRowH, right, mTableTop - r * mRowH);
+	commands.push('0.95 0.97 1 rg');
+	commands.push(`${left} ${mTableTop - mRowH} ${right - left} ${mRowH} re f`);
+	commands.push('0.2 0.2 0.25 RG');
+
+	for (let i = 0; i < mHead.length; i += 1) {
+		textH(mCols[i] + 4, mTableTop - 12, mHead[i], 9);
+	}
+	visibleMembers.forEach((m, idx) => {
+		const yy = mTableTop - (idx + 1) * mRowH - 12;
+		textA(mCols[0] + 5, yy, String(idx + 1), 8);
+		textH(mCols[1] + 4, yy, String(m.name || '-'), 8);
+		textA(mCols[2] + 4, yy, `Rs ${Number(m.savings || 0).toFixed(2)}`, 8);
+		textA(mCols[3] + 4, yy, `Rs ${Number(m.lumpSum || 0).toFixed(2)}`, 8);
+		textA(mCols[4] + 4, yy, `Rs ${Number(m.outstandingLoan || 0).toFixed(2)}`, 8);
+	});
+	y = mTableTop - mTableHeight - 18;
+
+	if (snapshot.memberWise.length > visibleMembers.length) {
+		textH(left, y, `नोट: कुल ${snapshot.memberWise.length} सदस्य, PDF में पहले ${visibleMembers.length} दर्शाए गए।`, 8);
+		y -= 14;
+	}
+
+	textH(left, y, 'समूह का कुल वित्तीय सारांश', 11);
+	y -= 14;
+	const totals = [
+		['कुल बचत', snapshot.shgTotals.totalSavings],
+		['कुल लम्पसम', snapshot.shgTotals.totalLumpSum],
+		['कुल ब्याज', snapshot.shgTotals.totalInterest],
+		['कुल दंड', snapshot.shgTotals.totalPenalty],
+		['कुल बकाया ऋण', snapshot.shgTotals.totalOutstandingLoan],
+		['कुल खर्च', snapshot.shgTotals.totalExpense],
+		['उपलब्ध नकद', snapshot.shgTotals.totalAvailableCash],
+	];
+	const tTop = y;
+	const tRowH = 18;
+	const tCols = [left, left + 350, right];
+	const tHeight = totals.length * tRowH;
+	rect(left, tTop - tHeight, right - left, tHeight);
+	line(tCols[1], tTop, tCols[1], tTop - tHeight);
+	for (let r = 1; r < totals.length; r += 1) line(left, tTop - r * tRowH, right, tTop - r * tRowH);
+	totals.forEach((t, idx) => {
+		const yy = tTop - idx * tRowH - 12;
+		textH(left + 5, yy, t[0], 9);
+		textA(tCols[1] + 5, yy, `Rs ${Number(t[1] || 0).toFixed(2)}`, 9);
+	});
+	y = tTop - tHeight - 14;
+	textH(left, y, 'यह रिपोर्ट मासिक स्नैपशॉट हेतु स्वचालित रूप से तैयार की गई है।', 8);
+
+	const content = commands.join('\n');
+	const objects = [];
+	objects.push('1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj');
+	objects.push('2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj');
+	objects.push(
+		'3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 6 0 R >> >> /Contents 5 0 R >> endobj',
+	);
+	objects.push('4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj');
+	objects.push(
+		`5 0 obj << /Length ${Buffer.byteLength(content, 'utf8')} >> stream\n${content}\nendstream endobj`,
+	);
+	objects.push(
+		'6 0 obj << /Type /Font /Subtype /Type0 /BaseFont /Mangal /Encoding /Identity-H /DescendantFonts [7 0 R] >> endobj',
+	);
+	objects.push(
+		'7 0 obj << /Type /Font /Subtype /CIDFontType2 /BaseFont /Mangal /CIDSystemInfo << /Registry (Adobe) /Ordering (Identity) /Supplement 0 >> /FontDescriptor 8 0 R /DW 1000 /CIDToGIDMap /Identity >> endobj',
+	);
+	objects.push(
+		'8 0 obj << /Type /FontDescriptor /FontName /Mangal /Flags 32 /ItalicAngle 0 /Ascent 880 /Descent -120 /CapHeight 700 /StemV 80 /MissingWidth 500 >> endobj',
+	);
+
+	let pdf = '%PDF-1.4\n';
+	const offsets = [0];
+	for (const obj of objects) {
+		offsets.push(Buffer.byteLength(pdf, 'utf8'));
+		pdf += `${obj}\n`;
+	}
+	const xrefStart = Buffer.byteLength(pdf, 'utf8');
+	pdf += `xref\n0 ${objects.length + 1}\n`;
+	pdf += '0000000000 65535 f \n';
+	for (let i = 1; i <= objects.length; i++) {
+		pdf += `${String(offsets[i]).padStart(10, '0')} 00000 n \n`;
+	}
+	pdf += `trailer << /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
+	return Buffer.from(pdf, 'utf8');
+}
+
