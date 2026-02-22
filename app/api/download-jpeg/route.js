@@ -1,6 +1,7 @@
 export const runtime = 'nodejs';
 
 import { randomUUID } from 'crypto';
+import { put } from '@vercel/blob';
 
 function sanitizeFileName(name = 'download.jpg') {
 	return String(name)
@@ -31,9 +32,43 @@ export async function GET(req) {
 	try {
 		cleanupStore();
 		const { searchParams } = new URL(req.url);
+		const src = String(searchParams.get('src') || '');
+		const downloadName = sanitizeFileName(
+			String(searchParams.get('name') || 'download.jpg'),
+		);
+
+		if (src) {
+			let parsed;
+			try {
+				parsed = new URL(src);
+			} catch {
+				return new Response('Invalid source URL', { status: 400 });
+			}
+			if (parsed.protocol !== 'https:') {
+				return new Response('Invalid source protocol', { status: 400 });
+			}
+
+			const fileResp = await fetch(src);
+			if (!fileResp.ok) {
+				return new Response('Source image unavailable', { status: 404 });
+			}
+			const buffer = Buffer.from(await fileResp.arrayBuffer());
+			const contentType =
+				fileResp.headers.get('content-type') || 'image/jpeg';
+			return new Response(buffer, {
+				status: 200,
+				headers: {
+					'Content-Type': contentType,
+					'Content-Disposition': `attachment; filename="${downloadName}"`,
+					'Cache-Control': 'no-store',
+					'Content-Length': String(buffer.length),
+				},
+			});
+		}
+
 		const token = String(searchParams.get('token') || '');
 		if (!token) {
-			return new Response('token is required', { status: 400 });
+			return new Response('token or src is required', { status: 400 });
 		}
 
 		const file = tempStore.get(token);
@@ -75,6 +110,30 @@ export async function POST(req) {
 			return new Response('Image too large', { status: 413 });
 		}
 
+		const hasBlobToken = Boolean(
+			process.env.BLOB_READ_WRITE_TOKEN ||
+				process.env.VERCEL_BLOB_READ_WRITE_TOKEN,
+		);
+		if (hasBlobToken) {
+			const uploadPath = `tmp-downloads/${Date.now()}-${randomUUID()}-${fileName}`;
+			const upload = await put(uploadPath, buffer, {
+				access: 'public',
+				contentType,
+				addRandomSuffix: false,
+				allowOverwrite: true,
+			});
+			const upstreamUrl = upload.downloadUrl || upload.url;
+			const downloadUrl = `/api/download-jpeg?src=${encodeURIComponent(
+				upstreamUrl,
+			)}&name=${encodeURIComponent(fileName)}`;
+
+			return Response.json({
+				success: true,
+				downloadUrl,
+				storage: 'vercel-blob',
+			});
+		}
+
 		const token = randomUUID();
 		tempStore.set(token, {
 			buffer,
@@ -87,6 +146,7 @@ export async function POST(req) {
 			success: true,
 			token,
 			downloadUrl: `/api/download-jpeg?token=${encodeURIComponent(token)}`,
+			storage: 'memory',
 		});
 	} catch {
 		return new Response('Failed to prepare download', { status: 500 });
