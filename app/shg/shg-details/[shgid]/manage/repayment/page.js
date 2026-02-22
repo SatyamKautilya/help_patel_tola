@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -10,8 +10,8 @@ import {
 	AlertCircle,
 	Loader2,
 	ArrowRight,
-	Edit2,
-	Info,
+	Users,
+	ListChecks,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -19,122 +19,128 @@ export default function LoanRepaymentPage({ params }) {
 	const { shgid } = params;
 	const router = useRouter();
 
-	const [step, setStep] = useState('entry'); // "entry" | "review"
+	const [stage, setStage] = useState('members'); // members | payment
 	const [loans, setLoans] = useState([]);
-	const [repayments, setRepayments] = useState({});
+	const [selectedMemberId, setSelectedMemberId] = useState(null);
+	const [selectedLoanId, setSelectedLoanId] = useState(null);
+	const [payment, setPayment] = useState({ principal: '', interest: '' });
 	const [loading, setLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [uiMessage, setUiMessage] = useState(null);
 
-	useEffect(() => {
-		const loadLoans = async () => {
-			setLoading(true);
-			try {
-				const res = await fetch('/api/shg?name=list-active-loans', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ shgId: shgid }),
-				});
-				const data = await res.json();
-				setLoans(data.loans || []);
+	const loadLoans = async () => {
+		setLoading(true);
+		try {
+			const res = await fetch('/api/shg?name=list-active-loans', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ shgId: shgid }),
+			});
+			const data = await res.json();
+			setLoans(data.loans || []);
+		} catch {
+			setUiMessage({ type: 'error', text: 'ऋण सूची लोड नहीं हो पाई' });
+		} finally {
+			setLoading(false);
+		}
+	};
 
-				const initial = {};
-				data.loans?.forEach((loan) => {
-					initial[loan._id] = {
-						principal: '',
-						interest: loan.monthlyInterest || '',
-					};
-				});
-				setRepayments(initial);
-			} catch {
-				setUiMessage({ type: 'error', text: 'लोन सूची लोड नहीं हो पाई' });
-			} finally {
-				setLoading(false);
-			}
-		};
+	useEffect(() => {
 		loadLoans();
 	}, [shgid]);
 
-	const updatePayment = (loanId, field, value) => {
-		setRepayments((p) => ({
-			...p,
-			[loanId]: { ...p[loanId], [field]: value },
-		}));
-	};
-
-	const getValidationErrors = (loan) => {
-		const pay = repayments[loan._id] || {};
-		const pVal = Number(pay.principal || 0);
-		if (pVal > loan.outstandingPrincipal) {
-			return 'मूलधन बकाया से अधिक है';
+	const memberGroups = useMemo(() => {
+		const map = new Map();
+		for (const loan of loans) {
+			const key = String(loan.memberId);
+			if (!map.has(key)) {
+				map.set(key, {
+					memberId: key,
+					memberName: loan.memberName || 'सदस्य',
+					loans: [],
+					totalOutstanding: 0,
+				});
+			}
+			const item = map.get(key);
+			item.loans.push(loan);
+			item.totalOutstanding += Number(loan.outstandingPrincipal || 0);
 		}
+		return Array.from(map.values());
+	}, [loans]);
 
+	const selectedMember = useMemo(() => {
+		return memberGroups.find((m) => m.memberId === String(selectedMemberId)) || null;
+	}, [memberGroups, selectedMemberId]);
+
+	const selectedLoan = useMemo(() => {
+		if (!selectedMember || !selectedLoanId) return null;
+		return selectedMember.loans.find((l) => l._id === selectedLoanId) || null;
+	}, [selectedMember, selectedLoanId]);
+
+	const principalPaid = Number(payment.principal || 0);
+	const interestPaid = Number(payment.interest || 0);
+	const totalPayment = principalPaid + interestPaid;
+	const remainingAfterPrincipal = Math.max(
+		Number(selectedLoan?.outstandingPrincipal || 0) - principalPaid,
+		0,
+	);
+
+	const validationError = useMemo(() => {
+		if (!selectedLoan) return 'ऋण चुनें';
+		if (principalPaid < 0 || interestPaid < 0) return 'नकारात्मक राशि मान्य नहीं है';
+		if (principalPaid > Number(selectedLoan.outstandingPrincipal || 0)) {
+			return 'मूलधन बकाया से अधिक नहीं हो सकता';
+		}
+		if (totalPayment <= 0) return 'भुगतान राशि दर्ज करें';
 		return null;
+	}, [selectedLoan, principalPaid, interestPaid, totalPayment]);
+
+	const openMemberPayment = (memberId) => {
+		const member = memberGroups.find((m) => m.memberId === String(memberId));
+		if (!member) return;
+		setSelectedMemberId(member.memberId);
+		setSelectedLoanId(member.loans[0]?._id || null);
+		setPayment({ principal: '', interest: member.loans[0]?.monthlyInterest || '' });
+		setStage('payment');
 	};
 
-	const hasAnyValidationError = () => {
-		return loans.some((loan) => {
-			const err = getValidationErrors(loan);
-			const pay = repayments[loan._id];
-			const total = Number(pay?.principal || 0) + Number(pay?.interest || 0);
-			return err && total > 0;
-		});
+	const onLoanChange = (loanId) => {
+		setSelectedLoanId(loanId);
+		const nextLoan = selectedMember?.loans?.find((l) => l._id === loanId);
+		setPayment({ principal: '', interest: nextLoan?.monthlyInterest || '' });
 	};
 
-	const grandTotal = useMemo(() => {
-		return Object.values(repayments).reduce((acc, curr) => {
-			return acc + Number(curr.principal || 0) + Number(curr.interest || 0);
-		}, 0);
-	}, [repayments]);
-
-	const activeRepayments = useMemo(() => {
-		return loans.filter((loan) => {
-			const pay = repayments[loan._id];
-			return Number(pay?.principal || 0) + Number(pay?.interest || 0) > 0;
-		});
-	}, [loans, repayments]);
-
-	const handleReview = () => {
-		if (hasAnyValidationError()) {
-			setUiMessage({ type: 'error', text: 'कृपया पहले त्रुटियां सुधारें' });
+	const submitPayment = async () => {
+		if (validationError || !selectedLoan) {
+			setUiMessage({ type: 'error', text: validationError || 'कृपया सही जानकारी भरें' });
 			return;
 		}
-		if (grandTotal <= 0) {
-			setUiMessage({ type: 'error', text: 'कम से कम एक भुगतान दर्ज करें' });
-			return;
-		}
-		setStep('review');
-	};
-
-	const submitRepayments = async () => {
-		const payloads = activeRepayments.map((loan) => {
-			const pay = repayments[loan._id] || {};
-			const principal = Number(pay.principal || 0);
-			const interest = Number(pay.interest || 0);
-			return {
-				loanId: loan._id,
-				memberId: loan.memberId,
-				principal,
-				interest,
-				amount: principal + interest,
-			};
-		});
 
 		try {
 			setSaving(true);
-			await Promise.all(
-				payloads.map((p) =>
-					fetch('/api/shg?name=collect-repayment', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ shgId: shgid, ...p }),
-					}),
-				),
-			);
+			const resp = await fetch('/api/shg?name=collect-repayment', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					shgId: shgid,
+					loanId: selectedLoan._id,
+					memberId: selectedLoan.memberId,
+					principal: principalPaid,
+					interest: interestPaid,
+					amount: totalPayment,
+				}),
+			});
+			const data = await resp.json();
+			if (!resp.ok) throw new Error(data?.error || 'भुगतान सहेजने में त्रुटि');
+
 			setUiMessage({ type: 'success', text: 'भुगतान सफलतापूर्वक सहेजा गया' });
-			setTimeout(() => router.back(), 1500);
-		} catch {
-			setUiMessage({ type: 'error', text: 'सहेजते समय त्रुटि हुई' });
+			setStage('members');
+			setSelectedMemberId(null);
+			setSelectedLoanId(null);
+			setPayment({ principal: '', interest: '' });
+			await loadLoans();
+		} catch (e) {
+			setUiMessage({ type: 'error', text: e.message || 'भुगतान सहेजते समय त्रुटि हुई' });
 		} finally {
 			setSaving(false);
 		}
@@ -151,225 +157,180 @@ export default function LoanRepaymentPage({ params }) {
 						<HandCoins className='w-6 h-6 text-white' />
 					</div>
 					<div>
-						<h1 className='text-xl font-black text-slate-800 tracking-tight'>
-							ऋण वसूली
-						</h1>
+						<h1 className='text-xl font-black text-slate-800 tracking-tight'>ऋण वसूली</h1>
 						<span className='text-[11px] font-bold text-emerald-700 tracking-wide'>
-							{step === 'entry'
-								? `कुल संग्रह: ₹${grandTotal}`
-								: 'समीक्षा और पुष्टि'}
+							{stage === 'members' ? 'पहले सदस्य चुनें' : 'एक समय में एक ऋण भुगतान'}
 						</span>
 					</div>
 				</div>
 				<motion.button
 					whileTap={{ scale: 0.9 }}
-					onClick={() => (step === 'review' ? setStep('entry') : router.back())}
+					onClick={() => (stage === 'payment' ? setStage('members') : router.back())}
 					className='p-3 bg-white rounded-2xl border shadow-sm'>
 					<ChevronLeft className='w-5 h-5 text-slate-600' />
 				</motion.button>
 			</nav>
 
-			<main className='relative z-10 flex-1 px-6 pt-6 pb-44 space-y-5'>
-
-				<div className='rounded-2xl border border-amber-200 bg-amber-50/70 p-4 flex items-start gap-3'>
-					<Info className='w-4 h-4 text-amber-700 mt-0.5' />
-					<div className='text-xs text-amber-900 font-medium leading-relaxed'>
-						यदि कोई भुगतान हो तो मासिक ब्याज पूरा भरना होगा। मूलधन बकाया राशि से
-						अधिक नहीं हो सकता।
-					</div>
-				</div>
-
+			<main className='relative z-10 flex-1 px-6 pt-6 pb-36'>
 				<AnimatePresence mode='wait'>
-					{step === 'entry' && (
+					{stage === 'members' ? (
 						<motion.div
-							key='entry'
-							initial={{ opacity: 0, x: -16 }}
+							key='members'
+							initial={{ opacity: 0, x: -12 }}
 							animate={{ opacity: 1, x: 0 }}
-							exit={{ opacity: 0, x: -16 }}
+							exit={{ opacity: 0, x: -12 }}
 							className='space-y-4'>
+							<div className='rounded-2xl border border-slate-200 bg-white p-4 flex items-center justify-between'>
+								<div className='flex items-center gap-2 text-slate-700 font-semibold'>
+									<Users className='w-4 h-4' />
+									<span>सक्रिय ऋण वाले सदस्य: {memberGroups.length}</span>
+								</div>
+								<div className='text-sm font-bold text-emerald-700'>
+									कुल बकाया: ₹
+									{memberGroups.reduce((sum, m) => sum + Number(m.totalOutstanding || 0), 0)}
+								</div>
+							</div>
+
 							{loading ? (
 								<div className='flex justify-center py-20'>
 									<Loader2 className='animate-spin text-emerald-500' />
 								</div>
+							) : memberGroups.length === 0 ? (
+								<div className='rounded-2xl border border-slate-200 bg-white p-6 text-center text-slate-600 font-medium'>
+									अभी कोई सक्रिय ऋण नहीं है।
+								</div>
 							) : (
-								loans.map((loan) => {
-									const pay = repayments[loan._id] || {};
-									const error = getValidationErrors(loan);
-									const total =
-										Number(pay.principal || 0) + Number(pay.interest || 0);
-									const remainingBalance =
-										loan.outstandingPrincipal - Number(pay.principal || 0);
-
-									return (
-										<div
-											key={loan._id}
-											className='rounded-2xl border border-slate-200 bg-white shadow-sm p-4 md:p-5'>
-											<div className='flex flex-wrap items-center justify-between gap-2 mb-4'>
-												<div>
-													<h3 className='text-xl font-bold text-slate-800'>
-														{loan.memberName}
-													</h3>
-													<p className='text-sm text-slate-500 mt-1'>ऋण खाता</p>
+								<div className='space-y-3'>
+									{memberGroups.map((member) => (
+										<button
+											key={member.memberId}
+											onClick={() => openMemberPayment(member.memberId)}
+											className='w-full rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm hover:border-emerald-300 transition-colors'>
+												<div className='flex items-center justify-between gap-3'>
+													<div>
+														<p className='text-base font-bold text-slate-800'>{member.memberName}</p>
+														<p className='text-xs text-slate-500 mt-1'>
+															सक्रिय ऋण: {member.loans.length}
+														</p>
+													</div>
+													<div className='flex items-center gap-2'>
+														<p className='text-sm font-bold text-emerald-700'>
+															₹{member.totalOutstanding}
+														</p>
+														<ArrowRight className='w-4 h-4 text-slate-500' />
+													</div>
 												</div>
-												<span className='px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 border border-emerald-200 text-emerald-700'>
-													ब्याज {loan.interestRate}%
-												</span>
-											</div>
-
-											<div className='grid grid-cols-2 gap-3 mb-4'>
-												<FocusMetric
-													label='शेष ऋण राशि'
-													value={loan.outstandingPrincipal}
-													tone='slate'
-												/>
-												<FocusMetric
-													label='देय ब्याज'
-													value={loan.monthlyInterest}
-													tone='amber'
-												/>
-											</div>
-
-											<div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
-												<InputBlock
-													label='ब्याज'
-													hint={`देय: ₹${loan.monthlyInterest}`}
-													iconClass='text-amber-600'
-													value={pay.interest}
-													onChange={(value) =>
-														updatePayment(loan._id, 'interest', value)
-													}
-													placeholder='0'
-												/>
-												<InputBlock
-													label='मूलधन'
-													hint='जमा किया गया मूलधन दर्ज करें'
-													iconClass='text-emerald-600'
-													value={pay.principal}
-													onChange={(value) =>
-														updatePayment(loan._id, 'principal', value)
-													}
-													placeholder='0'
-												/>
-											</div>
-
-											<div className='grid grid-cols-2 gap-3 mt-4'>
-												<FocusMetric
-													label='जमा मूलधन'
-													value={Number(pay.principal || 0)}
-													tone='emerald'
-												/>
-												<FocusMetric
-													label='मूलधन के बाद शेष'
-													value={Math.max(remainingBalance, 0)}
-													tone={remainingBalance <= 0 ? 'emerald' : 'rose'}
-												/>
-											</div>
-
-											{total > 0 ? (
-												<div className='mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5 flex items-center justify-between'>
-													<p className='text-sm font-semibold text-emerald-700'>
-														कुल जमा
-													</p>
-													<p className='text-lg font-bold text-emerald-800'>
-														₹{total}
-													</p>
-												</div>
-											) : null}
-
-											{error ? (
-												<div className='mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 flex items-center gap-2'>
-													<AlertCircle size={14} />
-													{error}
-												</div>
-											) : null}
-										</div>
-									);
-								})
+										</button>
+									))}
+								</div>
 							)}
 						</motion.div>
-					)}
-
-					{step === 'review' && (
+					) : (
 						<motion.div
-							key='review'
-							initial={{ opacity: 0, x: 16 }}
+							key='payment'
+							initial={{ opacity: 0, x: 12 }}
 							animate={{ opacity: 1, x: 0 }}
-							exit={{ opacity: 0, x: 16 }}
+							exit={{ opacity: 0, x: 12 }}
 							className='space-y-4'>
-							<div className='rounded-3xl bg-slate-900 text-white p-6 shadow-xl'>
-								<p className='text-xs uppercase tracking-wide text-slate-300'>
-									आज का संग्रह
-								</p>
-								<h2 className='text-4xl font-black mt-1'>₹{grandTotal}</h2>
-								<p className='text-xs text-slate-300 mt-2'>
-									{activeRepayments.length} सदस्य चयनित
+							<div className='rounded-2xl border border-slate-200 bg-white p-4'>
+								<p className='text-xs uppercase tracking-wide font-semibold text-slate-500'>चयनित सदस्य</p>
+								<p className='text-xl font-black text-slate-800 mt-1'>
+									{selectedMember?.memberName || '-'}
 								</p>
 							</div>
 
-							<div className='rounded-2xl border border-slate-200 bg-white p-4 space-y-3'>
-								{activeRepayments.map((loan) => {
-									const pay = repayments[loan._id] || {};
-									const principal = Number(pay.principal || 0);
-									const interest = Number(pay.interest || 0);
-									const total = principal + interest;
-									return (
-										<div
-											key={loan._id}
-											className='rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 flex items-center justify-between'>
-											<div>
-												<p className='font-semibold text-slate-800'>
-													{loan.memberName}
+							{selectedMember?.loans?.length > 1 ? (
+								<div className='rounded-2xl border border-slate-200 bg-white p-4'>
+									<p className='text-sm font-semibold text-slate-700 mb-2'>ऋण खाता चुनें</p>
+									<div className='space-y-2'>
+										{selectedMember.loans.map((loan) => (
+											<button
+												key={loan._id}
+												onClick={() => onLoanChange(loan._id)}
+												className={`w-full rounded-xl border px-3 py-2 text-left ${
+													selectedLoanId === loan._id
+														? 'border-emerald-300 bg-emerald-50'
+														: 'border-slate-200 bg-white'
+												}`}>
+												<p className='text-sm font-semibold text-slate-800'>
+													ऋण ID: {String(loan._id).slice(-6)}
 												</p>
 												<p className='text-xs text-slate-600 mt-1'>
-													ब्याज: ₹{interest} | मूलधन: ₹{principal}
+													बकाया: ₹{loan.outstandingPrincipal} | अपेक्षित ब्याज: ₹{loan.monthlyInterest}
 												</p>
-											</div>
-											<p className='font-bold text-slate-900'>₹{total}</p>
+											</button>
+										))}
+									</div>
+								</div>
+							) : null}
+
+							{selectedLoan ? (
+								<>
+									<div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
+										<FocusMetric label='शेष ऋण राशि' value={selectedLoan.outstandingPrincipal} tone='slate' />
+										<FocusMetric label='अपेक्षित ब्याज' value={selectedLoan.monthlyInterest} tone='amber' />
+										<FocusMetric label='मूलधन जमा के बाद शेष' value={remainingAfterPrincipal} tone={remainingAfterPrincipal <= 0 ? 'emerald' : 'rose'} />
+									</div>
+
+									<div className='rounded-2xl border border-slate-200 bg-white p-4 space-y-4'>
+										<InputBlock
+											label='मूलधन जमा'
+											hint='आज जितना मूलधन लिया जा रहा है'
+											iconClass='text-emerald-600'
+											value={payment.principal}
+											onChange={(value) => setPayment((p) => ({ ...p, principal: value }))}
+											placeholder='0'
+										/>
+										<InputBlock
+											label='ब्याज जमा'
+											hint={`अपेक्षित: ₹${selectedLoan.monthlyInterest} (प्रतिबंध नहीं)`}
+											iconClass='text-amber-600'
+											value={payment.interest}
+											onChange={(value) => setPayment((p) => ({ ...p, interest: value }))}
+											placeholder='0'
+										/>
+										<div className='rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5 flex items-center justify-between'>
+											<p className='text-sm font-semibold text-emerald-700'>कुल भुगतान</p>
+											<p className='text-lg font-bold text-emerald-800'>₹{totalPayment}</p>
 										</div>
-									);
-								})}
-							</div>
+										{validationError ? (
+											<div className='rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 flex items-center gap-2'>
+												<AlertCircle size={14} />
+												{validationError}
+											</div>
+										) : null}
+									</div>
+								</>
+							) : null}
 						</motion.div>
 					)}
 				</AnimatePresence>
 			</main>
 
-			<div className='fixed bottom-0 inset-x-0 p-6 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent z-50'>
-				<div className='max-w-3xl mx-auto'>
-					{step === 'entry' ? (
+			{stage === 'payment' ? (
+				<div className='fixed bottom-0 inset-x-0 p-6 bg-gradient-to-t from-slate-50 via-slate-50 to-transparent z-50'>
+					<div className='max-w-3xl mx-auto grid grid-cols-3 gap-3'>
+						<button
+							onClick={() => setStage('members')}
+							className='col-span-1 bg-white text-slate-900 border border-slate-200 py-4 rounded-2xl font-semibold text-sm inline-flex items-center justify-center gap-2'>
+							<ListChecks size={16} /> सूची
+						</button>
 						<motion.button
 							whileTap={{ scale: 0.98 }}
-							disabled={loading || grandTotal === 0 || hasAnyValidationError()}
-							onClick={handleReview}
-							className='w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 shadow-lg disabled:opacity-40'>
-							समीक्षा करें
-							<ArrowRight size={18} />
+							disabled={saving || Boolean(validationError)}
+							onClick={submitPayment}
+							className='col-span-2 bg-emerald-600 text-white py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 disabled:opacity-50'>
+							{saving ? (
+								<Loader2 className='animate-spin' />
+							) : (
+								<>
+									<CheckCircle2 size={18} /> भुगतान जमा करें
+								</>
+							)}
 						</motion.button>
-					) : (
-						<div className='grid grid-cols-3 gap-3'>
-							<motion.button
-								whileTap={{ scale: 0.98 }}
-								onClick={() => setStep('entry')}
-								className='col-span-1 bg-white text-slate-900 border border-slate-200 py-4 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2'>
-								<Edit2 size={16} /> बदलें
-							</motion.button>
-							<motion.button
-								whileTap={{ scale: 0.98 }}
-								disabled={saving}
-								onClick={submitRepayments}
-								className='col-span-2 bg-emerald-600 text-white py-4 rounded-2xl font-bold text-base flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 disabled:opacity-50'>
-								{saving ? (
-									<Loader2 className='animate-spin' />
-								) : (
-									<>
-										<CheckCircle2 size={18} /> भुगतान जमा करें
-									</>
-								)}
-							</motion.button>
-						</div>
-					)}
+					</div>
 				</div>
-			</div>
+			) : null}
 
 			<AnimatePresence>
 				{uiMessage ? (
@@ -382,11 +343,7 @@ export default function LoanRepaymentPage({ params }) {
 								? 'bg-red-50/95 border-red-200 text-red-800'
 								: 'bg-emerald-50/95 border-emerald-200 text-emerald-800'
 						}`}>
-						{uiMessage.type === 'error' ? (
-							<AlertCircle size={18} />
-						) : (
-							<CheckCircle2 size={18} />
-						)}
+						{uiMessage.type === 'error' ? <AlertCircle size={18} /> : <CheckCircle2 size={18} />}
 						<p className='font-semibold text-sm'>{uiMessage.text}</p>
 					</motion.div>
 				) : null}
@@ -394,7 +351,6 @@ export default function LoanRepaymentPage({ params }) {
 		</div>
 	);
 }
-
 
 function InputBlock({ label, hint, iconClass, value, onChange, placeholder }) {
 	return (
@@ -426,13 +382,9 @@ function FocusMetric({ label, value, tone = 'slate' }) {
 		rose: 'bg-rose-50 border-rose-200 text-rose-800',
 	};
 	return (
-		<div
-			className={`rounded-xl border px-3 py-2.5 ${tones[tone] || tones.slate}`}>
+		<div className={`rounded-xl border px-3 py-2.5 ${tones[tone] || tones.slate}`}>
 			<p className='text-xs font-semibold opacity-80'>{label}</p>
-			<p className='text-xl font-bold leading-tight mt-1'>
-				₹{Number(value || 0)}
-			</p>
+			<p className='text-xl font-bold leading-tight mt-1'>₹{Number(value || 0)}</p>
 		</div>
 	);
 }
-

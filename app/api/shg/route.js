@@ -1229,10 +1229,13 @@ async function listRevertableTransactions(data) {
 
 	const safeLimit = Math.min(Math.max(Number(limit) || 50, 1), 200);
 	const shgObjectId = new Types.ObjectId(String(shgId));
+	const thirtyDaysAgo = new Date();
+	thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
 	const txns = await Transaction.find({
 		shgId: shgObjectId,
 		isReversed: false,
+		$or: [{ date: { $gte: thirtyDaysAgo } }, { createdAt: { $gte: thirtyDaysAgo } }],
 	})
 		.sort({ date: -1, createdAt: -1 })
 		.limit(safeLimit)
@@ -1309,6 +1312,13 @@ async function revertTransaction(data) {
 
 		if (!txn) {
 			throw new Error('Transaction not found or already reversed');
+		}
+
+		const thirtyDaysAgo = new Date();
+		thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+		const txnDate = txn.date || txn.createdAt;
+		if (!txnDate || new Date(txnDate) < thirtyDaysAgo) {
+			throw new Error('Only transactions from the last 30 days can be reverted');
 		}
 
 		if (txn.type === TransactionType.LOAN_DISBURSEMENT) {

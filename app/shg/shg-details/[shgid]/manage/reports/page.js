@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -62,7 +62,7 @@ export default function ReportsPage({ params }) {
 			const nextPdfUrl = data?.storage?.cloudUrl || null;
 			setMessage({
 				type: 'success',
-				text: `??????? ????? ?? ??? Cloud URL: ${nextPdfUrl || '-'}`,
+				text: `रिपोर्ट जनरेट हो गई। Cloud URL: ${nextPdfUrl || '-'}`,
 			});
 			if (nextPdfUrl) {
 				setPdfPreviewUrl(nextPdfUrl);
@@ -70,7 +70,7 @@ export default function ReportsPage({ params }) {
 			}
 			await loadSnapshots();
 		} catch (e) {
-			setMessage({ type: 'error', text: e.message || '??????? ????? ???? ????' });
+			setMessage({ type: 'error', text: e.message || 'रिपोर्ट जनरेट नहीं हुई।' });
 		} finally {
 			setLoading(false);
 		}
@@ -83,9 +83,9 @@ export default function ReportsPage({ params }) {
 			<div className='max-w-4xl mx-auto space-y-6'>
 				<div className='flex items-center justify-between'>
 					<div>
-						<h1 className='text-2xl font-black text-slate-900'>????? ???????? ???????</h1>
+						<h1 className='text-2xl font-black text-slate-900'>मासिक स्नैपशॉट रिपोर्ट</h1>
 						<p className='text-sm text-slate-600 mt-1'>
-							?? SHG ?? ??? ????? ?? PDF ???????? ?????/????? ?????
+							हर SHG के लिए महीने का PDF स्नैपशॉट जनरेट/स्टोर करें।
 						</p>
 					</div>
 					<button
@@ -99,7 +99,7 @@ export default function ReportsPage({ params }) {
 					<div className='grid grid-cols-1 md:grid-cols-3 gap-3 items-end'>
 						<div className='md:col-span-2'>
 							<label className='text-xs uppercase tracking-wider font-black text-slate-500 mb-1 block'>
-								??? ?????
+								माह चुनें
 							</label>
 							<div className='relative'>
 								<CalendarDays className='w-4 h-4 absolute left-3 top-3 text-slate-500' />
@@ -108,7 +108,7 @@ export default function ReportsPage({ params }) {
 										value={month}
 										onChange={setMonth}
 										id='snapshot-month'
-										label='??? ?? ???? ?????'
+										label='माह और वर्ष चुनें'
 									/>
 								</div>
 							</div>
@@ -118,28 +118,28 @@ export default function ReportsPage({ params }) {
 							disabled={loading}
 							className='inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold disabled:opacity-60'>
 							<FileDown className='w-4 h-4' />
-							{loading ? '????? ?? ??? ??...' : '??? ????? ????'}
+							{loading ? 'जनरेट हो रहा है...' : 'अभी जनरेट करें'}
 						</button>
 					</div>
 					<p className='text-xs text-slate-500'>
-						??????? path: <code>shg-snapshots/&lt;shgId&gt;/&lt;YYYY-MM&gt;/snapshot.pdf</code>
+						रिपोर्ट path: <code>shg-snapshots/&lt;shgId&gt;/&lt;YYYY-MM&gt;/snapshot.pdf</code>
 					</p>
 				</div>
 
 				<div className='bg-white/85 border border-slate-200 rounded-2xl p-5'>
 					<div className='flex items-center justify-between mb-3'>
-						<h2 className='text-lg font-bold text-slate-900'>????? ????????</h2>
+						<h2 className='text-lg font-bold text-slate-900'>सेव्ड स्नैपशॉट</h2>
 						<button
 							onClick={loadSnapshots}
 							className='inline-flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg border border-slate-300 bg-white'>
 							<RefreshCw className='w-4 h-4' />
-							???????
+							रीफ्रेश
 						</button>
 					</div>
 					{loadingList ? (
-						<p className='text-sm text-slate-500'>??? ?? ??? ??...</p>
+						<p className='text-sm text-slate-500'>लोड हो रहा है...</p>
 					) : snapshots.length === 0 ? (
-						<p className='text-sm text-slate-600'>??? ?? ??? ???????? ??? ???? ???</p>
+						<p className='text-sm text-slate-600'>अभी तक कोई स्नैपशॉट सेव नहीं है।</p>
 					) : (
 						<div className='space-y-2'>
 							{snapshots.map((snap) => (
@@ -195,8 +195,8 @@ export default function ReportsPage({ params }) {
 							className='max-w-6xl h-[90vh] mx-auto bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col'>
 							<div className='px-4 py-3 border-b border-slate-200 flex items-center justify-between gap-3'>
 								<div>
-									<h3 className='text-lg font-bold text-slate-900'>PDF ???????</h3>
-									<p className='text-xs text-slate-500'>????? ??????? ????? ?? ??????? ????</p>
+									<h3 className='text-lg font-bold text-slate-900'>PDF रिपोर्ट</h3>
+									<p className='text-xs text-slate-500'>जनरेट रिपोर्ट देखें और डाउनलोड करें</p>
 								</div>
 								<div className='flex items-center gap-2'>
 									{canPreviewPdf ? (
@@ -207,14 +207,14 @@ export default function ReportsPage({ params }) {
 												rel='noreferrer'
 												className='inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-50'>
 												<ExternalLink className='w-4 h-4' />
-												?? ??? ???
+												नए टैब में
 											</a>
 											<a
 												href={pdfPreviewUrl}
 												download={`snapshot-${month}.pdf`}
 												className='inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-500'>
 												<Download className='w-4 h-4' />
-												???????
+												डाउनलोड
 											</a>
 										</>
 									) : null}
@@ -228,14 +228,20 @@ export default function ReportsPage({ params }) {
 
 							<div className='flex-1 bg-slate-100'>
 								{canPreviewPdf ? (
-									<iframe title='snapshot-pdf-preview' src={pdfPreviewUrl} className='w-full h-full border-0' />
+									<iframe
+										title='snapshot-pdf-preview'
+										src={pdfPreviewUrl}
+										className='w-full h-full border-0'
+									/>
 								) : (
 									<div className='h-full flex items-center justify-center px-6 text-center'>
 										<div>
 											<p className='text-sm text-slate-700 font-semibold'>
-												?? environment ??? direct PDF preview ?????? ???? ???
+												इस environment में direct PDF preview उपलब्ध नहीं है।
 											</p>
-											<p className='text-xs text-slate-500 mt-2 break-all'>URL: {pdfPreviewUrl || '-'}</p>
+											<p className='text-xs text-slate-500 mt-2 break-all'>
+												URL: {pdfPreviewUrl || '-'}
+											</p>
 										</div>
 									</div>
 								)}

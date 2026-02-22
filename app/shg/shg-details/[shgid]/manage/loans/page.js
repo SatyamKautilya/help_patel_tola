@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ import {
   ArrowRight,
   Loader2,
   LayoutDashboard,
+  Download,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -59,7 +60,7 @@ export default function BulkLoanPage({ params }) {
           }
         }
       } catch (err) {
-        setUiMessage({ type: "error", text: "सदस्य लोड करने में विफल" });
+        setUiMessage({ type: "error", text: "à¤¸à¤¦à¤¸à¥à¤¯ à¤²à¥‹à¤¡ à¤•à¤°à¤¨à¥‡ à¤®à¥‡à¤‚ à¤µà¤¿à¤«à¤²" });
       } finally {
         setLoading(false);
       }
@@ -123,7 +124,7 @@ export default function BulkLoanPage({ params }) {
     if (!member || !loan) return;
     const reason = String(loan.reason || "").trim();
     if (!reason) {
-      setUiMessage({ type: "error", text: "कृपया ऋण का कारण भरें" });
+      setUiMessage({ type: "error", text: "à¤•à¥ƒà¤ªà¤¯à¤¾ à¤‹à¤£ à¤•à¤¾ à¤•à¤¾à¤°à¤£ à¤­à¤°à¥‡à¤‚" });
       return;
     }
 
@@ -148,15 +149,15 @@ export default function BulkLoanPage({ params }) {
       )
       .join("");
 
-    const objectiveText = `सदस्य ${member.name || "-"} को आवश्यक कार्य हेतु ऋण प्रदान करना।`;
-    const discussionText = `कारण: ${reason} | मांग: ₹${amount} | प्रस्तावित मासिक ब्याज दर: ${rate}%`;
-    const resolutionText = `समूह सर्वसम्मति से सदस्य ${member.name || "-"} को ₹${amount} का ऋण ${rate}% मासिक ब्याज दर पर स्वीकृत करता है।`;
+    const objectiveText = `à¤¸à¤¦à¤¸à¥à¤¯ ${member.name || "-"} à¤•à¥‹ à¤†à¤µà¤¶à¥à¤¯à¤• à¤•à¤¾à¤°à¥à¤¯ à¤¹à¥‡à¤¤à¥ à¤‹à¤£ à¤ªà¥à¤°à¤¦à¤¾à¤¨ à¤•à¤°à¤¨à¤¾à¥¤`;
+    const discussionText = `à¤•à¤¾à¤°à¤£: ${reason} | à¤®à¤¾à¤‚à¤—: â‚¹${amount} | à¤ªà¥à¤°à¤¸à¥à¤¤à¤¾à¤µà¤¿à¤¤ à¤®à¤¾à¤¸à¤¿à¤• à¤¬à¥à¤¯à¤¾à¤œ à¤¦à¤°: ${rate}%`;
+    const resolutionText = `à¤¸à¤®à¥‚à¤¹ à¤¸à¤°à¥à¤µà¤¸à¤®à¥à¤®à¤¤à¤¿ à¤¸à¥‡ à¤¸à¤¦à¤¸à¥à¤¯ ${member.name || "-"} à¤•à¥‹ â‚¹${amount} à¤•à¤¾ à¤‹à¤£ ${rate}% à¤®à¤¾à¤¸à¤¿à¤• à¤¬à¥à¤¯à¤¾à¤œ à¤¦à¤° à¤ªà¤° à¤¸à¥à¤µà¥€à¤•à¥ƒà¤¤ à¤•à¤°à¤¤à¤¾ à¤¹à¥ˆà¥¤`;
 
     const win = window.open("", "_blank", "width=900,height=1000");
     if (!win) {
       setUiMessage({
         type: "error",
-        text: "पॉप-अप ब्लॉक है, कृपया Allow करें",
+        text: "à¤ªà¥‰à¤ª-à¤…à¤ª à¤¬à¥à¤²à¥‰à¤• à¤¹à¥ˆ, à¤•à¥ƒà¤ªà¤¯à¤¾ Allow à¤•à¤°à¥‡à¤‚",
       });
       return;
     }
@@ -185,16 +186,16 @@ export default function BulkLoanPage({ params }) {
 </head>
 <body>
   <div class="box">
-    <h1>${escapeHtml(shgName || "SHG")} - प्रस्ताव</h1>
-    <div class="meta">दिनांक: ${todayLabel}</div>
+    <h1>${escapeHtml(shgName || "SHG")} - à¤ªà¥à¤°à¤¸à¥à¤¤à¤¾à¤µ</h1>
+    <div class="meta">à¤¦à¤¿à¤¨à¤¾à¤‚à¤•: ${todayLabel}</div>
 
     <table>
       <thead>
         <tr>
-          <th>उद्देश्य</th>
-          <th>चर्चा</th>
-          <th>प्रस्ताव / संकल्प</th>
-          <th>सदस्य हस्ताक्षर सूची</th>
+          <th>à¤‰à¤¦à¥à¤¦à¥‡à¤¶à¥à¤¯</th>
+          <th>à¤šà¤°à¥à¤šà¤¾</th>
+          <th>à¤ªà¥à¤°à¤¸à¥à¤¤à¤¾à¤µ / à¤¸à¤‚à¤•à¤²à¥à¤ª</th>
+          <th>à¤¸à¤¦à¤¸à¥à¤¯ à¤¹à¤¸à¥à¤¤à¤¾à¤•à¥à¤·à¤° à¤¸à¥‚à¤šà¥€</th>
         </tr>
       </thead>
       <tbody>
@@ -202,7 +203,7 @@ export default function BulkLoanPage({ params }) {
           <td>${escapeHtml(objectiveText)}</td>
           <td>${escapeHtml(discussionText)}</td>
           <td>${escapeHtml(resolutionText)}</td>
-          <td>नीचे तालिका में सदस्य हस्ताक्षर किए जाएंगे।</td>
+          <td>à¤¨à¥€à¤šà¥‡ à¤¤à¤¾à¤²à¤¿à¤•à¤¾ à¤®à¥‡à¤‚ à¤¸à¤¦à¤¸à¥à¤¯ à¤¹à¤¸à¥à¤¤à¤¾à¤•à¥à¤·à¤° à¤•à¤¿à¤ à¤œà¤¾à¤à¤‚à¤—à¥‡à¥¤</td>
         </tr>
       </tbody>
     </table>
@@ -210,17 +211,17 @@ export default function BulkLoanPage({ params }) {
     <table class="sign-table">
       <thead>
         <tr>
-          <th class="center" style="width:52px;">क्रम</th>
-          <th>सदस्य का नाम</th>
-          <th style="width:180px;">हस्ताक्षर</th>
+          <th class="center" style="width:52px;">à¤•à¥à¤°à¤®</th>
+          <th>à¤¸à¤¦à¤¸à¥à¤¯ à¤•à¤¾ à¤¨à¤¾à¤®</th>
+          <th style="width:180px;">à¤¹à¤¸à¥à¤¤à¤¾à¤•à¥à¤·à¤°</th>
         </tr>
       </thead>
       <tbody>
-        ${memberSignRows || '<tr><td colspan="3" class="center">सदस्य उपलब्ध नहीं</td></tr>'}
+        ${memberSignRows || '<tr><td colspan="3" class="center">à¤¸à¤¦à¤¸à¥à¤¯ à¤‰à¤ªà¤²à¤¬à¥à¤§ à¤¨à¤¹à¥€à¤‚</td></tr>'}
       </tbody>
     </table>
 
-    <div class="foot">नोट: यह प्रस्ताव SHG बैठक में पारित करने हेतु तैयार किया गया है।</div>
+    <div class="foot">à¤¨à¥‹à¤Ÿ: à¤¯à¤¹ à¤ªà¥à¤°à¤¸à¥à¤¤à¤¾à¤µ SHG à¤¬à¥ˆà¤ à¤• à¤®à¥‡à¤‚ à¤ªà¤¾à¤°à¤¿à¤¤ à¤•à¤°à¤¨à¥‡ à¤¹à¥‡à¤¤à¥ à¤¤à¥ˆà¤¯à¤¾à¤° à¤•à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾ à¤¹à¥ˆà¥¤</div>
   </div>
 </body>
 </html>`);
@@ -229,10 +230,64 @@ export default function BulkLoanPage({ params }) {
     win.print();
   };
 
+  const downloadProposal = (member, loan) => {
+    if (!member || !loan) return;
+    const reason = String(loan.reason || "").trim();
+    if (!reason) {
+      setUiMessage({ type: "error", text: "Please add loan reason first" });
+      return;
+    }
+
+    const amount = Number(loan.principal || 0).toLocaleString("hi-IN");
+    const rate = Number(loan.interestRate || 0);
+    const escapeHtml = (value = "") =>
+      String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+
+    const html = `<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <title>Prastav-${escapeHtml(member.name || "member")}-${todayLabel}</title>
+  <style>
+    body { font-family: "Noto Sans Devanagari", "Mangal", sans-serif; margin: 24px; color: #0f172a; }
+    .box { border: 1px solid #cbd5e1; border-radius: 12px; padding: 16px; }
+    h1 { margin: 0 0 8px; font-size: 22px; }
+    p { margin: 6px 0; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>${escapeHtml(shgName || "SHG")} - à¤ªà¥à¤°à¤¸à¥à¤¤à¤¾à¤µ</h1>
+    <p><strong>à¤¦à¤¿à¤¨à¤¾à¤‚à¤•:</strong> ${todayLabel}</p>
+    <p><strong>à¤¸à¤¦à¤¸à¥à¤¯:</strong> ${escapeHtml(member.name || "-")}</p>
+    <p><strong>à¤‹à¤£ à¤°à¤¾à¤¶à¤¿:</strong> â‚¹${amount}</p>
+    <p><strong>à¤®à¤¾à¤¸à¤¿à¤• à¤¬à¥à¤¯à¤¾à¤œ à¤¦à¤°:</strong> ${rate}%</p>
+    <p><strong>à¤•à¤¾à¤°à¤£:</strong> ${escapeHtml(reason)}</p>
+    <p><strong>à¤Ÿà¤¿à¤ªà¥à¤ªà¤£à¥€:</strong> à¤¯à¤¹ à¤ªà¥à¤°à¤¸à¥à¤¤à¤¾à¤µ SHG à¤¬à¥ˆà¤ à¤• à¤®à¥‡à¤‚ à¤ªà¤¾à¤°à¤¿à¤¤ à¤•à¤°à¤¨à¥‡ à¤¹à¥‡à¤¤à¥ à¤¤à¥ˆà¤¯à¤¾à¤° à¤•à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾ à¤¹à¥ˆà¥¤</p>
+  </div>
+</body>
+</html>`;
+
+    const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Prastav-${member.name || "member"}-${todayLabel}.html`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   /* ---------------- SUBMIT ---------------- */
   const submitLoans = async () => {
     if (!validateDetailsStep()) {
-      setUiMessage({ type: "error", text: "कृपया सभी विवरण सही से भरें" });
+      setUiMessage({ type: "error", text: "à¤•à¥ƒà¤ªà¤¯à¤¾ à¤¸à¤­à¥€ à¤µà¤¿à¤µà¤°à¤£ à¤¸à¤¹à¥€ à¤¸à¥‡ à¤­à¤°à¥‡à¤‚" });
       return;
     }
 
@@ -254,10 +309,10 @@ export default function BulkLoanPage({ params }) {
           })
         )
       );
-      setUiMessage({ type: "success", text: "ऋण सफलतापूर्वक जारी" });
+      setUiMessage({ type: "success", text: "à¤‹à¤£ à¤¸à¤«à¤²à¤¤à¤¾à¤ªà¥‚à¤°à¥à¤µà¤• à¤œà¤¾à¤°à¥€" });
       setTimeout(() => router.back(), 2000);
     } catch {
-      setUiMessage({ type: "error", text: "त्रुटि हुई" });
+      setUiMessage({ type: "error", text: "à¤¤à¥à¤°à¥à¤Ÿà¤¿ à¤¹à¥à¤ˆ" });
     } finally {
       setSaving(false);
     }
@@ -278,7 +333,7 @@ export default function BulkLoanPage({ params }) {
             <HandCoins className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-slate-800 tracking-tighter leading-none">ऋण वितरण</h1>
+            <h1 className="text-xl font-black text-slate-800 tracking-tighter leading-none">à¤‹à¤£ à¤µà¤¿à¤¤à¤°à¤£</h1>
             <div className="flex gap-1 mt-1.5">
               {[0, 1, 2].map((i) => (
                 <div 
@@ -312,7 +367,7 @@ export default function BulkLoanPage({ params }) {
               <div className="relative group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={20} />
                 <input
-                  placeholder="सदस्य खोजें..."
+                  placeholder="à¤¸à¤¦à¤¸à¥à¤¯ à¤–à¥‹à¤œà¥‡à¤‚..."
                   className="w-full pl-12 pr-4 py-4 rounded-[1.5rem] bg-white/70 backdrop-blur-sm border border-white shadow-sm focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -321,7 +376,7 @@ export default function BulkLoanPage({ params }) {
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-20 text-slate-400">
                   <Loader2 className="animate-spin mb-2" />
-                  <p className="text-sm font-bold uppercase tracking-widest">लोड हो रहा है...</p>
+                  <p className="text-sm font-bold uppercase tracking-widest">à¤²à¥‹à¤¡ à¤¹à¥‹ à¤°à¤¹à¤¾ à¤¹à¥ˆ...</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-4">
@@ -361,7 +416,7 @@ export default function BulkLoanPage({ params }) {
               animate={{ opacity: 1, x: 0 }}
               className="space-y-4"
             >
-              <p className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] px-1">ऋण विवरण भरें</p>
+              <p className="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] px-1">à¤‹à¤£ à¤µà¤¿à¤µà¤°à¤£ à¤­à¤°à¥‡à¤‚</p>
               {selectedIds.map((id) => {
                 const m = members.find((x) => x._id === id);
                 const l = loanSettings[id] || {};
@@ -378,7 +433,7 @@ export default function BulkLoanPage({ params }) {
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-slate-400 ml-1 uppercase">राशि (Principal)</label>
+                          <label className="text-[10px] font-black text-slate-400 ml-1 uppercase">à¤°à¤¾à¤¶à¤¿ (Principal)</label>
                           <div className="relative">
                             <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 text-emerald-500" size={14} />
                             <input
@@ -392,7 +447,7 @@ export default function BulkLoanPage({ params }) {
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-slate-400 ml-1 uppercase">ब्याज % (Monthly)</label>
+                          <label className="text-[10px] font-black text-slate-400 ml-1 uppercase">à¤¬à¥à¤¯à¤¾à¤œ % (Monthly)</label>
                           <div className="relative">
                             <Percent className="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-400" size={14} />
                             <input
@@ -406,23 +461,33 @@ export default function BulkLoanPage({ params }) {
                       </div>
                       <div className="space-y-1.5">
                         <label className="text-[10px] font-black text-slate-400 ml-1 uppercase">
-                          ऋण देने का कारण
+                          à¤‹à¤£ à¤¦à¥‡à¤¨à¥‡ à¤•à¤¾ à¤•à¤¾à¤°à¤£
                         </label>
                         <textarea
                           rows={2}
-                          placeholder="कारण लिखें..."
+                          placeholder="à¤•à¤¾à¤°à¤£ à¤²à¤¿à¤–à¥‡à¤‚..."
                           className="w-full px-3 py-3 bg-white/50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 outline-none font-bold text-sm transition-all resize-none"
                           value={l.reason || ""}
                           onChange={(e) => updateLoan(id, "reason", e.target.value)}
                         />
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => printProposal(m, l)}
-                        className="text-xs px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold hover:bg-indigo-100 transition-colors"
-                      >
-                        प्रस्ताव PDF
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => printProposal(m, l)}
+                          className="text-xs px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold hover:bg-indigo-100 transition-colors"
+                        >
+                          Proposal PDF
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => downloadProposal(m, l)}
+                          className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold hover:bg-emerald-100 transition-colors"
+                        >
+                          <Download size={13} />
+                          Proposal Download
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -440,8 +505,8 @@ export default function BulkLoanPage({ params }) {
             >
               <div className="relative overflow-hidden p-6 rounded-[2.5rem] bg-slate-900 text-white shadow-xl mb-6">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl" />
-                <p className="opacity-60 text-[10px] font-black uppercase tracking-widest">सारांश</p>
-                <h2 className="text-3xl font-black tracking-tighter mt-1">{selectedIds.length} सदस्य चयनित</h2>
+                <p className="opacity-60 text-[10px] font-black uppercase tracking-widest">à¤¸à¤¾à¤°à¤¾à¤‚à¤¶</p>
+                <h2 className="text-3xl font-black tracking-tighter mt-1">{selectedIds.length} à¤¸à¤¦à¤¸à¥à¤¯ à¤šà¤¯à¤¨à¤¿à¤¤</h2>
               </div>
               
               {selectedIds.map((id) => {
@@ -451,10 +516,10 @@ export default function BulkLoanPage({ params }) {
                   <div key={id} className="bg-white/70 backdrop-blur-sm p-5 rounded-[2rem] border border-white flex justify-between items-center shadow-sm">
                     <div>
                       <p className="font-black text-slate-800 tracking-tight">{m?.name}</p>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ब्याज: {l.interestRate}% प्रति माह</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">à¤¬à¥à¤¯à¤¾à¤œ: {l.interestRate}% à¤ªà¥à¤°à¤¤à¤¿ à¤®à¤¾à¤¹</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-indigo-600 font-black text-xl tracking-tighter">₹{l.principal}</p>
+                      <p className="text-indigo-600 font-black text-xl tracking-tighter">â‚¹{l.principal}</p>
                     </div>
                   </div>
                 );
@@ -475,7 +540,7 @@ export default function BulkLoanPage({ params }) {
               onClick={() => setStep("details")}
               className="w-full bg-slate-900 text-white py-4 rounded-[1.8rem] font-black text-lg flex items-center justify-center gap-3 shadow-xl shadow-slate-200 transition-all disabled:opacity-30 group"
             >
-              आगे बढ़ें ({selectedIds.length})
+              à¤†à¤—à¥‡ à¤¬à¤¢à¤¼à¥‡à¤‚ ({selectedIds.length})
               <div className="p-1 bg-white/20 rounded-lg group-hover:translate-x-1 transition-transform">
                 <ArrowRight size={18} />
               </div>
@@ -485,10 +550,10 @@ export default function BulkLoanPage({ params }) {
           {step === "details" && (
             <motion.button
               whileTap={{ scale: 0.96 }}
-              onClick={() => validateDetailsStep() ? setStep("review") : setUiMessage({ type: "error", text: "विवरण भरें" })}
+              onClick={() => validateDetailsStep() ? setStep("review") : setUiMessage({ type: "error", text: "à¤µà¤¿à¤µà¤°à¤£ à¤­à¤°à¥‡à¤‚" })}
               className="w-full bg-indigo-600 text-white py-4 rounded-[1.8rem] font-black text-lg shadow-xl shadow-indigo-100"
             >
-              रिव्यू करें
+              à¤°à¤¿à¤µà¥à¤¯à¥‚ à¤•à¤°à¥‡à¤‚
             </motion.button>
           )}
 
@@ -499,7 +564,7 @@ export default function BulkLoanPage({ params }) {
               onClick={submitLoans}
               className="w-full bg-emerald-600 text-white py-4 rounded-[1.8rem] font-black text-lg flex justify-center items-center gap-3 shadow-xl shadow-emerald-100 disabled:opacity-50"
             >
-              {saving ? <Loader2 className="animate-spin" /> : <>ऋण जारी करें <HandCoins size={22} /></>}
+              {saving ? <Loader2 className="animate-spin" /> : <>à¤‹à¤£ à¤œà¤¾à¤°à¥€ à¤•à¤°à¥‡à¤‚ <HandCoins size={22} /></>}
             </motion.button>
           )}
         </div>
@@ -524,3 +589,4 @@ export default function BulkLoanPage({ params }) {
     </div>
   );
 }
+
