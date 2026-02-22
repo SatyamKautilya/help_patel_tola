@@ -308,7 +308,7 @@ export default function BulkLoanPage({ params }) {
     );
 
     const blob = await new Promise((resolve) =>
-      canvas.toBlob(resolve, "image/jpeg", 0.95),
+      canvas.toBlob(resolve, "image/jpeg", 0.82),
     );
     if (!blob) {
       setUiMessage({ type: "error", text: "JPEG बनाने में त्रुटि हुई" });

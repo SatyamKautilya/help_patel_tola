@@ -74,6 +74,22 @@ async function triggerServerJpegDownload(blob, fileName) {
 	setTimeout(() => form.remove(), 0);
 }
 
+async function canvasToCompressedJpegBlob(canvas, quality = 0.82) {
+	return new Promise((resolve, reject) => {
+		canvas.toBlob(
+			(result) => {
+				if (!result) {
+					reject(new Error('JPEG फाइल नहीं बन पाई'));
+					return;
+				}
+				resolve(result);
+			},
+			'image/jpeg',
+			quality,
+		);
+	});
+}
+
 export default function ReportsPage({ params }) {
 	const { shgid } = params;
 	const router = useRouter();
@@ -185,15 +201,26 @@ export default function ReportsPage({ params }) {
 			const html2canvas = await loadHtml2canvas();
 			const canvas = await html2canvas(reportRef.current, {
 				backgroundColor: '#ffffff',
-				scale: 2,
+				scale: 1,
 				useCORS: true,
 			});
-			const blob = await new Promise((resolve) =>
-				canvas.toBlob(resolve, 'image/jpeg', 0.95),
-			);
-			if (!blob) {
-				throw new Error('JPEG फाइल नहीं बन पाई');
+
+			// Keep payload smaller for webview/server upload reliability.
+			let exportCanvas = canvas;
+			const maxWidth = 1280;
+			if (canvas.width > maxWidth) {
+				const ratio = maxWidth / canvas.width;
+				const resized = document.createElement('canvas');
+				resized.width = Math.round(canvas.width * ratio);
+				resized.height = Math.round(canvas.height * ratio);
+				const rctx = resized.getContext('2d');
+				if (rctx) {
+					rctx.drawImage(canvas, 0, 0, resized.width, resized.height);
+					exportCanvas = resized;
+				}
 			}
+
+			const blob = await canvasToCompressedJpegBlob(exportCanvas, 0.8);
 			await triggerServerJpegDownload(
 				blob,
 				`snapshot-${previewMonth || month}.jpg`,
