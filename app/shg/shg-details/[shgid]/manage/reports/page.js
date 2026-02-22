@@ -43,16 +43,35 @@ function formatMoney(value) {
 	})}`;
 }
 
-function directDownloadBlob(blob, fileName) {
-	const url = URL.createObjectURL(blob);
-	const a = document.createElement('a');
-	a.href = url;
-	a.download = fileName;
-	a.setAttribute('download', fileName);
-	document.body.appendChild(a);
-	a.click();
-	a.remove();
-	setTimeout(() => URL.revokeObjectURL(url), 2000);
+async function triggerServerJpegDownload(blob, fileName) {
+	const dataUrl = await new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onloadend = () => resolve(reader.result);
+		reader.onerror = () => reject(new Error('JPEG पढ़ने में त्रुटि'));
+		reader.readAsDataURL(blob);
+	});
+
+	const form = document.createElement('form');
+	form.method = 'POST';
+	form.action = '/api/download-jpeg';
+	form.target = '_self';
+	form.style.display = 'none';
+
+	const inputData = document.createElement('input');
+	inputData.type = 'hidden';
+	inputData.name = 'dataUrl';
+	inputData.value = String(dataUrl || '');
+
+	const inputName = document.createElement('input');
+	inputName.type = 'hidden';
+	inputName.name = 'fileName';
+	inputName.value = fileName;
+
+	form.appendChild(inputData);
+	form.appendChild(inputName);
+	document.body.appendChild(form);
+	form.submit();
+	setTimeout(() => form.remove(), 0);
 }
 
 export default function ReportsPage({ params }) {
@@ -175,7 +194,10 @@ export default function ReportsPage({ params }) {
 			if (!blob) {
 				throw new Error('JPEG फाइल नहीं बन पाई');
 			}
-			directDownloadBlob(blob, `snapshot-${previewMonth || month}.jpg`);
+			await triggerServerJpegDownload(
+				blob,
+				`snapshot-${previewMonth || month}.jpg`,
+			);
 		} catch (e) {
 			setMessage({
 				type: 'error',
