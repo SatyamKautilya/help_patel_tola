@@ -87,12 +87,14 @@ export default function RouteChangeLoader() {
 		const onDocumentClick = (event) => {
 			if (event.defaultPrevented) return;
 			if (event.button !== 0) return;
-			if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+			if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+				return;
 			const anchor = event.target?.closest?.('a[href]');
 			if (!anchor) return;
 			if (anchor.target && anchor.target !== '_self') return;
 			const href = anchor.getAttribute('href');
-			if (!href || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+			if (!href || href.startsWith('mailto:') || href.startsWith('tel:'))
+				return;
 			if (shouldStartForHref(href)) start();
 		};
 
@@ -135,10 +137,9 @@ export default function RouteChangeLoader() {
 					style={{ width: `${progress}%` }}
 				/>
 			</div>
-			<div className='pointer-events-none fixed top-4 right-4 z-[10001]'>
+			<div className='pointer-events-none fixed -top-20 left-1/2 -translate-x-1/2 z-[10001]'>
 				<div className='h-7 w-7 rounded-full border-2 border-indigo-500/30 border-t-indigo-600 animate-spin bg-white/75 backdrop-blur-sm shadow-sm' />
 			</div>
 		</>
 	);
 }
-
