@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import HindiDatePicker from "@/components/HindiDatePicker";
 
 export default function LumpSumDepositEntry({ params }) {
   const { shgid } = params;
@@ -175,11 +176,12 @@ export default function LumpSumDepositEntry({ params }) {
                   <div className="p-2 bg-emerald-50 rounded-xl text-emerald-600">
                     <Calendar size={18} />
                   </div>
-                  <input
-                    type="date"
+                  <HindiDatePicker
                     value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full bg-transparent font-bold text-slate-700 outline-none"
+                    onChange={setDate}
+                    id="lump-sum-date"
+                    label="जमा तारीख चुनें"
+                    className="w-full"
                   />
                 </div>
                 <div className="flex gap-4 items-center bg-white/50 p-3 rounded-2xl border border-slate-100">

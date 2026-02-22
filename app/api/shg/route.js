@@ -18,6 +18,10 @@ import {
 	LoanRepaymentStatus,
 } from '@/lib/models/enum.js';
 import LumpSumDeposit from '@/lib/models/shgModels/LumpSumDeposit';
+import SnapshotReport from '@/lib/models/shgModels/SnapshotReport';
+import { put } from '@vercel/blob';
+import fs from 'fs/promises';
+import path from 'path';
 
 export async function POST(req) {
 	try {
@@ -36,9 +40,13 @@ export async function POST(req) {
 
 			case 'add-member':
 				return addMember(body);
+			case 'link-member-user':
+				return linkMemberUser(body);
 
 			case 'monthly-deposit':
 				return monthlyDeposit(body);
+			case 'save-expense':
+				return saveExpense(body);
 
 			case 'lump-sum':
 				return lumpSumContribution(body);
@@ -84,6 +92,16 @@ export async function POST(req) {
 				return lumpSumContribution(body);
 			case 'dashboard-summary':
 				return dashboardSummary(body);
+			case 'generate-shg-snapshot':
+				return generateShgSnapshot(body);
+			case 'list-shg-snapshots':
+				return listShgSnapshots(body);
+			case 'generate-monthly-snapshots':
+				return generateMonthlySnapshots(body);
+			case 'list-revertable-transactions':
+				return listRevertableTransactions(body);
+			case 'revert-transaction':
+				return revertTransaction(body);
 			default:
 				return NextResponse.json(
 					{ error: 'Invalid API action' },
@@ -107,10 +125,18 @@ export async function getShgByUserId(data) {
 	}
 
 	/* 1️⃣ Get active SHG memberships of user */
-	const memberships = await ShgMember.find({
+	let memberships = await ShgMember.find({
 		userId: userId,
 		isActive: true,
 	}).select('shgId role ');
+
+	if (memberships.length === 0) {
+		await autoAttachMemberByMobile(userId);
+		memberships = await ShgMember.find({
+			userId: userId,
+			isActive: true,
+		}).select('shgId role ');
+	}
 
 	if (memberships.length === 0) return NextResponse.json([]);
 
@@ -220,17 +246,112 @@ async function createSHG(data) {
 }
 
 async function addMember(data) {
+	const normalizedMobile = String(data.mobileNumber || '').trim();
+	let resolvedUserId = data.userId || null;
+
+	if (!resolvedUserId && normalizedMobile) {
+		const existingUser = await Users.findOne({
+			mobileNumber: normalizedMobile,
+			isActive: true,
+		})
+			.select('_id')
+			.lean();
+		resolvedUserId = existingUser?._id || null;
+	}
+
 	const member = await ShgMember.create({
 		shgId: data.shgId,
-		userId: data.userId || null,
+		userId: resolvedUserId,
 		name: data.name,
 		memberCode: data.memberCode,
+		mobileNumber: normalizedMobile || null,
 		role: data.role,
-		hasMobileAccess: !!data.userId,
+		hasMobileAccess: !!resolvedUserId,
 		joinedAt: new Date(),
 	});
 
 	return NextResponse.json(member);
+}
+
+async function autoAttachMemberByMobile(userId) {
+	if (!userId) return { matched: 0, modified: 0 };
+
+	const user = await Users.findOne({ _id: userId, isActive: true })
+		.select('_id mobileNumber')
+		.lean();
+
+	const mobileNumber = String(user?.mobileNumber || '').trim();
+	if (!mobileNumber) return { matched: 0, modified: 0 };
+
+	const attachResult = await ShgMember.updateMany(
+		{
+			mobileNumber,
+			isActive: true,
+			$or: [{ userId: null }, { userId: { $exists: false } }],
+		},
+		{
+			$set: {
+				userId: user._id,
+				hasMobileAccess: true,
+			},
+		},
+	);
+
+	return {
+		matched: attachResult.matchedCount || 0,
+		modified: attachResult.modifiedCount || 0,
+	};
+}
+
+async function linkMemberUser(data) {
+	const { shgId, memberId, mobileNumber } = data || {};
+
+	if (!shgId || !memberId || !mobileNumber) {
+		return NextResponse.json(
+			{ error: 'shgId, memberId and mobileNumber are required' },
+			{ status: 400 },
+		);
+	}
+
+	const normalizedMobile = String(mobileNumber).trim();
+	const user = await Users.findOne({
+		mobileNumber: normalizedMobile,
+		isActive: true,
+	})
+		.select('_id mobileNumber')
+		.lean();
+
+	if (!user?._id) {
+		return NextResponse.json(
+			{ error: 'No active app user found for this mobile number' },
+			{ status: 404 },
+		);
+	}
+
+	const updatedMember = await ShgMember.findOneAndUpdate(
+		{
+			_id: memberId,
+			shgId: shgId,
+			isActive: true,
+		},
+		{
+			$set: {
+				userId: user._id,
+				hasMobileAccess: true,
+				mobileNumber: normalizedMobile,
+			},
+		},
+		{ new: true },
+	).lean();
+
+	if (!updatedMember) {
+		return NextResponse.json(
+			{ error: 'Active member not found for this SHG' },
+			{ status: 404 },
+		);
+	}
+
+	return NextResponse.json({ success: true, member: updatedMember });
 }
 
 async function getOnboardingDraft(data) {
@@ -312,6 +433,39 @@ async function monthlyDeposit(data) {
 
 	return NextResponse.json(txn);
 }
+
+async function saveExpense(data) {
+	const { shgId, amount, expenseDate, reason, createdBy } = data || {};
+
+	if (!shgId || !amount || Number(amount) <= 0) {
+		return NextResponse.json(
+			{ error: 'shgId and valid amount are required' },
+			{ status: 400 },
+		);
+	}
+
+	const txDate = expenseDate ? new Date(expenseDate) : new Date();
+	if (Number.isNaN(txDate.getTime())) {
+		return NextResponse.json({ error: 'Invalid expenseDate' }, { status: 400 });
+	}
+
+	const txn = await Transaction.create({
+		shgId,
+		fromAccount: AccountType.SHG_CASH,
+		toAccount: AccountType.EXTERNAL,
+		amount: Number(amount),
+		type: TransactionType.OPENING_BALANCE,
+		date: txDate,
+		meta: {
+			category: 'MANUAL_EXPENSE',
+			reason: String(reason || '').trim() || null,
+		},
+		source: 'ADMIN',
+		createdBy: createdBy || 'SYSTEM',
+	});
+
+	return NextResponse.json({ success: true, transaction: txn });
+}
 // async function lumpSumContribution(data) {
 //   const txns = [];
 
@@ -339,6 +493,7 @@ async function createLoan(data) {
 		memberId: data.memberId,
 		principal: data.principal,
 		interestRate: data.interestRate,
+		loanReason: data.reason || '',
 		tenureMonths: data.tenureMonths,
 		issuedDate,
 		approvedBy: data.approvedBy,
@@ -352,7 +507,7 @@ async function createLoan(data) {
 		type: TransactionType.LOAN_DISBURSEMENT,
 		memberId: data.memberId,
 		date: issuedDate,
-		meta: { loanId: loan._id },
+		meta: { loanId: loan._id, reason: data.reason || '' },
 	});
 
 	return NextResponse.json(loan);
@@ -382,7 +537,7 @@ async function loanRepayment(data) {
 		type: TransactionType.LOAN_REPAYMENT,
 		memberId: data.memberId,
 		date: paymentDate,
-		meta: { loanId: data.loanId },
+		meta: { loanId: data.loanId, loanRepaymentId: repayment._id, month },
 	});
 
 	return NextResponse.json(repayment);
@@ -483,6 +638,7 @@ async function monthlyContributionDue(data) {
 		/* Transactions */
 		const txns = await Transaction.find({
 			shgId: shgObjectId,
+			isReversed: false,
 			type: {
 				$in: [
 					TransactionType.MONTHLY_DEPOSIT,
@@ -546,7 +702,7 @@ async function allShgMembers(data) {
 	const members = await ShgMember.find({
 		shgId: shgId,
 		isActive: true,
-	}).select('_id name memberCode role hasMobileAccess joinedAt');
+	}).select('_id name memberCode role hasMobileAccess joinedAt mobileNumber userId');
 	return NextResponse.json({ members });
 }
 
@@ -613,12 +769,14 @@ async function MemberPassbook(data) {
 		Transaction.find({
 			shgId: shgObjectId,
 			memberId: memberObjectId,
+			isReversed: false,
 		}).sort({ date: -1 }),
 		Transaction.aggregate([
 			{
 				$match: {
 					shgId: shgObjectId,
 					type: TransactionType.LUMP_SUM_CONTRIBUTION,
+					isReversed: false,
 				},
 			},
 			{
@@ -963,7 +1121,7 @@ async function collectRepayment(data) {
 					type: TransactionType.LOAN_REPAYMENT,
 					memberId: loan.memberId,
 					date: new Date(),
-					meta: { loanId: loan._id },
+					meta: { loanId: loan._id, loanRepaymentId: repayment[0]._id, month: currentMonth },
 				},
 			],
 			{ session },
@@ -1063,6 +1221,663 @@ async function lumpSumContribution(data) {
 	}
 }
 
+async function listRevertableTransactions(data) {
+	const { shgId, limit = 50 } = data || {};
+	if (!shgId) {
+		return NextResponse.json({ error: 'shgId is required' }, { status: 400 });
+	}
+
+	const safeLimit = Math.min(Math.max(Number(limit) || 50, 1), 200);
+	const shgObjectId = new Types.ObjectId(String(shgId));
+
+	const txns = await Transaction.find({
+		shgId: shgObjectId,
+		isReversed: false,
+	})
+		.sort({ date: -1, createdAt: -1 })
+		.limit(safeLimit)
+		.select('_id shgId type amount date memberId fromAccount toAccount meta createdAt')
+		.lean();
+
+	const memberIds = txns
+		.map((t) => t.memberId)
+		.filter(Boolean)
+		.map((id) => String(id));
+
+	const members = await ShgMember.find({ _id: { $in: memberIds } })
+		.select('_id name memberCode')
+		.lean();
+	const memberMap = Object.fromEntries(
+		members.map((m) => [String(m._id), { name: m.name, memberCode: m.memberCode }]),
+	);
+
+	const transactions = txns.map((t) => ({
+		...t,
+		memberName: t.memberId ? memberMap[String(t.memberId)]?.name || null : null,
+		memberCode: t.memberId ? memberMap[String(t.memberId)]?.memberCode || null : null,
+	}));
+
+	return NextResponse.json({ transactions });
+}
+
+async function findLinkedRepaymentForTxn(txn, session) {
+	const loanId = txn?.meta?.loanId;
+	if (!loanId) return null;
+
+	if (txn?.meta?.loanRepaymentId) {
+		const direct = await LoanRepayment.findOne({
+			_id: txn.meta.loanRepaymentId,
+			isReversed: false,
+		}).session(session);
+		if (direct) return direct;
+	}
+
+	const fallback = await LoanRepayment.findOne({
+		loanId: loanId,
+		shgId: txn.shgId,
+		memberId: txn.memberId || null,
+		amount: Number(txn.amount),
+		isReversed: false,
+	})
+		.sort({ paymentDate: -1, createdAt: -1 })
+		.session(session);
+
+	return fallback;
+}
+
+async function revertTransaction(data) {
+	const { shgId, transactionId, reason, revertedBy } = data || {};
+	if (!shgId || !transactionId) {
+		return NextResponse.json(
+			{ error: 'shgId and transactionId are required' },
+			{ status: 400 },
+		);
+	}
+
+	const shgObjectId = new Types.ObjectId(String(shgId));
+	const txObjectId = new Types.ObjectId(String(transactionId));
+
+	const session = await mongoose.connection.startSession();
+	session.startTransaction();
+
+	try {
+		const txn = await Transaction.findOne({
+			_id: txObjectId,
+			shgId: shgObjectId,
+			isReversed: false,
+		}).session(session);
+
+		if (!txn) {
+			throw new Error('Transaction not found or already reversed');
+		}
+
+		if (txn.type === TransactionType.LOAN_DISBURSEMENT) {
+			const loanId = txn?.meta?.loanId;
+			if (!loanId) throw new Error('Linked loanId missing in transaction meta');
+
+			const activeRepaymentCount = await LoanRepayment.countDocuments({
+				loanId,
+				isReversed: false,
+			}).session(session);
+
+			if (activeRepaymentCount > 0) {
+				throw new Error('Repayment exists for this loan. Revert repayments first.');
+			}
+
+			await Loan.updateOne(
+				{ _id: loanId },
+				{
+					$set: {
+						principal: 0,
+						status: LoanRepaymentStatus.CLOSED,
+						closedAt: new Date(),
+					},
+				},
+				{ session },
+			);
+		}
+
+		if (txn.type === TransactionType.LOAN_REPAYMENT) {
+			const repayment = await findLinkedRepaymentForTxn(txn, session);
+			if (!repayment) {
+				throw new Error('Linked loan repayment not found');
+			}
+
+			await LoanRepayment.updateOne(
+				{ _id: repayment._id },
+				{ $set: { isReversed: true } },
+				{ session },
+			);
+
+			const loan = await Loan.findById(repayment.loanId).session(session);
+			if (loan) {
+				const principalAgg = await LoanRepayment.aggregate([
+					{
+						$match: {
+							loanId: loan._id,
+							isReversed: false,
+						},
+					},
+					{
+						$group: {
+							_id: null,
+							totalPrincipalPaid: { $sum: '$principalComponent' },
+						},
+					},
+				]).session(session);
+
+				const paid = Number(principalAgg?.[0]?.totalPrincipalPaid || 0);
+				const outstanding = Math.max(Number(loan.principal || 0) - paid, 0);
+				if (outstanding > 0 && loan.status === LoanRepaymentStatus.CLOSED) {
+					await Loan.updateOne(
+						{ _id: loan._id },
+						{
+							$set: { status: LoanRepaymentStatus.ONGOING },
+							$unset: { closedAt: '' },
+						},
+						{ session },
+					);
+				}
+			}
+		}
+
+		if (txn.type === TransactionType.BANK_LOAN_RECEIVED) {
+			const bankLoanId = txn?.meta?.bankLoanId;
+			if (!bankLoanId) throw new Error('Linked bankLoanId missing in transaction meta');
+
+			await BankLoan.updateOne(
+				{ _id: bankLoanId },
+				{
+					$set: {
+						principal: 0,
+						status: 'CLOSED',
+						closedAt: new Date(),
+					},
+				},
+				{ session },
+			);
+		}
+
+		if (txn.type === TransactionType.LUMP_SUM_CONTRIBUTION) {
+			const lumpSumDepositId = txn?.meta?.lumpSumDepositId;
+			if (lumpSumDepositId) {
+				await LumpSumDeposit.updateOne(
+					{ _id: lumpSumDepositId },
+					{ $set: { isReversed: true } },
+					{ session },
+				);
+			}
+		}
+
+		await Transaction.updateOne(
+			{ _id: txn._id },
+			{
+				$set: {
+					isReversed: true,
+					meta: {
+						...(txn.meta || {}),
+						revertedAt: new Date().toISOString(),
+						revertedBy: revertedBy || 'SYSTEM',
+						revertReason: String(reason || '').trim() || null,
+					},
+				},
+			},
+			{ session },
+		);
+
+		await session.commitTransaction();
+		session.endSession();
+
+		return NextResponse.json({ success: true });
+	} catch (err) {
+		await session.abortTransaction();
+		session.endSession();
+		return NextResponse.json(
+			{ error: err.message || 'Failed to revert transaction' },
+			{ status: 400 },
+		);
+	}
+}
+
+function monthKeyFromDate(date) {
+	return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function parseMonthStart(month) {
+	if (!month) {
+		const now = new Date();
+		return new Date(now.getFullYear(), now.getMonth(), 1);
+	}
+	const d = new Date(`${month}-01T00:00:00`);
+	if (Number.isNaN(d.getTime())) {
+		throw new Error('Invalid month format. Expected YYYY-MM');
+	}
+	return d;
+}
+
+function toPdfText(value) {
+	return String(value ?? '')
+		.replace(/\\/g, '\\\\')
+		.replace(/\(/g, '\\(')
+		.replace(/\)/g, '\\)');
+}
+
+function buildSimplePdf(lines) {
+	const textCommands = lines
+		.map((line, idx) => `1 0 0 1 40 ${800 - idx * 14} Tm (${toPdfText(line)}) Tj`)
+		.join('\n');
+	const content = `BT\n/F1 10 Tf\n${textCommands}\nET`;
+
+	const objects = [];
+	objects.push('1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj');
+	objects.push('2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj');
+	objects.push(
+		'3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >> endobj',
+	);
+	objects.push('4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj');
+	objects.push(
+		`5 0 obj << /Length ${Buffer.byteLength(content, 'utf8')} >> stream\n${content}\nendstream endobj`,
+	);
+
+	let pdf = '%PDF-1.4\n';
+	const offsets = [0];
+	for (const obj of objects) {
+		offsets.push(Buffer.byteLength(pdf, 'utf8'));
+		pdf += `${obj}\n`;
+	}
+	const xrefStart = Buffer.byteLength(pdf, 'utf8');
+	pdf += `xref\n0 ${objects.length + 1}\n`;
+	pdf += '0000000000 65535 f \n';
+	for (let i = 1; i <= objects.length; i++) {
+		pdf += `${String(offsets[i]).padStart(10, '0')} 00000 n \n`;
+	}
+	pdf += `trailer << /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
+	return Buffer.from(pdf, 'utf8');
+}
+
+async function buildShgSnapshotData(shgId, month) {
+	const shgObjectId = new Types.ObjectId(String(shgId));
+	const monthStart = parseMonthStart(month);
+	const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0, 23, 59, 59, 999);
+
+	const [shg, members, transactions, loans, repayments] = await Promise.all([
+		Shg.findById(shgObjectId).select('_id name village').lean(),
+		ShgMember.find({ shgId: shgObjectId, isActive: true })
+			.select('_id name memberCode')
+			.sort({ createdAt: 1 })
+			.lean(),
+		Transaction.find({ shgId: shgObjectId, isReversed: false }).lean(),
+		Loan.find({ shgId: shgObjectId }).select('_id memberId principal').lean(),
+		LoanRepayment.find({ shgId: shgObjectId, isReversed: false })
+			.select('loanId memberId principalComponent interestComponent')
+			.lean(),
+	]);
+
+	if (!shg) {
+		throw new Error('SHG not found');
+	}
+
+	const memberMap = Object.fromEntries(members.map((m) => [String(m._id), m]));
+	const savingsByMember = {};
+	const lumpSumByMember = {};
+
+	let totalSavings = 0;
+	let totalLumpSum = 0;
+	let totalInterest = 0;
+	let totalPenalty = 0;
+	let totalExpense = 0;
+
+	for (const tx of transactions) {
+		const memberKey = tx.memberId ? String(tx.memberId) : null;
+
+		if (tx.type === TransactionType.MONTHLY_DEPOSIT) {
+			totalSavings += Number(tx.amount || 0);
+			if (memberKey) savingsByMember[memberKey] = (savingsByMember[memberKey] || 0) + Number(tx.amount || 0);
+		}
+
+		if (tx.type === TransactionType.LUMP_SUM_CONTRIBUTION) {
+			totalLumpSum += Number(tx.amount || 0);
+			if (memberKey) lumpSumByMember[memberKey] = (lumpSumByMember[memberKey] || 0) + Number(tx.amount || 0);
+		}
+
+		if (tx.type === TransactionType.PENALTY_CHARGE) {
+			totalPenalty += Number(tx.amount || 0);
+		}
+
+		if (tx.type === TransactionType.OPENING_BALANCE) {
+			if (
+				tx?.meta?.category === 'TOTAL_SAVINGS_TILL_DATE' ||
+				String(tx.toAccount || '') === AccountType.MEMBER_SAVINGS
+			) {
+				totalSavings += Number(tx.amount || 0);
+				if (memberKey) savingsByMember[memberKey] = (savingsByMember[memberKey] || 0) + Number(tx.amount || 0);
+			} else if (
+				tx?.meta?.category === 'TOTAL_LUMP_SUM_PAYMENTS_TILL_DATE' ||
+				(String(tx.fromAccount || '') === AccountType.EXTERNAL &&
+					String(tx.toAccount || '') === AccountType.SHG_CASH)
+			) {
+				totalLumpSum += Number(tx.amount || 0);
+			} else if (
+				tx?.meta?.category === 'TOTAL_INTEREST_INCOME_TILL_DATE' ||
+				String(tx.toAccount || '') === AccountType.INTEREST_INCOME
+			) {
+				totalInterest += Number(tx.amount || 0);
+			} else if (tx?.meta?.category === 'TOTAL_PENALTY_INCOME_TILL_DATE') {
+				totalPenalty += Number(tx.amount || 0);
+			} else if (
+				tx?.meta?.category === 'TOTAL_EXPENDITURE_TILL_DATE' ||
+				tx?.meta?.category === 'MANUAL_EXPENSE' ||
+				(String(tx.fromAccount || '') === AccountType.SHG_CASH &&
+					String(tx.toAccount || '') === AccountType.EXTERNAL)
+			) {
+				totalExpense += Number(tx.amount || 0);
+			}
+		}
+	}
+
+	const principalRepaidByLoan = {};
+	let totalPrincipalRepaid = 0;
+	for (const rep of repayments) {
+		const p = Number(rep.principalComponent || 0);
+		const i = Number(rep.interestComponent || 0);
+		totalPrincipalRepaid += p;
+		totalInterest += i;
+		const loanKey = String(rep.loanId);
+		principalRepaidByLoan[loanKey] = (principalRepaidByLoan[loanKey] || 0) + p;
+	}
+
+	const outstandingByMember = {};
+	let totalLoanDisbursed = 0;
+	for (const loan of loans) {
+		const principal = Number(loan.principal || 0);
+		totalLoanDisbursed += principal;
+		const paid = Number(principalRepaidByLoan[String(loan._id)] || 0);
+		const outstanding = Math.max(principal - paid, 0);
+		const memberKey = String(loan.memberId);
+		outstandingByMember[memberKey] = (outstandingByMember[memberKey] || 0) + outstanding;
+	}
+
+	const totalOutstandingLoan = Math.max(totalLoanDisbursed - totalPrincipalRepaid, 0);
+	const totalAvailableCash =
+		totalSavings + totalLumpSum + totalInterest + totalPenalty - totalOutstandingLoan - totalExpense;
+
+	const memberWise = members.map((member) => {
+		const key = String(member._id);
+		return {
+			memberId: member._id,
+			name: member.name,
+			memberCode: member.memberCode,
+			savings: Number((savingsByMember[key] || 0).toFixed(2)),
+			lumpSum: Number((lumpSumByMember[key] || 0).toFixed(2)),
+			outstandingLoan: Number((outstandingByMember[key] || 0).toFixed(2)),
+		};
+	});
+
+	return {
+		shgId: shg._id,
+		shgName: shg.name,
+		village: shg.village,
+		month: monthKeyFromDate(monthStart),
+		generatedAt: new Date().toISOString(),
+		range: {
+			start: monthStart.toISOString(),
+			end: monthEnd.toISOString(),
+		},
+		memberWise,
+		shgTotals: {
+			totalSavings: Number(totalSavings.toFixed(2)),
+			totalLumpSum: Number(totalLumpSum.toFixed(2)),
+			totalInterest: Number(totalInterest.toFixed(2)),
+			totalPenalty: Number(totalPenalty.toFixed(2)),
+			totalOutstandingLoan: Number(totalOutstandingLoan.toFixed(2)),
+			totalExpense: Number(totalExpense.toFixed(2)),
+			totalAvailableCash: Number(totalAvailableCash.toFixed(2)),
+		},
+	};
+}
+
+async function saveSnapshotToDummyCloud(snapshot) {
+	const baseDir = path.join(process.cwd(), 'dummy-cloud', 'shg-snapshots');
+	const folder = path.join(baseDir, String(snapshot.shgId), snapshot.month);
+	await fs.mkdir(folder, { recursive: true });
+
+	const lines = [
+		`SHG Snapshot Report`,
+		`SHG: ${snapshot.shgName} (${snapshot.shgId})`,
+		`Village: ${snapshot.village || '-'}`,
+		`Month: ${snapshot.month}`,
+		`Generated At: ${snapshot.generatedAt}`,
+		``,
+		`Member Wise`,
+		`Name | Savings | Lump Sum | Outstanding Loan`,
+		...snapshot.memberWise.map(
+			(m) =>
+				`${m.name} | ${m.savings.toFixed(2)} | ${m.lumpSum.toFixed(2)} | ${m.outstandingLoan.toFixed(2)}`,
+		),
+		``,
+		`SHG Totals`,
+		`Total Savings: ${snapshot.shgTotals.totalSavings.toFixed(2)}`,
+		`Total Lump Sum: ${snapshot.shgTotals.totalLumpSum.toFixed(2)}`,
+		`Total Interest: ${snapshot.shgTotals.totalInterest.toFixed(2)}`,
+		`Total Penalty: ${snapshot.shgTotals.totalPenalty.toFixed(2)}`,
+		`Total Outstanding Loan: ${snapshot.shgTotals.totalOutstandingLoan.toFixed(2)}`,
+		`Total Expense: ${snapshot.shgTotals.totalExpense.toFixed(2)}`,
+		`Total Available Cash: ${snapshot.shgTotals.totalAvailableCash.toFixed(2)}`,
+	];
+
+	const pdfBuffer = buildSimplePdf(lines);
+	const pdfPath = path.join(folder, 'snapshot.pdf');
+	const jsonPath = path.join(folder, 'snapshot.json');
+	await fs.writeFile(pdfPath, pdfBuffer);
+	await fs.writeFile(jsonPath, JSON.stringify(snapshot, null, 2), 'utf8');
+
+	return {
+		storage: 'dummy-cloud',
+		folder,
+		pdfPath,
+		jsonPath,
+		pdfBlobPath: `shg-snapshots/${snapshot.shgId}/${snapshot.month}/snapshot.pdf`,
+		jsonBlobPath: `shg-snapshots/${snapshot.shgId}/${snapshot.month}/snapshot.json`,
+		cloudUrl: `dummy://shg-snapshots/${snapshot.shgId}/${snapshot.month}/snapshot.pdf`,
+		jsonCloudUrl: `dummy://shg-snapshots/${snapshot.shgId}/${snapshot.month}/snapshot.json`,
+	};
+}
+
+async function saveSnapshotMetadata({ snapshot, storage, triggerType }) {
+	await SnapshotReport.findOneAndUpdate(
+		{
+			shgId: new Types.ObjectId(String(snapshot.shgId)),
+			month: snapshot.month,
+		},
+		{
+			$set: {
+				generatedAt: new Date(snapshot.generatedAt),
+				triggerType: triggerType || 'ON_DEMAND',
+				storageProvider: storage.storage,
+				cloudPath: storage.pdfBlobPath || storage.pdfPath || '',
+				cloudUrl: storage.cloudUrl,
+				jsonCloudPath: storage.jsonBlobPath || storage.jsonPath || null,
+				jsonCloudUrl: storage.jsonCloudUrl || null,
+				snapshot,
+			},
+		},
+		{ upsert: true, new: true, setDefaultsOnInsert: true },
+	);
+}
+
+async function saveSnapshotToCloudStorage(snapshot, { triggerType = 'ON_DEMAND' } = {}) {
+	const blobBasePath = `shg-snapshots/${snapshot.shgId}/${snapshot.month}`;
+	const lines = [
+		`SHG Snapshot Report`,
+		`SHG: ${snapshot.shgName} (${snapshot.shgId})`,
+		`Village: ${snapshot.village || '-'}`,
+		`Month: ${snapshot.month}`,
+		`Generated At: ${snapshot.generatedAt}`,
+		``,
+		`Member Wise`,
+		`Name | Savings | Lump Sum | Outstanding Loan`,
+		...snapshot.memberWise.map(
+			(m) =>
+				`${m.name} | ${m.savings.toFixed(2)} | ${m.lumpSum.toFixed(2)} | ${m.outstandingLoan.toFixed(2)}`,
+		),
+		``,
+		`SHG Totals`,
+		`Total Savings: ${snapshot.shgTotals.totalSavings.toFixed(2)}`,
+		`Total Lump Sum: ${snapshot.shgTotals.totalLumpSum.toFixed(2)}`,
+		`Total Interest: ${snapshot.shgTotals.totalInterest.toFixed(2)}`,
+		`Total Penalty: ${snapshot.shgTotals.totalPenalty.toFixed(2)}`,
+		`Total Outstanding Loan: ${snapshot.shgTotals.totalOutstandingLoan.toFixed(2)}`,
+		`Total Expense: ${snapshot.shgTotals.totalExpense.toFixed(2)}`,
+		`Total Available Cash: ${snapshot.shgTotals.totalAvailableCash.toFixed(2)}`,
+	];
+
+	const pdfBuffer = buildSimplePdf(lines);
+	const jsonBuffer = Buffer.from(JSON.stringify(snapshot, null, 2), 'utf8');
+	const hasBlobToken = Boolean(
+		process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_BLOB_READ_WRITE_TOKEN,
+	);
+
+	let storage;
+	if (hasBlobToken) {
+		const pdfBlobPath = `${blobBasePath}/snapshot.pdf`;
+		const jsonBlobPath = `${blobBasePath}/snapshot.json`;
+		const [pdfUpload, jsonUpload] = await Promise.all([
+			put(pdfBlobPath, pdfBuffer, {
+				access: 'public',
+				contentType: 'application/pdf',
+				addRandomSuffix: false,
+				allowOverwrite: true,
+			}),
+			put(jsonBlobPath, jsonBuffer, {
+				access: 'public',
+				contentType: 'application/json',
+				addRandomSuffix: false,
+				allowOverwrite: true,
+			}),
+		]);
+
+		storage = {
+			storage: 'vercel-blob',
+			pdfBlobPath,
+			jsonBlobPath,
+			cloudUrl: pdfUpload.url,
+			jsonCloudUrl: jsonUpload.url,
+		};
+	} else {
+		storage = await saveSnapshotToDummyCloud(snapshot);
+	}
+
+	await saveSnapshotMetadata({ snapshot, storage, triggerType });
+	return storage;
+}
+
+async function generateShgSnapshot(data) {
+	const { shgId, month } = data || {};
+	if (!shgId) {
+		return NextResponse.json({ error: 'shgId is required' }, { status: 400 });
+	}
+
+	try {
+		const snapshot = await buildShgSnapshotData(shgId, month);
+		const storage = await saveSnapshotToCloudStorage(snapshot, {
+			triggerType: 'ON_DEMAND',
+		});
+		return NextResponse.json({ success: true, snapshot, storage });
+	} catch (error) {
+		return NextResponse.json(
+			{ error: error.message || 'Failed to generate snapshot' },
+			{ status: 400 },
+		);
+	}
+}
+
+async function listShgSnapshots(data) {
+	const { shgId } = data || {};
+	if (!shgId) {
+		return NextResponse.json({ error: 'shgId is required' }, { status: 400 });
+	}
+
+	const shgObjectId = new Types.ObjectId(String(shgId));
+
+	const reports = await SnapshotReport.find({ shgId: shgObjectId })
+		.select('month generatedAt cloudUrl storageProvider cloudPath')
+		.sort({ month: -1 })
+		.lean();
+
+	if (reports.length > 0) {
+		return NextResponse.json({
+			snapshots: reports.map((r) => ({
+				month: r.month,
+				generatedAt: r.generatedAt,
+				cloudUrl: r.cloudUrl,
+				storageProvider: r.storageProvider,
+				path: r.cloudPath,
+			})),
+		});
+	}
+
+	// Backward compatibility: read old local dummy folders if metadata docs are not available.
+	const shgDir = path.join(process.cwd(), 'dummy-cloud', 'shg-snapshots', String(shgId));
+	try {
+		const monthDirs = await fs.readdir(shgDir, { withFileTypes: true });
+		const snapshots = [];
+		for (const d of monthDirs) {
+			if (!d.isDirectory()) continue;
+			const jsonPath = path.join(shgDir, d.name, 'snapshot.json');
+			try {
+				const raw = await fs.readFile(jsonPath, 'utf8');
+				const dataObj = JSON.parse(raw);
+				snapshots.push({
+					month: d.name,
+					generatedAt: dataObj.generatedAt,
+					cloudUrl: `dummy://shg-snapshots/${shgId}/${d.name}/snapshot.pdf`,
+					storageProvider: 'dummy-cloud',
+					path: `shg-snapshots/${shgId}/${d.name}/snapshot.pdf`,
+				});
+			} catch {
+				// ignore malformed files
+			}
+		}
+		snapshots.sort((a, b) => String(b.month).localeCompare(String(a.month)));
+		return NextResponse.json({ snapshots });
+	} catch {
+		return NextResponse.json({ snapshots: [] });
+	}
+}
+
+async function generateMonthlySnapshots(data) {
+	const { month, force = false } = data || {};
+	const runDate = month ? parseMonthStart(month) : new Date();
+
+	if (!force && runDate.getDate() !== 31) {
+		return NextResponse.json(
+			{ error: 'Monthly snapshot run is allowed only on 31st unless force=true' },
+			{ status: 400 },
+		);
+	}
+
+	const shgs = await Shg.find({ status: 'ACTIVE' }).select('_id').lean();
+	const results = [];
+	for (const shg of shgs) {
+		try {
+			const snapshot = await buildShgSnapshotData(shg._id, monthKeyFromDate(runDate));
+			const storage = await saveSnapshotToCloudStorage(snapshot, {
+				triggerType: 'SCHEDULED',
+			});
+			results.push({ shgId: shg._id, success: true, storage });
+		} catch (e) {
+			results.push({ shgId: shg._id, success: false, error: e.message });
+		}
+	}
+
+	return NextResponse.json({
+		success: true,
+		month: monthKeyFromDate(runDate),
+		totalShgs: shgs.length,
+		results,
+	});
+}
+
 async function dashboardSummary(data) {
 	const { shgId } = data;
 	if (!shgId) {
@@ -1070,11 +1885,13 @@ async function dashboardSummary(data) {
 	}
 
 	const shgObjectId = new Types.ObjectId(String(shgId));
+	const shgDoc = await Shg.findById(shgObjectId).select('name').lean();
 
 	/* Fetch all transactions, loans and repayments for this SHG */
 	const [transactions, loans, repayments] = await Promise.all([
 		Transaction.find({
 			shgId: shgObjectId,
+			isReversed: false,
 		}).lean(),
 		Loan.find({
 			shgId: shgObjectId,
@@ -1083,6 +1900,7 @@ async function dashboardSummary(data) {
 			.lean(),
 		LoanRepayment.find({
 			shgId: shgObjectId,
+			isReversed: false,
 		})
 			.select('principalComponent interestComponent amount')
 			.lean(),
@@ -1181,6 +1999,7 @@ async function dashboardSummary(data) {
 		totalExpense;
 
 	return NextResponse.json({
+		shgName: shgDoc?.name || '',
 		totalMonthlySavings,
 		totalLumpSum,
 		totalPrincipalRepaid,

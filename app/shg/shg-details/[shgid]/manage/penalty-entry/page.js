@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import HindiMonthYearPicker from "@/components/HindiMonthYearPicker";
 
 const PENALTY_TYPES = [
   "देर से भुगतान",
@@ -121,11 +122,12 @@ export default function PenaltyEntryPage({ params }) {
         <div className="bg-white/80 border border-white rounded-[2.5rem] p-5 shadow-xl shadow-rose-100/50 flex justify-between items-center">
           <div className="flex items-center gap-3 bg-rose-50 px-4 py-2 rounded-2xl">
             <Calendar className="text-rose-500 w-4 h-4" />
-            <input
-              type="month"
+            <HindiMonthYearPicker
               value={month}
-              onChange={(e) => setMonth(e.target.value)}
-              className="font-black text-rose-900 bg-transparent outline-none text-sm"
+              onChange={setMonth}
+              id="penalty-month"
+              label="माह और वर्ष चुनें"
+              className="min-w-[260px]"
             />
           </div>
           <div className="text-right">

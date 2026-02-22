@@ -80,6 +80,26 @@ const actions = [
 		border: 'border-blue-200',
 		upcoming: false,
 	},
+	{
+		title: 'Member Link',
+		desc: 'App Account',
+		icon: Users,
+		href: 'member-link',
+		color: 'text-violet-700',
+		bg: 'bg-violet-50',
+		border: 'border-violet-200',
+		upcoming: false,
+	},
+	{
+		title: 'Revert Txn',
+		desc: 'Undo Entry',
+		icon: ShieldCheck,
+		href: 'revert-transactions',
+		color: 'text-rose-700',
+		bg: 'bg-rose-50',
+		border: 'border-rose-200',
+		upcoming: false,
+	},
 	// {
 	//   title: "सदस्य",
 	//   desc: "मैनेजमेंट",
@@ -108,7 +128,7 @@ const actions = [
 		color: 'text-sky-600',
 		bg: 'bg-sky-50',
 		border: 'border-sky-200',
-		upcoming: true,
+		upcoming: false,
 	},
 ];
 

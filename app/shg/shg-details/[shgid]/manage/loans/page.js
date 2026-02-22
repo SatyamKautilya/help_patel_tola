@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   IndianRupee,
@@ -26,6 +26,7 @@ export default function BulkLoanPage({ params }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIds, setSelectedIds] = useState([]);
   const [loanSettings, setLoanSettings] = useState({});
+  const [shgName, setShgName] = useState("SHG");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uiMessage, setUiMessage] = useState(null);
@@ -35,13 +36,28 @@ export default function BulkLoanPage({ params }) {
     const loadMembers = async () => {
       setLoading(true);
       try {
-        const res = await fetch("/api/shg?name=list-members", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ shgId: shgid }),
-        });
-        const data = await res.json();
-        setMembers(data.members || []);
+        const [memberRes, shgSummaryRes] = await Promise.all([
+          fetch("/api/shg?name=list-members", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ shgId: shgid }),
+          }),
+          fetch("/api/shg?name=dashboard-summary", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ shgId: shgid }),
+          }),
+        ]);
+
+        const memberData = await memberRes.json();
+        setMembers(memberData.members || []);
+
+        if (shgSummaryRes.ok) {
+          const shgSummaryData = await shgSummaryRes.json();
+          if (shgSummaryData?.shgName) {
+            setShgName(shgSummaryData.shgName);
+          }
+        }
       } catch (err) {
         setUiMessage({ type: "error", text: "सदस्य लोड करने में विफल" });
       } finally {
@@ -60,7 +76,7 @@ export default function BulkLoanPage({ params }) {
       if (!loanSettings[id]) {
         setLoanSettings((p) => ({
           ...p,
-          [id]: { principal: "", interestRate: "1" },
+          [id]: { principal: "", interestRate: "", reason: "" },
         }));
       }
     }
@@ -77,13 +93,140 @@ export default function BulkLoanPage({ params }) {
     m?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const todayLabel = useMemo(
+    () =>
+      new Date().toLocaleDateString("hi-IN", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+    []
+  );
+
   const validateDetailsStep = () => {
     for (const id of selectedIds) {
       const l = loanSettings[id];
-      if (!l || !l.principal || Number(l.principal) <= 0 || !l.interestRate || Number(l.interestRate) <= 0) 
+      if (
+        !l ||
+        !l.principal ||
+        Number(l.principal) <= 0 ||
+        !l.interestRate ||
+        Number(l.interestRate) <= 0 ||
+        !String(l.reason || "").trim()
+      )
         return false;
     }
     return true;
+  };
+
+  const printProposal = (member, loan) => {
+    if (!member || !loan) return;
+    const reason = String(loan.reason || "").trim();
+    if (!reason) {
+      setUiMessage({ type: "error", text: "कृपया ऋण का कारण भरें" });
+      return;
+    }
+
+    const amount = Number(loan.principal || 0).toLocaleString("hi-IN");
+    const rate = Number(loan.interestRate || 0);
+    const escapeHtml = (value = "") =>
+      String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+
+    const memberSignRows = (members || [])
+      .map(
+        (m, idx) => `
+          <tr>
+            <td class="center">${idx + 1}</td>
+            <td>${escapeHtml(m.name || "-")}</td>
+            <td class="sig"></td>
+          </tr>`,
+      )
+      .join("");
+
+    const objectiveText = `सदस्य ${member.name || "-"} को आवश्यक कार्य हेतु ऋण प्रदान करना।`;
+    const discussionText = `कारण: ${reason} | मांग: ₹${amount} | प्रस्तावित मासिक ब्याज दर: ${rate}%`;
+    const resolutionText = `समूह सर्वसम्मति से सदस्य ${member.name || "-"} को ₹${amount} का ऋण ${rate}% मासिक ब्याज दर पर स्वीकृत करता है।`;
+
+    const win = window.open("", "_blank", "width=900,height=1000");
+    if (!win) {
+      setUiMessage({
+        type: "error",
+        text: "पॉप-अप ब्लॉक है, कृपया Allow करें",
+      });
+      return;
+    }
+
+    const fileBase = `Prastav-${member.name || "member"}-${todayLabel}`;
+    win.document.write(`
+<!doctype html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <title>${fileBase}</title>
+  <style>
+    body { font-family: "Noto Sans Devanagari", "Mangal", sans-serif; margin: 36px; color: #0f172a; }
+    .box { border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; }
+    h1 { margin: 0; font-size: 26px; text-align: center; }
+    .meta { margin: 8px 0 18px; text-align: center; color: #334155; font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #94a3b8; padding: 10px; vertical-align: top; font-size: 14px; }
+    th { background: #f1f5f9; text-align: left; }
+    .sign-table { margin-top: 16px; }
+    .sign-table th, .sign-table td { font-size: 13px; }
+    .center { text-align: center; }
+    .sig { width: 180px; height: 36px; }
+    .foot { margin-top: 14px; font-size: 12px; color: #475569; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>${escapeHtml(shgName || "SHG")} - प्रस्ताव</h1>
+    <div class="meta">दिनांक: ${todayLabel}</div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>उद्देश्य</th>
+          <th>चर्चा</th>
+          <th>प्रस्ताव / संकल्प</th>
+          <th>सदस्य हस्ताक्षर सूची</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>${escapeHtml(objectiveText)}</td>
+          <td>${escapeHtml(discussionText)}</td>
+          <td>${escapeHtml(resolutionText)}</td>
+          <td>नीचे तालिका में सदस्य हस्ताक्षर किए जाएंगे।</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="sign-table">
+      <thead>
+        <tr>
+          <th class="center" style="width:52px;">क्रम</th>
+          <th>सदस्य का नाम</th>
+          <th style="width:180px;">हस्ताक्षर</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${memberSignRows || '<tr><td colspan="3" class="center">सदस्य उपलब्ध नहीं</td></tr>'}
+      </tbody>
+    </table>
+
+    <div class="foot">नोट: यह प्रस्ताव SHG बैठक में पारित करने हेतु तैयार किया गया है।</div>
+  </div>
+</body>
+</html>`);
+    win.document.close();
+    win.focus();
+    win.print();
   };
 
   /* ---------------- SUBMIT ---------------- */
@@ -97,6 +240,7 @@ export default function BulkLoanPage({ params }) {
       memberId: id,
       principal: Number(loanSettings[id].principal),
       interestRate: Number(loanSettings[id].interestRate),
+      reason: String(loanSettings[id].reason || "").trim(),
     }));
 
     try {
@@ -260,6 +404,25 @@ export default function BulkLoanPage({ params }) {
                           </div>
                         </div>
                       </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-slate-400 ml-1 uppercase">
+                          ऋण देने का कारण
+                        </label>
+                        <textarea
+                          rows={2}
+                          placeholder="कारण लिखें..."
+                          className="w-full px-3 py-3 bg-white/50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-indigo-500/20 outline-none font-bold text-sm transition-all resize-none"
+                          value={l.reason || ""}
+                          onChange={(e) => updateLoan(id, "reason", e.target.value)}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => printProposal(m, l)}
+                        className="text-xs px-3 py-1.5 rounded-xl bg-indigo-50 text-indigo-700 border border-indigo-200 font-semibold hover:bg-indigo-100 transition-colors"
+                      >
+                        प्रस्ताव PDF
+                      </button>
                     </div>
                   </div>
                 );

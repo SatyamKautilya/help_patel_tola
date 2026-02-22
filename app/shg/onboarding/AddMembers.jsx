@@ -177,7 +177,13 @@ function AddSingleMember({ shgId, index, total, onAdded }) {
 						</label>
 						<button
 							disabled={!customName || addingMember || !selectedRole}
-							onClick={() => addMember({ name: customName, role: selectedRole })}
+							onClick={() =>
+								addMember({
+									name: customName,
+									role: selectedRole,
+									mobileNumber: mobile || null,
+								})
+							}
 							className='w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 px-4 py-2 rounded-lg text-sm text-white'>
 							<UserPlus className='w-4 h-4' />
 							ऐप खाते के बिना जोड़ें

@@ -12,7 +12,6 @@ import {
 	ArrowRight,
 	Edit2,
 	Info,
-	Users,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -66,16 +65,6 @@ export default function LoanRepaymentPage({ params }) {
 	const getValidationErrors = (loan) => {
 		const pay = repayments[loan._id] || {};
 		const pVal = Number(pay.principal || 0);
-		const iVal = Number(pay.interest || 0);
-
-		if (iVal > loan.monthlyInterest) {
-			return 'ब्याज देय राशि से अधिक है';
-		}
-
-		if ((pVal > 0 || iVal > 0) && iVal < loan.monthlyInterest) {
-			return 'मासिक ब्याज पूरा भरना अनिवार्य है';
-		}
-
 		if (pVal > loan.outstandingPrincipal) {
 			return 'मूलधन बकाया से अधिक है';
 		}
@@ -88,12 +77,7 @@ export default function LoanRepaymentPage({ params }) {
 			const err = getValidationErrors(loan);
 			const pay = repayments[loan._id];
 			const total = Number(pay?.principal || 0) + Number(pay?.interest || 0);
-			return (
-				err &&
-				(total > 0 ||
-					(repayments[loan._id]?.interest &&
-						Number(repayments[loan._id]?.interest) > loan.monthlyInterest))
-			);
+			return err && total > 0;
 		});
 	};
 
@@ -108,15 +92,6 @@ export default function LoanRepaymentPage({ params }) {
 			const pay = repayments[loan._id];
 			return Number(pay?.principal || 0) + Number(pay?.interest || 0) > 0;
 		});
-	}, [loans, repayments]);
-
-	const errorCount = useMemo(() => {
-		return loans.filter((loan) => {
-			const err = getValidationErrors(loan);
-			const pay = repayments[loan._id];
-			const total = Number(pay?.principal || 0) + Number(pay?.interest || 0);
-			return err && total > 0;
-		}).length;
 	}, [loans, repayments]);
 
 	const handleReview = () => {
@@ -195,24 +170,6 @@ export default function LoanRepaymentPage({ params }) {
 			</nav>
 
 			<main className='relative z-10 flex-1 px-6 pt-6 pb-44 space-y-5'>
-				<div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
-					<TopMetric
-						icon={<Users size={16} />}
-						label='सक्रिय ऋण'
-						value={loans.length}
-					/>
-					<TopMetric
-						icon={<CheckCircle2 size={16} />}
-						label='चयनित सदस्य'
-						value={activeRepayments.length}
-					/>
-					<TopMetric
-						icon={<AlertCircle size={16} />}
-						label='त्रुटियां'
-						value={errorCount}
-						danger={errorCount > 0}
-					/>
-				</div>
 
 				<div className='rounded-2xl border border-amber-200 bg-amber-50/70 p-4 flex items-start gap-3'>
 					<Info className='w-4 h-4 text-amber-700 mt-0.5' />
@@ -438,23 +395,6 @@ export default function LoanRepaymentPage({ params }) {
 	);
 }
 
-function TopMetric({ icon, label, value, danger = false }) {
-	return (
-		<div className='rounded-xl border border-slate-200 bg-white px-3 py-3 flex items-center gap-3'>
-			<div
-				className={`w-8 h-8 rounded-lg flex items-center justify-center ${danger ? 'bg-red-50 text-red-600' : 'bg-emerald-50 text-emerald-700'}`}>
-				{icon}
-			</div>
-			<div>
-				<p className='text-[11px] font-semibold text-slate-500'>{label}</p>
-				<p
-					className={`text-sm font-bold ${danger ? 'text-red-700' : 'text-slate-900'}`}>
-					{value}
-				</p>
-			</div>
-		</div>
-	);
-}
 
 function InputBlock({ label, hint, iconClass, value, onChange, placeholder }) {
 	return (
@@ -495,3 +435,4 @@ function FocusMetric({ label, value, tone = 'slate' }) {
 		</div>
 	);
 }
+

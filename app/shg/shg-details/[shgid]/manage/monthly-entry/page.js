@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import HindiMonthYearPicker from "@/components/HindiMonthYearPicker";
 
 export default function MonthlySavingsEntry({ params }) {
   const { shgid } = params;
@@ -154,11 +155,12 @@ export default function MonthlySavingsEntry({ params }) {
         <div className="bg-white rounded-3xl p-5 shadow-sm border border-slate-200 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Calendar className="text-indigo-500 w-5 h-5" />
-            <input
-              type="month"
+            <HindiMonthYearPicker
               value={month}
-              onChange={(e) => setMonth(e.target.value)}
-              className="font-bold text-slate-700 outline-none bg-transparent"
+              onChange={setMonth}
+              id="monthly-savings-month"
+              label="माह और वर्ष चुनें"
+              className="min-w-[260px]"
             />
           </div>
           <div className="h-8 w-[1px] bg-slate-200" />
