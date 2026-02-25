@@ -7,128 +7,148 @@ import {
 	IndianRupee,
 	HandCoins,
 	FileText,
-	Settings,
 	ArrowRight,
 	ChevronLeft,
 	TrendingUp,
 	ShieldCheck,
 	LayoutDashboard,
 	Lock,
-	Sparkles,
+	PiggyBank,
+	ReceiptText,
+	AlertCircle,
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 
-const actions = [
+const sections = [
 	{
-		title: 'बचत',
-		desc: 'एंट्री',
-		icon: IndianRupee,
-		href: 'monthly-entry',
-		color: 'text-indigo-600',
-		bg: 'bg-indigo-50',
-		border: 'border-indigo-200',
-		upcoming: false,
+		label: 'बचत',
+		labelEn: 'Monthly Saving & Lumpsum',
+		accentColor: 'text-indigo-700',
+		accentBg: 'bg-indigo-50',
+		accentBorder: 'border-indigo-200',
+		icon: PiggyBank,
+		actions: [
+			{
+				title: 'बचत',
+				desc: 'एंट्री',
+				icon: IndianRupee,
+				href: 'monthly-entry',
+				color: 'text-indigo-600',
+				bg: 'bg-indigo-50',
+				border: 'border-indigo-200',
+				upcoming: false,
+			},
+			{
+				title: 'एक-मुश्त जमा',
+				desc: 'एंट्री',
+				icon: FileText,
+				href: 'lump-sum',
+				color: 'text-pink-700',
+				bg: 'bg-pink-50',
+				border: 'border-pink-200',
+				upcoming: false,
+			},
+		],
 	},
-
 	{
-		title: 'पेनल्टी',
-		desc: 'एंट्री',
-		icon: IndianRupee,
-		href: 'penalty-entry',
-		color: 'text-red-600',
-		bg: 'bg-red-50',
-		border: 'border-red-200',
-		upcoming: false,
-	},
-	{
-		title: 'ऋण दें',
-		desc: 'वितरण',
+		label: 'ऋण',
+		labelEn: 'Loans',
+		accentColor: 'text-emerald-700',
+		accentBg: 'bg-emerald-50',
+		accentBorder: 'border-emerald-200',
 		icon: HandCoins,
-		href: 'loans',
-		color: 'text-emerald-600',
-		bg: 'bg-emerald-50',
-		border: 'border-emerald-200',
-		upcoming: false,
+		actions: [
+			{
+				title: 'ऋण दें',
+				desc: 'वितरण',
+				icon: HandCoins,
+				href: 'loans',
+				color: 'text-emerald-600',
+				bg: 'bg-emerald-50',
+				border: 'border-emerald-200',
+				upcoming: false,
+			},
+			{
+				title: 'भुगतान',
+				desc: 'किस्त',
+				icon: FileText,
+				href: 'repayment',
+				color: 'text-orange-600',
+				bg: 'bg-orange-50',
+				border: 'border-orange-200',
+				upcoming: false,
+			},
+		],
 	},
 	{
-		title: 'भुगतान',
-		desc: 'किस्त',
-		icon: FileText,
-		href: 'repayment',
-		color: 'text-orange-600',
-		bg: 'bg-orange-50',
-		border: 'border-orange-200',
-		upcoming: false,
+		label: 'पेनल्टी & खर्चा',
+		labelEn: 'Penalty & Expense',
+		accentColor: 'text-red-700',
+		accentBg: 'bg-red-50',
+		accentBorder: 'border-red-200',
+		icon: AlertCircle,
+		actions: [
+			{
+				title: 'पेनल्टी',
+				desc: 'एंट्री',
+				icon: IndianRupee,
+				href: 'penalty-entry',
+				color: 'text-red-600',
+				bg: 'bg-red-50',
+				border: 'border-red-200',
+				upcoming: false,
+			},
+			{
+				title: 'खर्चा',
+				desc: 'एंट्री',
+				icon: ReceiptText,
+				href: 'expenses',
+				color: 'text-blue-700',
+				bg: 'bg-blue-50',
+				border: 'border-blue-200',
+				upcoming: false,
+			},
+		],
 	},
 	{
-		title: 'एक-मुश्त जमा',
-		desc: 'एंट्री',
-		icon: FileText,
-		href: 'lump-sum',
-		color: 'text-pink-700',
-		bg: 'bg-pink-50',
-		border: 'border-pink-200',
-		upcoming: false,
-	},
-	{
-		title: 'खर्चा',
-		desc: 'एंट्री',
-		icon: FileText,
-		href: 'expenses',
-		color: 'text-blue-700',
-		bg: 'bg-blue-50',
-		border: 'border-blue-200',
-		upcoming: false,
-	},
-	{
-		title: 'Member Link',
-		desc: 'App Account',
-		icon: Users,
-		href: 'member-link',
-		color: 'text-violet-700',
-		bg: 'bg-violet-50',
-		border: 'border-violet-200',
-		upcoming: false,
-	},
-	{
-		title: 'Revert Txn',
-		desc: 'Undo Entry',
-		icon: ShieldCheck,
-		href: 'revert-transactions',
-		color: 'text-rose-700',
-		bg: 'bg-rose-50',
-		border: 'border-rose-200',
-		upcoming: false,
-	},
-	// {
-	//   title: "सदस्य",
-	//   desc: "मैनेजमेंट",
-	//   icon: Users,
-	//   href: "members",
-	//   color: "text-rose-600",
-	//   bg: "bg-rose-50",
-	//   border: "border-rose-200",
-	//   upcoming: true,
-	// },
-	// {
-	//   title: "नियम",
-	//   desc: "सेटिंग्स",
-	//   icon: Settings,
-	//   href: "settings",
-	//   color: "text-purple-600",
-	//   bg: "bg-purple-50",
-	//   border: "border-purple-200",
-	//   upcoming: true,
-	// },
-	{
-		title: 'रिपोर्ट',
-		desc: 'विवरण',
-		icon: TrendingUp,
-		href: 'reports',
-		color: 'text-sky-600',
-		bg: 'bg-sky-50',
-		border: 'border-sky-200',
-		upcoming: false,
+		label: 'अन्य प्रबंधन',
+		labelEn: 'Other Management',
+		accentColor: 'text-violet-700',
+		accentBg: 'bg-violet-50',
+		accentBorder: 'border-violet-200',
+		icon: LayoutDashboard,
+		actions: [
+			{
+				title: 'Member Link',
+				desc: 'App Account',
+				icon: Users,
+				href: 'member-link',
+				color: 'text-violet-700',
+				bg: 'bg-violet-50',
+				border: 'border-violet-200',
+				upcoming: false,
+			},
+			{
+				title: 'Revert Txn',
+				desc: 'Undo Entry',
+				icon: ShieldCheck,
+				href: 'revert-transactions',
+				color: 'text-rose-700',
+				bg: 'bg-rose-50',
+				border: 'border-rose-200',
+				upcoming: false,
+			},
+			{
+				title: 'रिपोर्ट',
+				desc: 'विवरण',
+				icon: TrendingUp,
+				href: 'reports',
+				color: 'text-sky-600',
+				bg: 'bg-sky-50',
+				border: 'border-sky-200',
+				upcoming: false,
+			},
+		],
 	},
 ];
 
@@ -136,6 +156,8 @@ export default function ShgManagerHome({ params }) {
 	const { shgid } = params;
 	const router = useRouter();
 	const thisUser = useSelector((state) => state.appContext.user);
+
+	let cardIndex = 0;
 
 	return (
 		<div className='h-screen overflow-y-auto bg-[#fafafa] relative flex flex-col'>
@@ -165,60 +187,84 @@ export default function ShgManagerHome({ params }) {
 				<motion.button
 					whileTap={{ scale: 0.8 }}
 					onClick={() => router.back()}
-					className='absolute  right-6 p-3 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white z-20'>
+					className='absolute right-6 p-3 bg-white/80 backdrop-blur-md rounded-2xl shadow-lg border border-white z-20'>
 					<ChevronLeft className='w-5 h-5 text-slate-600' />
 				</motion.button>
 			</nav>
 
-			<main className='relative z-10 flex-1 flex flex-col px-6 py-4'>
-				{/* Greeting & Subtitle */}
-
-				{/* Glassmorphism Financial Card (Light & Colorful) */}
-
-				{/* Grid Section - Optimized for height */}
-				<div className='grid grid-cols-2 gap-5 h-full mb-16'>
-					{actions.map((a, i) => (
-						<motion.button
-							key={a.href}
-							onClick={() =>
-								!a.upcoming &&
-								router.push(`/shg/shg-details/${shgid}/manage/${a.href}`)
-							}
-							initial={{ opacity: 0, y: 10 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ delay: i * 0.05 }}
-							whileTap={{ scale: a.upcoming ? 1 : 0.95 }}
-							disabled={a.upcoming}
-							className={`group relative flex flex-col justify-center bg-white/70 backdrop-blur-sm border-2 ${a.border} rounded-[2rem] p-4 text-left hover:bg-white transition-all overflow-hidden shadow-sm ${a.upcoming ? 'opacity-50 bg-gray-300/50 cursor-not-allowed' : ''}`}>
-							{a.upcoming && (
-								<div className='absolute top-3 right-3 p-1.5 bg-slate-200 rounded-lg'>
-									<Lock className='w-4 h-4 text-red-600' />
+			<main className='relative z-10 flex-1 flex flex-col px-6 py-4 gap-6 mb-16'>
+				{sections.map((section) => {
+					const SectionIcon = section.icon;
+					return (
+						<div key={section.labelEn}>
+							{/* Section Header */}
+							<div className='flex items-center gap-2 mb-3'>
+								<div
+									className={`w-7 h-7 rounded-xl ${section.accentBg} flex items-center justify-center`}>
+									<SectionIcon className={`w-4 h-4 ${section.accentColor}`} />
 								</div>
-							)}
-							<div
-								className={`w-11 h-11 rounded-2xl ${a.bg} flex items-center justify-center ${a.color} mb-3 shadow-sm`}>
-								<a.icon className='w-6 h-6' />
+								<div>
+									<h3
+										className={`text-sm font-black tracking-tight ${section.accentColor}`}>
+										{section.label}
+									</h3>
+									<p className='text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none'>
+										{section.labelEn}
+									</p>
+								</div>
+								<div
+									className={`flex-1 h-px ml-1 ${section.accentBg} border-t ${section.accentBorder}`}
+								/>
 							</div>
-							<div>
-								<h3 className='text-sm font-bold text-slate-800 tracking-tight leading-none'>
-									{a.title}
-								</h3>
-								<p className='text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter'>
-									{a.desc}
-								</p>
-							</div>
-							<div
-								className={`absolute right-4 bottom-4 p-1 rounded-lg ${a.bg}`}>
-								<ArrowRight className={`w-3 h-3 ${a.color}`} />
-							</div>
-						</motion.button>
-					))}
-				</div>
 
-				{/* Mini Footer */}
+							{/* Cards Grid */}
+							<div className='grid grid-cols-2 gap-4'>
+								{section.actions.map((a) => {
+									const idx = cardIndex++;
+									return (
+										<motion.button
+											key={a.href}
+											onClick={() =>
+												!a.upcoming &&
+												router.push(
+													`/shg/shg-details/${shgid}/manage/${a.href}`,
+												)
+											}
+											initial={{ opacity: 0, y: 10 }}
+											animate={{ opacity: 1, y: 0 }}
+											transition={{ delay: idx * 0.05 }}
+											whileTap={{ scale: a.upcoming ? 1 : 0.95 }}
+											disabled={a.upcoming}
+											className={`group relative flex flex-col justify-center bg-white/70 backdrop-blur-sm border-2 ${a.border} rounded-[2rem] p-4 text-left hover:bg-white transition-all overflow-hidden shadow-sm ${a.upcoming ? 'opacity-50 bg-gray-300/50 cursor-not-allowed' : ''}`}>
+											{a.upcoming && (
+												<div className='absolute top-3 right-3 p-1.5 bg-slate-200 rounded-lg'>
+													<Lock className='w-4 h-4 text-red-600' />
+												</div>
+											)}
+											<div
+												className={`w-11 h-11 rounded-2xl ${a.bg} flex items-center justify-center ${a.color} mb-3 shadow-sm`}>
+												<a.icon className='w-6 h-6' />
+											</div>
+											<div>
+												<h3 className='text-sm font-bold text-slate-800 tracking-tight leading-none'>
+													{a.title}
+												</h3>
+												<p className='text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter'>
+													{a.desc}
+												</p>
+											</div>
+											<div
+												className={`absolute right-4 bottom-4 p-1 rounded-lg ${a.bg}`}>
+												<ArrowRight className={`w-3 h-3 ${a.color}`} />
+											</div>
+										</motion.button>
+									);
+								})}
+							</div>
+						</div>
+					);
+				})}
 			</main>
-
-			{/* Back Button - Fixed Bottom Left */}
 		</div>
 	);
 }

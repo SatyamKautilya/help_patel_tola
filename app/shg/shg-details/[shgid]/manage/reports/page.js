@@ -11,30 +11,8 @@ import {
 	Download,
 	X,
 	FileText,
-	ImageDown,
 } from 'lucide-react';
 import HindiMonthYearPicker from '@/components/HindiMonthYearPicker';
-
-let html2canvasLoaderPromise = null;
-
-function loadHtml2canvas() {
-	if (typeof window === 'undefined')
-		return Promise.reject(new Error('Window unavailable'));
-	if (window.html2canvas) return Promise.resolve(window.html2canvas);
-	if (html2canvasLoaderPromise) return html2canvasLoaderPromise;
-
-	html2canvasLoaderPromise = new Promise((resolve, reject) => {
-		const script = document.createElement('script');
-		script.src =
-			'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-		script.async = true;
-		script.onload = () => resolve(window.html2canvas);
-		script.onerror = () => reject(new Error('html2canvas लोड नहीं हुआ'));
-		document.head.appendChild(script);
-	});
-
-	return html2canvasLoaderPromise;
-}
 
 function formatMoney(value) {
 	return `Rs ${Number(value || 0).toLocaleString('en-IN', {
@@ -43,12 +21,15 @@ function formatMoney(value) {
 	})}`;
 }
 
-async function triggerServerJpegDownload(blob, fileName) {
+async function triggerServerFileDownload(blob, fileName) {
+	const safeHeaderFileName = encodeURIComponent(
+		String(fileName || 'download.file'),
+	);
 	const prepareResp = await fetch('/api/download-jpeg', {
 		method: 'POST',
 		headers: {
-			'Content-Type': blob.type || 'image/jpeg',
-			'x-file-name': fileName,
+			'Content-Type': blob.type || 'application/octet-stream',
+			'x-file-name': safeHeaderFileName,
 		},
 		body: blob,
 	});
@@ -65,22 +46,6 @@ async function triggerServerJpegDownload(blob, fileName) {
 	window.location.assign(url);
 }
 
-async function canvasToCompressedJpegBlob(canvas, quality = 0.82) {
-	return new Promise((resolve, reject) => {
-		canvas.toBlob(
-			(result) => {
-				if (!result) {
-					reject(new Error('JPEG फाइल नहीं बन पाई'));
-					return;
-				}
-				resolve(result);
-			},
-			'image/jpeg',
-			quality,
-		);
-	});
-}
-
 export default function ReportsPage({ params }) {
 	const { shgid } = params;
 	const router = useRouter();
@@ -90,10 +55,9 @@ export default function ReportsPage({ params }) {
 	const [loading, setLoading] = useState(false);
 	const [loadingList, setLoadingList] = useState(true);
 	const [loadingSnapshot, setLoadingSnapshot] = useState(false);
-	const [downloadingJpeg, setDownloadingJpeg] = useState(false);
+	const [downloadingPdf, setDownloadingPdf] = useState(false);
 	const [snapshots, setSnapshots] = useState([]);
 	const [message, setMessage] = useState(null);
-	const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
 	const [snapshotPreview, setSnapshotPreview] = useState(null);
 	const [previewMonth, setPreviewMonth] = useState(null);
 	const [showReportModal, setShowReportModal] = useState(false);
@@ -129,17 +93,12 @@ export default function ReportsPage({ params }) {
 		return data?.snapshot;
 	};
 
-	const openReportPreview = async ({
-		targetMonth,
-		targetPdfUrl,
-		snapshotData,
-	}) => {
+	const openReportPreview = async ({ targetMonth, snapshotData }) => {
 		setLoadingSnapshot(true);
 		setMessage(null);
 		try {
 			const snapshot = snapshotData || (await fetchSnapshotData(targetMonth));
 			setSnapshotPreview(snapshot);
-			setPdfPreviewUrl(targetPdfUrl || null);
 			setPreviewMonth(targetMonth);
 			setShowReportModal(true);
 		} catch (e) {
@@ -171,7 +130,6 @@ export default function ReportsPage({ params }) {
 			await loadSnapshots();
 			await openReportPreview({
 				targetMonth: month,
-				targetPdfUrl: data?.storage?.proxyUrl || null,
 				snapshotData: data?.snapshot || null,
 			});
 		} catch (e) {
@@ -184,45 +142,137 @@ export default function ReportsPage({ params }) {
 		}
 	};
 
-	const downloadJpeg = async () => {
-		if (!reportRef.current || !snapshotPreview) return;
-		setDownloadingJpeg(true);
-		setMessage(null);
-		try {
-			const html2canvas = await loadHtml2canvas();
-			const canvas = await html2canvas(reportRef.current, {
-				backgroundColor: '#ffffff',
-				scale: 1,
-				useCORS: true,
-			});
+	const escapeHtml = (value) =>
+		String(value ?? '')
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;')
+			.replace(/\"/g, '&quot;')
+			.replace(/'/g, '&#39;');
 
-			// Keep payload smaller for webview/server upload reliability.
-			let exportCanvas = canvas;
-			const maxWidth = 1280;
-			if (canvas.width > maxWidth) {
-				const ratio = maxWidth / canvas.width;
-				const resized = document.createElement('canvas');
-				resized.width = Math.round(canvas.width * ratio);
-				resized.height = Math.round(canvas.height * ratio);
-				const rctx = resized.getContext('2d');
-				if (rctx) {
-					rctx.drawImage(canvas, 0, 0, resized.width, resized.height);
-					exportCanvas = resized;
-				}
+	const buildSnapshotPdfHtml = (snapshot) => {
+		const rows = (snapshot?.memberWise || [])
+			.map(
+				(member, idx) => `
+					<tr>
+						<td style="border:1px solid #334155;padding:6px;">${idx + 1}</td>
+						<td style="border:1px solid #334155;padding:6px;">${escapeHtml(member?.name || '-')}</td>
+						<td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(member?.savings))}</td>
+						<td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(member?.lumpSum))}</td>
+						<td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(member?.outstandingLoan))}</td>
+					</tr>
+				`,
+			)
+			.join('');
+
+		const totals = snapshot?.shgTotals || {};
+
+		return `
+			<div class="snapshot-pdf-root" style="width:760px;background:#ffffff;color:#0f172a;padding:10px;font-family:'Noto Sans Devanagari','Mangal',sans-serif;box-sizing:border-box;overflow:hidden;">
+				<div style="border:2px solid #334155;padding:14px;box-sizing:border-box;">
+					<h1 style="margin:0;text-align:center;font-size:24px;font-weight:800;">मासिक SHG रिपोर्ट</h1>
+					<div style="margin-top:8px;display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;font-size:12px;">
+						<p style="margin:0;">समूह: <strong>${escapeHtml(snapshot?.shgName || '-')}</strong></p>
+						<p style="margin:0;">माह: <strong>${escapeHtml(snapshot?.month || previewMonth || month || '-')}</strong></p>
+						<p style="margin:0;">Generated: <strong>${escapeHtml(new Date(snapshot?.generatedAt || Date.now()).toLocaleString('hi-IN'))}</strong></p>
+					</div>
+
+					<h3 style="margin:14px 0 8px 0;font-size:14px;">सदस्य-वार विवरण</h3>
+					<table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px;">
+						<thead>
+							<tr>
+								<th style="border:1px solid #334155;padding:6px;text-align:left;width:36px;">क्र.</th>
+								<th style="border:1px solid #334155;padding:6px;text-align:left;">सदस्य</th>
+								<th style="border:1px solid #334155;padding:6px;text-align:left;">बचत</th>
+								<th style="border:1px solid #334155;padding:6px;text-align:left;">लम्पसम</th>
+								<th style="border:1px solid #334155;padding:6px;text-align:left;">बकाया ऋण</th>
+							</tr>
+						</thead>
+						<tbody>
+							${
+								rows ||
+								`<tr><td style="border:1px solid #334155;padding:6px;">1</td><td style="border:1px solid #334155;padding:6px;">-</td><td style="border:1px solid #334155;padding:6px;">-</td><td style="border:1px solid #334155;padding:6px;">-</td><td style="border:1px solid #334155;padding:6px;">-</td></tr>`
+							}
+						</tbody>
+					</table>
+
+					<h3 style="margin:14px 0 8px 0;font-size:14px;">SHG कुल सारांश</h3>
+					<table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px;">
+						<tbody>
+							<tr><td style="border:1px solid #334155;padding:6px;">कुल बचत</td><td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(totals.totalSavings))}</td></tr>
+							<tr><td style="border:1px solid #334155;padding:6px;">कुल लम्पसम</td><td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(totals.totalLumpSum))}</td></tr>
+							<tr><td style="border:1px solid #334155;padding:6px;">कुल ब्याज</td><td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(totals.totalInterest))}</td></tr>
+							<tr><td style="border:1px solid #334155;padding:6px;">कुल दंड</td><td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(totals.totalPenalty))}</td></tr>
+							<tr><td style="border:1px solid #334155;padding:6px;">कुल बकाया ऋण</td><td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(totals.totalOutstandingLoan))}</td></tr>
+							<tr><td style="border:1px solid #334155;padding:6px;">कुल खर्च</td><td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(totals.totalExpense))}</td></tr>
+							<tr><td style="border:1px solid #334155;padding:6px;font-weight:800;background:#fef9c3;">कुल नकद</td><td style="border:1px solid #334155;padding:6px;font-weight:800;background:#fef9c3;">${escapeHtml(formatMoney(totals.totalCash))}</td></tr>
+							<tr><td style="border:1px solid #334155;padding:6px;font-weight:800;background:#ecfdf5;">उपलब्ध नकद</td><td style="border:1px solid #334155;padding:6px;font-weight:800;background:#ecfdf5;">${escapeHtml(formatMoney(totals.totalAvailableCash))}</td></tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		`;
+	};
+
+	const downloadSnapshotPdf = async () => {
+		if (!snapshotPreview) return;
+		setDownloadingPdf(true);
+		setMessage(null);
+		let wrapper = null;
+		try {
+			const html2pdfModule = await import('html2pdf.js');
+			const html2pdf = html2pdfModule.default || html2pdfModule;
+
+			wrapper = document.createElement('div');
+			wrapper.style.position = 'fixed';
+			wrapper.style.left = '-10000px';
+			wrapper.style.top = '0';
+			wrapper.style.width = '760px';
+			wrapper.style.zIndex = '-1';
+			wrapper.innerHTML = buildSnapshotPdfHtml(snapshotPreview);
+			document.body.appendChild(wrapper);
+
+			const pdfRoot = wrapper.querySelector('.snapshot-pdf-root');
+			if (!pdfRoot) {
+				throw new Error('PDF टेम्पलेट तैयार नहीं हुआ');
 			}
 
-			const blob = await canvasToCompressedJpegBlob(exportCanvas, 0.8);
-			await triggerServerJpegDownload(
+			const blob = await html2pdf()
+				.set({
+					margin: [2, 2, 2, 2],
+					image: { type: 'jpeg', quality: 0.95 },
+					html2canvas: {
+						scale: 2,
+						useCORS: true,
+						backgroundColor: '#ffffff',
+					},
+					jsPDF: {
+						unit: 'mm',
+						format: 'a4',
+						orientation: 'portrait',
+					},
+				})
+				.from(pdfRoot)
+				.outputPdf('blob');
+
+			if (!blob) {
+				throw new Error('PDF तैयार नहीं हुआ');
+			}
+
+			await triggerServerFileDownload(
 				blob,
-				`snapshot-${previewMonth || month}.jpg`,
+				`snapshot-${previewMonth || month}.pdf`,
 			);
 		} catch (e) {
 			setMessage({
 				type: 'error',
-				text: e.message || 'JPEG डाउनलोड नहीं हुआ।',
+				text: e.message || 'PDF डाउनलोड नहीं हुआ।',
 			});
 		} finally {
-			setDownloadingJpeg(false);
+			if (wrapper && wrapper.parentNode) {
+				wrapper.parentNode.removeChild(wrapper);
+			}
+			setDownloadingPdf(false);
 		}
 	};
 
@@ -239,8 +289,8 @@ export default function ReportsPage({ params }) {
 							मासिक स्नैपशॉट रिपोर्ट
 						</h1>
 						<p className='text-sm text-slate-600 mt-1'>
-							हर SHG के लिए महीने का स्नैपशॉट जनरेट करें, रिपोर्ट देखें और
-							JPEG/PDF डाउनलोड करें।
+							हर SHG के लिए महीने का स्नैपशॉट जनरेट करें, रिपोर्ट देखें और A4
+							PDF डाउनलोड करें।
 						</p>
 					</div>
 					<button
@@ -315,7 +365,6 @@ export default function ReportsPage({ params }) {
 											onClick={() =>
 												openReportPreview({
 													targetMonth: snap.month,
-													targetPdfUrl: snap.proxyUrl || null,
 												})
 											}
 											disabled={loadingSnapshot}
@@ -365,26 +414,17 @@ export default function ReportsPage({ params }) {
 										स्नैपशॉट रिपोर्ट
 									</h3>
 									<p className='text-xs text-slate-500'>
-										HTML preview और JPEG/PDF डाउनलोड
+										HTML preview और A4 PDF डाउनलोड
 									</p>
 								</div>
 								<div className='flex items-center gap-2'>
 									<button
-										onClick={downloadJpeg}
-										disabled={!canPreviewReport || downloadingJpeg}
+										onClick={downloadSnapshotPdf}
+										disabled={!canPreviewReport || downloadingPdf}
 										className='inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-500 disabled:opacity-60'>
-										<ImageDown className='w-4 h-4' />
-										{downloadingJpeg ? 'JPEG बन रहा है...' : 'JPEG डाउनलोड'}
+										<Download className='w-4 h-4' />
+										{downloadingPdf ? 'PDF बन रहा है...' : 'PDF डाउनलोड'}
 									</button>
-									{pdfPreviewUrl ? (
-										<a
-											href={pdfPreviewUrl}
-											download={`snapshot-${previewMonth || month}.pdf`}
-											className='inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-500'>
-											<Download className='w-4 h-4' />
-											PDF डाउनलोड
-										</a>
-									) : null}
 									<button
 										onClick={() => setShowReportModal(false)}
 										className='p-2 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-50'>
@@ -515,6 +555,12 @@ export default function ReportsPage({ params }) {
 													<span>कुल खर्च</span>
 													<span className='font-semibold'>
 														{formatMoney(totals.totalExpense)}
+													</span>
+												</div>
+												<div className='border border-slate-300 p-2 flex items-center justify-between md:col-span-2 bg-yellow-50'>
+													<span className='font-bold'>कुल नकद</span>
+													<span className='font-black'>
+														{formatMoney(totals.totalCash)}
 													</span>
 												</div>
 												<div className='border border-slate-300 p-2 flex items-center justify-between md:col-span-2 bg-emerald-50'>

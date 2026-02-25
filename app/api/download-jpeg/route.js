@@ -3,11 +3,13 @@ export const runtime = 'nodejs';
 import { randomUUID } from 'crypto';
 import { put } from '@vercel/blob';
 
-function sanitizeFileName(name = 'download.jpg') {
-	return String(name)
-		.replace(/[^\w.\-]+/g, '_')
-		.replace(/_+/g, '_')
-		.replace(/^_+|_+$/g, '') || 'download.jpg';
+function sanitizeFileName(name = 'download.file') {
+	return (
+		String(name)
+			.replace(/[^\w.\-]+/g, '_')
+			.replace(/_+/g, '_')
+			.replace(/^_+|_+$/g, '') || 'download.file'
+	);
 }
 
 const STORE_TTL_MS = 5 * 60 * 1000;
@@ -34,7 +36,7 @@ export async function GET(req) {
 		const { searchParams } = new URL(req.url);
 		const src = String(searchParams.get('src') || '');
 		const downloadName = sanitizeFileName(
-			String(searchParams.get('name') || 'download.jpg'),
+			String(searchParams.get('name') || 'download.file'),
 		);
 
 		if (src) {
@@ -50,11 +52,11 @@ export async function GET(req) {
 
 			const fileResp = await fetch(src);
 			if (!fileResp.ok) {
-				return new Response('Source image unavailable', { status: 404 });
+				return new Response('Source file unavailable', { status: 404 });
 			}
 			const buffer = Buffer.from(await fileResp.arrayBuffer());
 			const contentType =
-				fileResp.headers.get('content-type') || 'image/jpeg';
+				fileResp.headers.get('content-type') || 'application/octet-stream';
 			return new Response(buffer, {
 				status: 200,
 				headers: {
@@ -80,39 +82,50 @@ export async function GET(req) {
 		return new Response(file.buffer, {
 			status: 200,
 			headers: {
-				'Content-Type': file.contentType || 'image/jpeg',
+				'Content-Type': file.contentType || 'application/octet-stream',
 				'Content-Disposition': `attachment; filename="${file.fileName}"`,
 				'Cache-Control': 'no-store',
 				'Content-Length': String(file.buffer.length),
 			},
 		});
 	} catch {
-		return new Response('Failed to download image', { status: 500 });
+		return new Response('Failed to download file', { status: 500 });
 	}
 }
 
 export async function POST(req) {
 	try {
 		cleanupStore();
-		const rawName = req.headers.get('x-file-name') || 'download.jpg';
-		const fileName = sanitizeFileName(rawName);
-		const contentType = req.headers.get('content-type') || 'image/jpeg';
-		if (!contentType.startsWith('image/')) {
-			return new Response('Only image payload is allowed', { status: 400 });
+		const rawName = req.headers.get('x-file-name') || 'download.file';
+		let decodedFileName = rawName;
+		try {
+			decodedFileName = decodeURIComponent(rawName);
+		} catch {
+			decodedFileName = rawName;
+		}
+		const fileName = sanitizeFileName(decodedFileName);
+		const contentType =
+			req.headers.get('content-type') || 'application/octet-stream';
+		const isAllowedContentType =
+			contentType.startsWith('image/') || contentType === 'application/pdf';
+		if (!isAllowedContentType) {
+			return new Response('Only image or PDF payload is allowed', {
+				status: 400,
+			});
 		}
 
 		const arrayBuffer = await req.arrayBuffer();
 		const buffer = Buffer.from(arrayBuffer || []);
 		if (!buffer.length) {
-			return new Response('Empty image payload', { status: 400 });
+			return new Response('Empty file payload', { status: 400 });
 		}
 		if (buffer.length > 8 * 1024 * 1024) {
-			return new Response('Image too large', { status: 413 });
+			return new Response('File too large', { status: 413 });
 		}
 
 		const hasBlobToken = Boolean(
 			process.env.BLOB_READ_WRITE_TOKEN ||
-				process.env.VERCEL_BLOB_READ_WRITE_TOKEN,
+			process.env.VERCEL_BLOB_READ_WRITE_TOKEN,
 		);
 		if (hasBlobToken) {
 			const uploadPath = `tmp-downloads/${Date.now()}-${randomUUID()}-${fileName}`;
@@ -149,6 +162,6 @@ export async function POST(req) {
 			storage: 'memory',
 		});
 	} catch {
-		return new Response('Failed to prepare download', { status: 500 });
+		return new Response('Failed to prepare file download', { status: 500 });
 	}
 }

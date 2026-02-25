@@ -21,6 +21,8 @@
 		"date-fns": "^4.1.0",
 		"expo-server-sdk": "^4.0.0",
 		"git-cli": "^0.11.0",
+		"html2pdf": "^0.0.11",
+		"html2pdf.js": "^0.14.0",
 		"lucide-react": "^0.516.0",
 		"mongoose": "^8.3.0",
 		"next": "^14.2.3",

@@ -359,7 +359,10 @@ async function linkMemberUser(data) {
 async function getOnboardingDraft(data) {
 	const { createdBy } = data;
 	if (!createdBy) {
-		return NextResponse.json({ error: 'createdBy is required' }, { status: 400 });
+		return NextResponse.json(
+			{ error: 'createdBy is required' },
+			{ status: 400 },
+		);
 	}
 
 	const shg = await Shg.findOne({
@@ -517,7 +520,9 @@ async function createLoan(data) {
 
 async function loanRepayment(data) {
 	const loan = await Loan.findById(data.loanId);
-	const paymentDate = data.paymentDate ? new Date(data.paymentDate) : new Date();
+	const paymentDate = data.paymentDate
+		? new Date(data.paymentDate)
+		: new Date();
 	const month = data.month || paymentDate.toISOString().slice(0, 7);
 	const repayment = await LoanRepayment.create({
 		loanId: data.loanId,
@@ -541,6 +546,30 @@ async function loanRepayment(data) {
 		date: paymentDate,
 		meta: { loanId: data.loanId, loanRepaymentId: repayment._id, month },
 	});
+
+	/* Auto-close loan if outstanding principal becomes zero */
+	if (loan) {
+		const principalAgg = await LoanRepayment.aggregate([
+			{ $match: { loanId: loan._id, isReversed: false } },
+			{
+				$group: {
+					_id: null,
+					totalPrincipalPaid: { $sum: '$principalComponent' },
+				},
+			},
+		]);
+		const totalPrincipalPaid = principalAgg[0]?.totalPrincipalPaid || 0;
+		const outstanding = Math.max(
+			Number(loan.principal || 0) - totalPrincipalPaid,
+			0,
+		);
+		if (outstanding === 0) {
+			await Loan.updateOne(
+				{ _id: loan._id },
+				{ status: LoanRepaymentStatus.CLOSED, closedAt: new Date() },
+			);
+		}
+	}
 
 	return NextResponse.json(repayment);
 }
@@ -704,7 +733,9 @@ async function allShgMembers(data) {
 	const members = await ShgMember.find({
 		shgId: shgId,
 		isActive: true,
-	}).select('_id name memberCode role hasMobileAccess joinedAt mobileNumber userId');
+	}).select(
+		'_id name memberCode role hasMobileAccess joinedAt mobileNumber userId',
+	);
 	return NextResponse.json({ members });
 }
 
@@ -845,7 +876,9 @@ async function MemberPassbook(data) {
 		totalPenalties,
 	};
 	return NextResponse.json({
-		transactions: transactions.filter((tx) => new Date(tx.date) >= sixMonthsAgo),
+		transactions: transactions.filter(
+			(tx) => new Date(tx.date) >= sixMonthsAgo,
+		),
 		summary,
 	});
 }
@@ -1123,7 +1156,11 @@ async function collectRepayment(data) {
 					type: TransactionType.LOAN_REPAYMENT,
 					memberId: loan.memberId,
 					date: new Date(),
-					meta: { loanId: loan._id, loanRepaymentId: repayment[0]._id, month: currentMonth },
+					meta: {
+						loanId: loan._id,
+						loanRepaymentId: repayment[0]._id,
+						month: currentMonth,
+					},
 				},
 			],
 			{ session },
@@ -1237,11 +1274,16 @@ async function listRevertableTransactions(data) {
 	const txns = await Transaction.find({
 		shgId: shgObjectId,
 		isReversed: false,
-		$or: [{ date: { $gte: thirtyDaysAgo } }, { createdAt: { $gte: thirtyDaysAgo } }],
+		$or: [
+			{ date: { $gte: thirtyDaysAgo } },
+			{ createdAt: { $gte: thirtyDaysAgo } },
+		],
 	})
 		.sort({ date: -1, createdAt: -1 })
 		.limit(safeLimit)
-		.select('_id shgId type amount date memberId fromAccount toAccount meta createdAt')
+		.select(
+			'_id shgId type amount date memberId fromAccount toAccount meta createdAt',
+		)
 		.lean();
 
 	const memberIds = txns
@@ -1253,13 +1295,18 @@ async function listRevertableTransactions(data) {
 		.select('_id name memberCode')
 		.lean();
 	const memberMap = Object.fromEntries(
-		members.map((m) => [String(m._id), { name: m.name, memberCode: m.memberCode }]),
+		members.map((m) => [
+			String(m._id),
+			{ name: m.name, memberCode: m.memberCode },
+		]),
 	);
 
 	const transactions = txns.map((t) => ({
 		...t,
 		memberName: t.memberId ? memberMap[String(t.memberId)]?.name || null : null,
-		memberCode: t.memberId ? memberMap[String(t.memberId)]?.memberCode || null : null,
+		memberCode: t.memberId
+			? memberMap[String(t.memberId)]?.memberCode || null
+			: null,
 	}));
 
 	return NextResponse.json({ transactions });
@@ -1320,7 +1367,9 @@ async function revertTransaction(data) {
 		thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 		const txnDate = txn.date || txn.createdAt;
 		if (!txnDate || new Date(txnDate) < thirtyDaysAgo) {
-			throw new Error('Only transactions from the last 30 days can be reverted');
+			throw new Error(
+				'Only transactions from the last 30 days can be reverted',
+			);
 		}
 
 		if (txn.type === TransactionType.LOAN_DISBURSEMENT) {
@@ -1333,7 +1382,9 @@ async function revertTransaction(data) {
 			}).session(session);
 
 			if (activeRepaymentCount > 0) {
-				throw new Error('Repayment exists for this loan. Revert repayments first.');
+				throw new Error(
+					'Repayment exists for this loan. Revert repayments first.',
+				);
 			}
 
 			await Loan.updateOne(
@@ -1395,7 +1446,8 @@ async function revertTransaction(data) {
 
 		if (txn.type === TransactionType.BANK_LOAN_RECEIVED) {
 			const bankLoanId = txn?.meta?.bankLoanId;
-			if (!bankLoanId) throw new Error('Linked bankLoanId missing in transaction meta');
+			if (!bankLoanId)
+				throw new Error('Linked bankLoanId missing in transaction meta');
 
 			await BankLoan.updateOne(
 				{ _id: bankLoanId },
@@ -1503,7 +1555,8 @@ function buildSnapshotOnePagePdf(snapshot) {
 	let y = pageHeight - 44;
 
 	const commands = [];
-	const line = (x1, y1, x2, y2) => commands.push(`${x1} ${y1} m ${x2} ${y2} l S`);
+	const line = (x1, y1, x2, y2) =>
+		commands.push(`${x1} ${y1} m ${x2} ${y2} l S`);
 	const rect = (x, yy, w, h) => commands.push(`${x} ${yy} ${w} ${h} re S`);
 	const textH = (x, yy, text, size = 10) =>
 		commands.push(pdfTextUnicode({ x, y: yy, text, size, font: 'F2' }));
@@ -1515,13 +1568,33 @@ function buildSnapshotOnePagePdf(snapshot) {
 	commands.push(`${left} ${y - 38} ${right - left} 52 re f`);
 	commands.push('0.2 0.2 0.25 RG');
 	rect(left, y - 38, right - left, 52);
-	textH(left + 12, y - 10, '\u092e\u093e\u0938\u093f\u0915 SHG \u0930\u093f\u092a\u094b\u0930\u094d\u091f', 14);
-	textH(left + 12, y - 26, `\u0938\u092e\u0942\u0939: ${snapshot.shgName || '-'}`, 10);
+	textH(
+		left + 12,
+		y - 10,
+		'\u092e\u093e\u0938\u093f\u0915 SHG \u0930\u093f\u092a\u094b\u0930\u094d\u091f',
+		14,
+	);
+	textH(
+		left + 12,
+		y - 26,
+		`\u0938\u092e\u0942\u0939: ${snapshot.shgName || '-'}`,
+		10,
+	);
 	textH(right - 170, y - 26, `\u092e\u093e\u0939: ${snapshot.month}`, 10);
-	textA(right - 170, y - 40, `Generated: ${new Date(snapshot.generatedAt).toLocaleString('en-IN')}`, 8);
+	textA(
+		right - 170,
+		y - 40,
+		`Generated: ${new Date(snapshot.generatedAt).toLocaleString('en-IN')}`,
+		8,
+	);
 	y -= 56;
 
-	textH(left, y - 4, '\u0938\u0926\u0938\u094d\u092f-\u0935\u093e\u0930 \u0938\u093e\u0930\u093e\u0902\u0936', 11);
+	textH(
+		left,
+		y - 4,
+		'\u0938\u0926\u0938\u094d\u092f-\u0935\u093e\u0930 \u0938\u093e\u0930\u093e\u0902\u0936',
+		11,
+	);
 	y -= 14;
 	const mTableTop = y;
 	const mRowH = 16;
@@ -1538,8 +1611,10 @@ function buildSnapshotOnePagePdf(snapshot) {
 	const mTableHeight = mRows * mRowH;
 
 	rect(left, mTableTop - mTableHeight, right - left, mTableHeight);
-	for (let i = 1; i < mCols.length - 1; i += 1) line(mCols[i], mTableTop, mCols[i], mTableTop - mTableHeight);
-	for (let r = 1; r < mRows; r += 1) line(left, mTableTop - r * mRowH, right, mTableTop - r * mRowH);
+	for (let i = 1; i < mCols.length - 1; i += 1)
+		line(mCols[i], mTableTop, mCols[i], mTableTop - mTableHeight);
+	for (let r = 1; r < mRows; r += 1)
+		line(left, mTableTop - r * mRowH, right, mTableTop - r * mRowH);
 	commands.push('0.95 0.97 1 rg');
 	commands.push(`${left} ${mTableTop - mRowH} ${right - left} ${mRowH} re f`);
 	commands.push('0.2 0.2 0.25 RG');
@@ -1553,7 +1628,12 @@ function buildSnapshotOnePagePdf(snapshot) {
 		textH(mCols[1] + 4, yy, String(m.name || '-'), 8);
 		textA(mCols[2] + 4, yy, `Rs ${Number(m.savings || 0).toFixed(2)}`, 8);
 		textA(mCols[3] + 4, yy, `Rs ${Number(m.lumpSum || 0).toFixed(2)}`, 8);
-		textA(mCols[4] + 4, yy, `Rs ${Number(m.outstandingLoan || 0).toFixed(2)}`, 8);
+		textA(
+			mCols[4] + 4,
+			yy,
+			`Rs ${Number(m.outstandingLoan || 0).toFixed(2)}`,
+			8,
+		);
 	});
 	y = mTableTop - mTableHeight - 18;
 
@@ -1576,12 +1656,28 @@ function buildSnapshotOnePagePdf(snapshot) {
 	y -= 14;
 	const totals = [
 		['\u0915\u0941\u0932 \u092c\u091a\u0924', snapshot.shgTotals.totalSavings],
-		['\u0915\u0941\u0932 \u0932\u092e\u094d\u092a\u0938\u092e', snapshot.shgTotals.totalLumpSum],
-		['\u0915\u0941\u0932 \u092c\u094d\u092f\u093e\u091c', snapshot.shgTotals.totalInterest],
+		[
+			'\u0915\u0941\u0932 \u0932\u092e\u094d\u092a\u0938\u092e',
+			snapshot.shgTotals.totalLumpSum,
+		],
+		[
+			'\u0915\u0941\u0932 \u092c\u094d\u092f\u093e\u091c',
+			snapshot.shgTotals.totalInterest,
+		],
 		['\u0915\u0941\u0932 \u0926\u0902\u0921', snapshot.shgTotals.totalPenalty],
-		['\u0915\u0941\u0932 \u092c\u0915\u093e\u092f\u093e \u090b\u0923', snapshot.shgTotals.totalOutstandingLoan],
-		['\u0915\u0941\u0932 \u0916\u0930\u094d\u091a', snapshot.shgTotals.totalExpense],
-		['\u0909\u092a\u0932\u092c\u094d\u0927 \u0928\u0915\u0926', snapshot.shgTotals.totalAvailableCash],
+		[
+			'\u0915\u0941\u0932 \u092c\u0915\u093e\u092f\u093e \u090b\u0923',
+			snapshot.shgTotals.totalOutstandingLoan,
+		],
+		[
+			'\u0915\u0941\u0932 \u0916\u0930\u094d\u091a',
+			snapshot.shgTotals.totalExpense,
+		],
+		['\u0915\u0941\u0932 \u0928\u0915\u0926', snapshot.shgTotals.totalCash],
+		[
+			'\u0909\u092a\u0932\u092c\u094d\u0927 \u0928\u0915\u0926',
+			snapshot.shgTotals.totalAvailableCash,
+		],
 	];
 	const tTop = y;
 	const tRowH = 18;
@@ -1589,7 +1685,8 @@ function buildSnapshotOnePagePdf(snapshot) {
 	const tHeight = totals.length * tRowH;
 	rect(left, tTop - tHeight, right - left, tHeight);
 	line(tCols[1], tTop, tCols[1], tTop - tHeight);
-	for (let r = 1; r < totals.length; r += 1) line(left, tTop - r * tRowH, right, tTop - r * tRowH);
+	for (let r = 1; r < totals.length; r += 1)
+		line(left, tTop - r * tRowH, right, tTop - r * tRowH);
 	totals.forEach((t, idx) => {
 		const yy = tTop - idx * tRowH - 12;
 		textH(left + 5, yy, t[0], 9);
@@ -1610,7 +1707,9 @@ function buildSnapshotOnePagePdf(snapshot) {
 	objects.push(
 		'3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 6 0 R >> >> /Contents 5 0 R >> endobj',
 	);
-	objects.push('4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj');
+	objects.push(
+		'4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj',
+	);
 	objects.push(
 		`5 0 obj << /Length ${Buffer.byteLength(content, 'utf8')} >> stream\n${content}\nendstream endobj`,
 	);
@@ -1643,7 +1742,15 @@ function buildSnapshotOnePagePdf(snapshot) {
 async function buildShgSnapshotData(shgId, month) {
 	const shgObjectId = new Types.ObjectId(String(shgId));
 	const monthStart = parseMonthStart(month);
-	const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0, 23, 59, 59, 999);
+	const monthEnd = new Date(
+		monthStart.getFullYear(),
+		monthStart.getMonth() + 1,
+		0,
+		23,
+		59,
+		59,
+		999,
+	);
 
 	const [shg, members, transactions, loans, repayments] = await Promise.all([
 		Shg.findById(shgObjectId).select('_id name village').lean(),
@@ -1652,7 +1759,12 @@ async function buildShgSnapshotData(shgId, month) {
 			.sort({ createdAt: 1 })
 			.lean(),
 		Transaction.find({ shgId: shgObjectId, isReversed: false }).lean(),
-		Loan.find({ shgId: shgObjectId }).select('_id memberId principal').lean(),
+		Loan.find({
+			shgId: shgObjectId,
+			status: { $ne: LoanRepaymentStatus.CLOSED },
+		})
+			.select('_id memberId principal status')
+			.lean(),
 		LoanRepayment.find({ shgId: shgObjectId, isReversed: false })
 			.select('loanId memberId principalComponent interestComponent')
 			.lean(),
@@ -1677,12 +1789,16 @@ async function buildShgSnapshotData(shgId, month) {
 
 		if (tx.type === TransactionType.MONTHLY_DEPOSIT) {
 			totalSavings += Number(tx.amount || 0);
-			if (memberKey) savingsByMember[memberKey] = (savingsByMember[memberKey] || 0) + Number(tx.amount || 0);
+			if (memberKey)
+				savingsByMember[memberKey] =
+					(savingsByMember[memberKey] || 0) + Number(tx.amount || 0);
 		}
 
 		if (tx.type === TransactionType.LUMP_SUM_CONTRIBUTION) {
 			totalLumpSum += Number(tx.amount || 0);
-			if (memberKey) lumpSumByMember[memberKey] = (lumpSumByMember[memberKey] || 0) + Number(tx.amount || 0);
+			if (memberKey)
+				lumpSumByMember[memberKey] =
+					(lumpSumByMember[memberKey] || 0) + Number(tx.amount || 0);
 		}
 
 		if (tx.type === TransactionType.PENALTY_CHARGE) {
@@ -1695,7 +1811,9 @@ async function buildShgSnapshotData(shgId, month) {
 				String(tx.toAccount || '') === AccountType.MEMBER_SAVINGS
 			) {
 				totalSavings += Number(tx.amount || 0);
-				if (memberKey) savingsByMember[memberKey] = (savingsByMember[memberKey] || 0) + Number(tx.amount || 0);
+				if (memberKey)
+					savingsByMember[memberKey] =
+						(savingsByMember[memberKey] || 0) + Number(tx.amount || 0);
 			} else if (
 				tx?.meta?.category === 'TOTAL_LUMP_SUM_PAYMENTS_TILL_DATE' ||
 				(String(tx.fromAccount || '') === AccountType.EXTERNAL &&
@@ -1720,15 +1838,18 @@ async function buildShgSnapshotData(shgId, month) {
 		}
 	}
 
+	const activeLoanIds = new Set(loans.map((l) => String(l._id)));
 	const principalRepaidByLoan = {};
 	let totalPrincipalRepaid = 0;
 	for (const rep of repayments) {
 		const p = Number(rep.principalComponent || 0);
 		const i = Number(rep.interestComponent || 0);
-		totalPrincipalRepaid += p;
 		totalInterest += i;
 		const loanKey = String(rep.loanId);
 		principalRepaidByLoan[loanKey] = (principalRepaidByLoan[loanKey] || 0) + p;
+		if (activeLoanIds.has(loanKey)) {
+			totalPrincipalRepaid += p;
+		}
 	}
 
 	const outstandingByMember = {};
@@ -1739,12 +1860,16 @@ async function buildShgSnapshotData(shgId, month) {
 		const paid = Number(principalRepaidByLoan[String(loan._id)] || 0);
 		const outstanding = Math.max(principal - paid, 0);
 		const memberKey = String(loan.memberId);
-		outstandingByMember[memberKey] = (outstandingByMember[memberKey] || 0) + outstanding;
+		outstandingByMember[memberKey] =
+			(outstandingByMember[memberKey] || 0) + outstanding;
 	}
 
-	const totalOutstandingLoan = Math.max(totalLoanDisbursed - totalPrincipalRepaid, 0);
-	const totalAvailableCash =
-		totalSavings + totalLumpSum + totalInterest + totalPenalty - totalOutstandingLoan - totalExpense;
+	const totalOutstandingLoan = Math.max(
+		totalLoanDisbursed - totalPrincipalRepaid,
+		0,
+	);
+	const totalCash = totalSavings + totalLumpSum + totalInterest + totalPenalty;
+	const totalAvailableCash = totalCash - totalOutstandingLoan - totalExpense;
 
 	const memberWise = members.map((member) => {
 		const key = String(member._id);
@@ -1776,6 +1901,7 @@ async function buildShgSnapshotData(shgId, month) {
 			totalPenalty: Number(totalPenalty.toFixed(2)),
 			totalOutstandingLoan: Number(totalOutstandingLoan.toFixed(2)),
 			totalExpense: Number(totalExpense.toFixed(2)),
+			totalCash: Number(totalCash.toFixed(2)),
 			totalAvailableCash: Number(totalAvailableCash.toFixed(2)),
 		},
 	};
@@ -1826,12 +1952,16 @@ async function saveSnapshotMetadata({ snapshot, storage, triggerType }) {
 	);
 }
 
-async function saveSnapshotToCloudStorage(snapshot, { triggerType = 'ON_DEMAND' } = {}) {
+async function saveSnapshotToCloudStorage(
+	snapshot,
+	{ triggerType = 'ON_DEMAND' } = {},
+) {
 	const blobBasePath = `shg-snapshots/${snapshot.shgId}/${snapshot.month}`;
 	const pdfBuffer = buildSnapshotOnePagePdf(snapshot);
 	const jsonBuffer = Buffer.from(JSON.stringify(snapshot, null, 2), 'utf8');
 	const hasBlobToken = Boolean(
-		process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_BLOB_READ_WRITE_TOKEN,
+		process.env.BLOB_READ_WRITE_TOKEN ||
+		process.env.VERCEL_BLOB_READ_WRITE_TOKEN,
 	);
 
 	let storage;
@@ -1886,7 +2016,11 @@ async function generateShgSnapshot(data) {
 			proxyUrl,
 			cloudUrl: null,
 		};
-		return NextResponse.json({ success: true, snapshot, storage: responseStorage });
+		return NextResponse.json({
+			success: true,
+			snapshot,
+			storage: responseStorage,
+		});
 	} catch (error) {
 		return NextResponse.json(
 			{ error: error.message || 'Failed to generate snapshot' },
@@ -1922,7 +2056,12 @@ async function listShgSnapshots(data) {
 	}
 
 	// Backward compatibility: read old local dummy folders if metadata docs are not available.
-	const shgDir = path.join(process.cwd(), 'dummy-cloud', 'shg-snapshots', String(shgId));
+	const shgDir = path.join(
+		process.cwd(),
+		'dummy-cloud',
+		'shg-snapshots',
+		String(shgId),
+	);
 	try {
 		const monthDirs = await fs.readdir(shgDir, { withFileTypes: true });
 		const snapshots = [];
@@ -1988,7 +2127,9 @@ async function generateMonthlySnapshots(data) {
 
 	if (!force && runDate.getDate() !== 31) {
 		return NextResponse.json(
-			{ error: 'Monthly snapshot run is allowed only on 31st unless force=true' },
+			{
+				error: 'Monthly snapshot run is allowed only on 31st unless force=true',
+			},
 			{ status: 400 },
 		);
 	}
@@ -1997,7 +2138,10 @@ async function generateMonthlySnapshots(data) {
 	const results = [];
 	for (const shg of shgs) {
 		try {
-			const snapshot = await buildShgSnapshotData(shg._id, monthKeyFromDate(runDate));
+			const snapshot = await buildShgSnapshotData(
+				shg._id,
+				monthKeyFromDate(runDate),
+			);
 			const storage = await saveSnapshotToCloudStorage(snapshot, {
 				triggerType: 'SCHEDULED',
 			});
@@ -2032,14 +2176,15 @@ async function dashboardSummary(data) {
 		}).lean(),
 		Loan.find({
 			shgId: shgObjectId,
+			status: { $ne: LoanRepaymentStatus.CLOSED },
 		})
-			.select('_id principal')
+			.select('_id principal status')
 			.lean(),
 		LoanRepayment.find({
 			shgId: shgObjectId,
 			isReversed: false,
 		})
-			.select('principalComponent interestComponent amount')
+			.select('loanId principalComponent interestComponent amount')
 			.lean(),
 	]);
 
@@ -2053,12 +2198,16 @@ async function dashboardSummary(data) {
 	let totalExpense = 0;
 
 	/* Repayment split: principal reduces outstanding, interest is income */
+	const activeLoanIds = new Set(loans.map((l) => String(l._id)));
 	repayments.forEach((repayment) => {
 		const principal = Number(repayment?.principalComponent || 0);
 		const interest = Number(repayment?.interestComponent || 0);
 		if (principal > 0 || interest > 0) {
-			totalPrincipalRepaid += principal;
 			totalInterestCollected += interest;
+			/* Only count principal repaid for active (non-closed) loans */
+			if (repayment?.loanId && activeLoanIds.has(String(repayment.loanId))) {
+				totalPrincipalRepaid += principal;
+			}
 			return;
 		}
 		/* Legacy fallback when split components are absent:
@@ -2149,4 +2298,3 @@ async function dashboardSummary(data) {
 		lastUpdated: new Date().toISOString(),
 	});
 }
-
