@@ -798,7 +798,13 @@ async function MemberPassbook(data) {
 
 	const shgObjectId = new Types.ObjectId(String(shgid));
 	const memberObjectId = new Types.ObjectId(String(memberId));
-	const [transactions, shgLumpSumAgg, activeMemberCount] = await Promise.all([
+	const [
+		transactions,
+		shgLumpSumAgg,
+		activeMemberCount,
+		activeLoans,
+		repaymentAgg,
+	] = await Promise.all([
 		Transaction.find({
 			shgId: shgObjectId,
 			memberId: memberObjectId,
@@ -820,6 +826,28 @@ async function MemberPassbook(data) {
 			},
 		]),
 		ShgMember.countDocuments({ shgId: shgObjectId, isActive: true }),
+		Loan.find({
+			shgId: shgObjectId,
+			memberId: memberObjectId,
+			status: { $ne: LoanRepaymentStatus.CLOSED },
+		})
+			.select('_id principal')
+			.lean(),
+		LoanRepayment.aggregate([
+			{
+				$match: {
+					shgId: shgObjectId,
+					memberId: memberObjectId,
+					isReversed: false,
+				},
+			},
+			{
+				$group: {
+					_id: '$loanId',
+					totalPrincipalPaid: { $sum: '$principalComponent' },
+				},
+			},
+		]),
 	]);
 
 	const sixMonthsAgo = new Date();
@@ -867,12 +895,26 @@ async function MemberPassbook(data) {
 		activeMemberCount > 0 ? totalShgLumpSum / activeMemberCount : 0;
 	const totalSavings = totalMonthlySavingsPaid + perMemberLumpSumShare;
 
+	/* Calculate outstanding loan from Loan + LoanRepayment (only active loans, principal only) */
+	const principalPaidMap = Object.fromEntries(
+		repaymentAgg.map((r) => [String(r._id), r.totalPrincipalPaid || 0]),
+	);
+	let outstandingLoan = 0;
+	let activeLoanDisbursed = 0;
+	for (const loan of activeLoans) {
+		const principal = Number(loan.principal || 0);
+		activeLoanDisbursed += principal;
+		const paid = Number(principalPaidMap[String(loan._id)] || 0);
+		outstandingLoan += Math.max(principal - paid, 0);
+	}
+
 	const summary = {
 		totalSavings: Number(totalSavings.toFixed(2)),
 		totalMonthlySavingsPaid: Number(totalMonthlySavingsPaid.toFixed(2)),
 		lumpSumShare: Number(perMemberLumpSumShare.toFixed(2)),
-		totalLoansDisbursed,
+		totalLoansDisbursed: activeLoanDisbursed,
 		totalLoanRepayments,
+		outstandingLoan: Number(outstandingLoan.toFixed(2)),
 		totalPenalties,
 	};
 	return NextResponse.json({

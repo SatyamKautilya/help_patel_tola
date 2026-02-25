@@ -87,6 +87,11 @@ export default function MemberPassbookSummary({ params }) {
 	}, [shgid, memberId]);
 
 	const remainingLoan = useMemo(() => {
+		/* Use the server-calculated outstanding (only active loans, principal only) */
+		if (summary?.outstandingLoan != null) {
+			return Number(summary.outstandingLoan);
+		}
+		/* Fallback for older API responses */
 		const issued = Number(summary?.totalLoansDisbursed || 0);
 		const paid = Number(summary?.totalLoanRepayments || 0);
 		return Math.max(issued - paid, 0);
