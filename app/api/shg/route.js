@@ -1857,18 +1857,18 @@ async function buildShgSnapshotData(shgId, month) {
 					savingsByMember[memberKey] =
 						(savingsByMember[memberKey] || 0) + Number(tx.amount || 0);
 			} else if (
-				tx?.meta?.category === 'TOTAL_LUMP_SUM_PAYMENTS_TILL_DATE' ||
-				(String(tx.fromAccount || '') === AccountType.EXTERNAL &&
-					String(tx.toAccount || '') === AccountType.SHG_CASH)
-			) {
-				totalLumpSum += Number(tx.amount || 0);
-			} else if (
 				tx?.meta?.category === 'TOTAL_INTEREST_INCOME_TILL_DATE' ||
 				String(tx.toAccount || '') === AccountType.INTEREST_INCOME
 			) {
 				totalInterest += Number(tx.amount || 0);
 			} else if (tx?.meta?.category === 'TOTAL_PENALTY_INCOME_TILL_DATE') {
 				totalPenalty += Number(tx.amount || 0);
+			} else if (
+				tx?.meta?.category === 'TOTAL_LUMP_SUM_PAYMENTS_TILL_DATE' ||
+				(String(tx.fromAccount || '') === AccountType.EXTERNAL &&
+					String(tx.toAccount || '') === AccountType.SHG_CASH)
+			) {
+				totalLumpSum += Number(tx.amount || 0);
 			} else if (
 				tx?.meta?.category === 'TOTAL_EXPENDITURE_TILL_DATE' ||
 				tx?.meta?.category === 'MANUAL_EXPENSE' ||

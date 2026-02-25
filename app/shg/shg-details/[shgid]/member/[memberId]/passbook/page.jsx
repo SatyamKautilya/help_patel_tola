@@ -285,7 +285,7 @@ export default function MemberPassbookSummary({ params }) {
 									</div>
 
 									<CalcRow
-										label='Outstanding Loan'
+										label='बकाया ऋण'
 										sign='-'
 										amount={shgSheet.loanGiven}
 										tone='minus'

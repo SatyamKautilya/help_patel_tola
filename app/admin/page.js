@@ -23,7 +23,11 @@ const AdminDashboard = () => {
 	useEffect(() => {
 		const checkAuth = async () => {
 			try {
-				const res = await fetch('/api/auth/me', { cache: 'no-store' });
+				const res = await fetch('/api/auth/me', {
+					credentials: 'same-origin',
+					cache: 'no-store',
+					headers: { 'Cache-Control': 'no-cache' },
+				});
 				if (res.ok) {
 					const data = await res.json();
 					setAuthUser(data?.user || null);
@@ -228,7 +232,8 @@ const AdminDashboard = () => {
 					<div className='bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/20 rounded-2xl p-6 md:p-8 space-y-4'>
 						<h3 className='text-2xl font-bold text-white'>SHG Onboarding</h3>
 						<p className='text-slate-300 text-sm'>
-							Open dedicated full-screen onboarding page for better laptop workflow.
+							Open dedicated full-screen onboarding page for better laptop
+							workflow.
 						</p>
 						<button
 							onClick={() => router.push('/shg/onboarding')}

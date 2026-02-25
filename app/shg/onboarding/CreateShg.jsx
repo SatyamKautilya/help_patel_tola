@@ -144,11 +144,13 @@ export default function CreateShg({ onNext, creatorId }) {
 					icon={<MapPin className='w-4 h-4 text-slate-500' />}
 					placeholder='जिला'
 					value={form.district}
-					onChange={(value) => setForm((prev) => ({ ...prev, district: value }))}
+					onChange={(value) =>
+						setForm((prev) => ({ ...prev, district: value }))
+					}
 				/>
 				<Field
 					label='गठन तिथि'
-					icon={<CalendarDays className='w-4 h-4 text-slate-500' />}
+					icon={<CalendarDays className='w-4 h-4 text-pink-400' />}
 					type='date'
 					value={form.formationDate}
 					onChange={(value) =>

@@ -1,5 +1,10 @@
 import { setLoader, setShgOnboardingData } from '@/app/store/appSlice';
-import { ArrowRight, CheckCircle2, Loader2, IndianRupeeIcon } from 'lucide-react';
+import {
+	ArrowRight,
+	CheckCircle2,
+	Loader2,
+	IndianRupeeIcon,
+} from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -13,8 +18,12 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 
 	const [step, setStep] = useState(1);
 	const [saving, setSaving] = useState(false);
-	const [memberSavings, setMemberSavings] = useState(existingFinance.memberSavings || {});
-	const [memberLoans, setMemberLoans] = useState(existingFinance.memberLoans || {});
+	const [memberSavings, setMemberSavings] = useState(
+		existingFinance.memberSavings || {},
+	);
+	const [memberLoans, setMemberLoans] = useState(
+		existingFinance.memberLoans || {},
+	);
 	const [totals, setTotals] = useState({
 		incomeFromInterest: existingFinance.incomeFromInterest || '',
 		incomeFromPenalty: existingFinance.incomeFromPenalty || '',
@@ -36,7 +45,10 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 
 	const totalMemberSavings = useMemo(
 		() =>
-			members.reduce((sum, member) => sum + money(memberSavings[member._id] || 0), 0),
+			members.reduce(
+				(sum, member) => sum + money(memberSavings[member._id] || 0),
+				0,
+			),
 		[members, memberSavings],
 	);
 
@@ -52,7 +64,8 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 	const totalPrincipalPaid = useMemo(
 		() =>
 			members.reduce(
-				(sum, member) => sum + money(memberLoans[member._id]?.totalPrincipalPaid || 0),
+				(sum, member) =>
+					sum + money(memberLoans[member._id]?.totalPrincipalPaid || 0),
 				0,
 			),
 		[members, memberLoans],
@@ -96,7 +109,11 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 		return res.json();
 	};
 
-	const createLoanWithRepayment = async (memberId, loanInfo, onboardingDate) => {
+	const createLoanWithRepayment = async (
+		memberId,
+		loanInfo,
+		onboardingDate,
+	) => {
 		const totalIssued = money(loanInfo?.totalIssued);
 		const totalPaid = money(loanInfo?.totalPrincipalPaid);
 		if (totalIssued <= 0) return;
@@ -247,9 +264,12 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 					<IndianRupeeIcon className='w-6 h-6 text-pink-400' />
 				</div>
 				<div>
-					<h2 className='text-2xl font-bold text-white'>SHG वित्तीय ऑनबोर्डिंग</h2>
+					<h2 className='text-2xl font-bold text-white'>
+						SHG वित्तीय ऑनबोर्डिंग
+					</h2>
 					<p className='text-sm text-slate-400'>
-						एकमुश्त प्रारंभिक आंकड़े भरें। यह स्क्रीन लैपटॉप उपयोग के लिए बनाई गई है।
+						एकमुश्त प्रारंभिक आंकड़े भरें। यह स्क्रीन लैपटॉप उपयोग के लिए बनाई
+						गई है।
 					</p>
 				</div>
 			</div>
@@ -265,7 +285,9 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 								<div
 									key={member._id}
 									className='grid grid-cols-12 items-center gap-3 bg-slate-800/50 rounded-lg px-3 py-2'>
-									<span className='col-span-1 text-slate-500 text-sm'>{index + 1}</span>
+									<span className='col-span-1 text-slate-500 text-sm'>
+										{index + 1}
+									</span>
 									<span className='col-span-7 text-slate-200 text-sm font-medium'>
 										{member.name}
 									</span>
@@ -288,9 +310,12 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 					</div>
 
 					<div className='space-y-4 bg-slate-900/40 border border-slate-700 rounded-xl p-5'>
-						<h3 className='text-lg font-semibold text-indigo-300'>सदस्यवार ऋण विवरण</h3>
+						<h3 className='text-lg font-semibold text-indigo-300'>
+							सदस्यवार ऋण विवरण
+						</h3>
 						<p className='text-xs text-slate-400'>
-							प्रत्येक सदस्य के लिए: कुल जारी, जारी तिथि, और कुल मूलधन चुकाया भरें।
+							प्रत्येक सदस्य के लिए: कुल जारी, जारी तिथि, और कुल मूलधन चुकाया
+							भरें।
 						</p>
 						<div className='space-y-3 max-h-[280px] overflow-y-auto pr-2'>
 							{members.map((member) => (
@@ -328,7 +353,7 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 												},
 											}))
 										}
-										className='md:col-span-3 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-white'
+										className='md:col-span-3 bg-slate-950 border border-slate-600 rounded-lg px-3 py-2 text-white'
 									/>
 									<input
 										type='number'
@@ -374,7 +399,10 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 								label='कुल लंपसम भुगतान'
 								value={totals.totalLumpSumPayments}
 								onChange={(value) =>
-									setTotals((prev) => ({ ...prev, totalLumpSumPayments: value }))
+									setTotals((prev) => ({
+										...prev,
+										totalLumpSumPayments: value,
+									}))
 								}
 							/>
 							<Field
@@ -421,19 +449,28 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 
 			{step === 2 ? (
 				<div className='space-y-5 bg-slate-900/40 border border-slate-700 rounded-xl p-6'>
-					<h3 className='text-xl font-semibold text-white'>प्रारंभिक कुल राशि की समीक्षा</h3>
+					<h3 className='text-xl font-semibold text-white'>
+						प्रारंभिक कुल राशि की समीक्षा
+					</h3>
 					<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
 						<Row label='सदस्य कुल बचत' value={totalMemberSavings} />
 						<Row label='कुल जारी ऋण' value={totalLoansIssued} />
 						<Row label='कुल मूलधन चुकाया' value={totalPrincipalPaid} />
 						<Row label='ब्याज से आय' value={money(totals.incomeFromInterest)} />
-						<Row label='जुर्माना से आय' value={money(totals.incomeFromPenalty)} />
+						<Row
+							label='जुर्माना से आय'
+							value={money(totals.incomeFromPenalty)}
+						/>
 						<Row
 							label='कुल लंपसम भुगतान'
 							value={money(totals.totalLumpSumPayments)}
 						/>
 						<Row label='कुल व्यय' value={money(totals.totalExpenditure)} />
-						<Row label='गणना अनुसार उपलब्ध नकद' value={calculatedAvailableCash} highlight />
+						<Row
+							label='गणना अनुसार उपलब्ध नकद'
+							value={calculatedAvailableCash}
+							highlight
+						/>
 					</div>
 
 					<div className='flex justify-end gap-3'>
@@ -447,7 +484,11 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 							onClick={handleSubmit}
 							disabled={saving}
 							className='px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex items-center gap-2'>
-							{saving ? <Loader2 className='animate-spin w-4 h-4' /> : <CheckCircle2 className='w-4 h-4' />}
+							{saving ? (
+								<Loader2 className='animate-spin w-4 h-4' />
+							) : (
+								<CheckCircle2 className='w-4 h-4' />
+							)}
 							{saving ? 'सेव हो रहा है...' : 'सेव करें और आगे बढ़ें'}
 						</button>
 					</div>
@@ -460,7 +501,9 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 function Field({ label, value, onChange }) {
 	return (
 		<div className='space-y-1'>
-			<label className='text-xs uppercase tracking-wide text-slate-400'>{label}</label>
+			<label className='text-xs uppercase tracking-wide text-slate-400'>
+				{label}
+			</label>
 			<input
 				type='number'
 				min='0'
@@ -477,7 +520,8 @@ function Row({ label, value, highlight = false }) {
 	return (
 		<div className='flex items-center justify-between bg-slate-800/50 rounded-lg px-4 py-3'>
 			<span className='text-slate-300 text-sm'>{label}</span>
-			<span className={`font-semibold ${highlight ? 'text-pink-400' : 'text-white'}`}>
+			<span
+				className={`font-semibold ${highlight ? 'text-pink-400' : 'text-white'}`}>
 				Rs. {Number(value || 0).toLocaleString('en-IN')}
 			</span>
 		</div>
