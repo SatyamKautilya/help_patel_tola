@@ -138,7 +138,9 @@ export async function POST(request) {
 				);
 			}
 
-			const normalizedMobile = String(content.mobileNumber || '').trim();
+			const normalizedMobile = content.mobileNumber
+				? String(content.mobileNumber).trim()
+				: null;
 			let existingUserByMobile = null;
 			if (normalizedMobile) {
 				existingUserByMobile = await Users.findOne({
@@ -155,26 +157,34 @@ export async function POST(request) {
 				);
 			}
 
+			const updateFields = {
+				name: content.name,
+				villageName: content.villageName,
+				lastSeen: content.lastSeen,
+				isActive: true,
+				...(existingUserByMobile
+					? {
+							mobileNumber: existingUserByMobile.mobileNumber,
+							userGroups: existingUserByMobile.userGroups || [],
+							taggedVillage: existingUserByMobile.taggedVillage || [],
+							isAdmin: existingUserByMobile.isAdmin || false,
+							hindiName: existingUserByMobile.hindiName || '',
+							passwordHash: existingUserByMobile.passwordHash || '',
+							villageRoles: existingUserByMobile.villageRoles || [],
+						}
+					: {}),
+			};
+
+			// Only update mobileNumber if explicitly provided (non-empty)
+			// to avoid wiping existing mobile numbers on routine visits
+			if (normalizedMobile && !existingUserByMobile) {
+				updateFields.mobileNumber = normalizedMobile;
+			}
+
 			const user = await Users.findOneAndUpdate(
 				{ id: content.appInstanceId }, // search condition
 				{
-					$set: {
-						name: content.name,
-						villageName: content.villageName,
-						lastSeen: content.lastSeen,
-						mobileNumber: normalizedMobile,
-						isActive: true,
-						...(existingUserByMobile
-							? {
-									userGroups: existingUserByMobile.userGroups || [],
-									taggedVillage: existingUserByMobile.taggedVillage || [],
-									isAdmin: existingUserByMobile.isAdmin || false,
-									hindiName: existingUserByMobile.hindiName || '',
-									passwordHash: existingUserByMobile.passwordHash || '',
-									villageRoles: existingUserByMobile.villageRoles || [],
-								}
-							: {}),
-					},
+					$set: updateFields,
 				},
 				{
 					upsert: true, // 🔥 create if not exists

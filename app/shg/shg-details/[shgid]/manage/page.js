@@ -22,7 +22,7 @@ import { useSelector } from 'react-redux';
 const sections = [
 	{
 		label: 'बचत',
-		labelEn: 'Monthly Saving & Lumpsum',
+		labelEn: 'Monthly Saving & Share Money',
 		accentColor: 'text-indigo-700',
 		accentBg: 'bg-indigo-50',
 		accentBorder: 'border-indigo-200',
@@ -39,7 +39,7 @@ const sections = [
 				upcoming: false,
 			},
 			{
-				title: 'एक-मुश्त जमा',
+				title: 'शेयर राशि जमा',
 				desc: 'एंट्री',
 				icon: FileText,
 				href: 'lump-sum',

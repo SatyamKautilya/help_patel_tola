@@ -28,7 +28,7 @@ export default function OnboardingFlow({ creatorId = '' }) {
 	const steps = [
 		{ id: 1, title: 'SHG विवरण', hint: 'समूह की मूल जानकारी' },
 		{ id: 2, title: 'सदस्य जोड़ें', hint: 'भूमिका और सदस्य विवरण' },
-		{ id: 3, title: 'वित्तीय विवरण', hint: 'एकमुश्त प्रारंभिक आंकड़े' },
+		{ id: 3, title: 'वित्तीय विवरण', hint: 'शेयर राशि प्रारंभिक आंकड़े' },
 		{ id: 4, title: 'अंतिम पुष्टि', hint: 'समापन और सबमिट' },
 	];
 

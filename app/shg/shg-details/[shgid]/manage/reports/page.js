@@ -184,7 +184,7 @@ export default function ReportsPage({ params }) {
 								<th style="border:1px solid #334155;padding:6px;text-align:left;width:36px;">क्र.</th>
 								<th style="border:1px solid #334155;padding:6px;text-align:left;">सदस्य</th>
 								<th style="border:1px solid #334155;padding:6px;text-align:left;">बचत</th>
-								<th style="border:1px solid #334155;padding:6px;text-align:left;">लम्पसम</th>
+								<th style="border:1px solid #334155;padding:6px;text-align:left;">शेयर राशि</th>
 								<th style="border:1px solid #334155;padding:6px;text-align:left;">बकाया ऋण</th>
 							</tr>
 						</thead>
@@ -200,7 +200,7 @@ export default function ReportsPage({ params }) {
 					<table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px;">
 						<tbody>
 							<tr><td style="border:1px solid #334155;padding:6px;">कुल बचत</td><td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(totals.totalSavings))}</td></tr>
-							<tr><td style="border:1px solid #334155;padding:6px;">कुल लम्पसम</td><td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(totals.totalLumpSum))}</td></tr>
+							<tr><td style="border:1px solid #334155;padding:6px;">कुल शेयर राशि</td><td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(totals.totalLumpSum))}</td></tr>
 							<tr><td style="border:1px solid #334155;padding:6px;">कुल ब्याज</td><td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(totals.totalInterest))}</td></tr>
 							<tr><td style="border:1px solid #334155;padding:6px;">कुल दंड</td><td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(totals.totalPenalty))}</td></tr>
 							<tr><td style="border:1px solid #334155;padding:6px;">कुल बकाया ऋण</td><td style="border:1px solid #334155;padding:6px;">${escapeHtml(formatMoney(totals.totalOutstandingLoan))}</td></tr>
@@ -484,7 +484,7 @@ export default function ReportsPage({ params }) {
 																बचत
 															</th>
 															<th className='border border-slate-300 p-2 text-left'>
-																लम्पसम
+																शेयर राशि
 															</th>
 															<th className='border border-slate-300 p-2 text-left'>
 																बकाया ऋण
@@ -528,7 +528,7 @@ export default function ReportsPage({ params }) {
 													</span>
 												</div>
 												<div className='border border-slate-300 p-2 flex items-center justify-between'>
-													<span>कुल लम्पसम</span>
+													<span>कुल शेयर राशि</span>
 													<span className='font-semibold'>
 														{formatMoney(totals.totalLumpSum)}
 													</span>

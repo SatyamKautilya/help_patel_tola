@@ -268,7 +268,7 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 						SHG वित्तीय ऑनबोर्डिंग
 					</h2>
 					<p className='text-sm text-slate-400'>
-						एकमुश्त प्रारंभिक आंकड़े भरें। यह स्क्रीन लैपटॉप उपयोग के लिए बनाई
+						शेयर राशि प्रारंभिक आंकड़े भरें। यह स्क्रीन लैपटॉप उपयोग के लिए बनाई
 						गई है।
 					</p>
 				</div>
@@ -378,7 +378,7 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 
 					<div className='xl:col-span-2 bg-slate-900/40 border border-slate-700 rounded-xl p-5'>
 						<h3 className='text-lg font-semibold text-indigo-300 mb-3'>
-							अन्य एकमुश्त आंकड़े (आज तक)
+							अन्य शेयर राशि आंकड़े (आज तक)
 						</h3>
 						<div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
 							<Field
@@ -396,7 +396,7 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 								}
 							/>
 							<Field
-								label='कुल लंपसम भुगतान'
+								label='कुल शेयर राशि भुगतान'
 								value={totals.totalLumpSumPayments}
 								onChange={(value) =>
 									setTotals((prev) => ({
@@ -462,7 +462,7 @@ export default function ShgFinancialSetup({ shgId, onNext }) {
 							value={money(totals.incomeFromPenalty)}
 						/>
 						<Row
-							label='कुल लंपसम भुगतान'
+							label='कुल शेयर राशि भुगतान'
 							value={money(totals.totalLumpSumPayments)}
 						/>
 						<Row label='कुल व्यय' value={money(totals.totalExpenditure)} />

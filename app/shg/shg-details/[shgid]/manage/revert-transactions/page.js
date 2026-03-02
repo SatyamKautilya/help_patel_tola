@@ -3,11 +3,17 @@
 import { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { AlertCircle, CheckCircle2, ChevronLeft, RotateCcw, Search } from 'lucide-react';
+import {
+	AlertCircle,
+	CheckCircle2,
+	ChevronLeft,
+	RotateCcw,
+	Search,
+} from 'lucide-react';
 
 const TYPE_LABELS = {
 	MONTHLY_DEPOSIT: 'मासिक बचत',
-	LUMP_SUM_CONTRIBUTION: 'एक-मुश्त जमा',
+	LUMP_SUM_CONTRIBUTION: 'शेयर राशि जमा',
 	LOAN_DISBURSEMENT: 'ऋण वितरण',
 	LOAN_REPAYMENT: 'ऋण भुगतान',
 	INTEREST_PAYMENT: 'ब्याज भुगतान',
@@ -41,7 +47,10 @@ export default function RevertTransactionsPage({ params }) {
 			const data = await resp.json();
 			setTransactions(data.transactions || []);
 		} catch (e) {
-			setMessage({ type: 'error', text: e.message || 'ट्रांजेक्शन लोड नहीं हुए।' });
+			setMessage({
+				type: 'error',
+				text: e.message || 'ट्रांजेक्शन लोड नहीं हुए।',
+			});
 		} finally {
 			setLoading(false);
 		}
@@ -57,7 +66,9 @@ export default function RevertTransactionsPage({ params }) {
 		return transactions.filter((t) => {
 			const typeText = (TYPE_LABELS[t.type] || t.type || '').toLowerCase();
 			const memberText = (t.memberName || '').toLowerCase();
-			const reasonText = String(t?.meta?.reason || t?.meta?.note || '').toLowerCase();
+			const reasonText = String(
+				t?.meta?.reason || t?.meta?.note || '',
+			).toLowerCase();
 			return (
 				typeText.includes(q) ||
 				memberText.includes(q) ||
@@ -85,12 +96,18 @@ export default function RevertTransactionsPage({ params }) {
 			const data = await resp.json();
 			if (!resp.ok) throw new Error(data?.error || 'Revert failed');
 
-			setMessage({ type: 'success', text: 'ट्रांजेक्शन सफलतापूर्वक रिवर्ट हो गया।' });
+			setMessage({
+				type: 'success',
+				text: 'ट्रांजेक्शन सफलतापूर्वक रिवर्ट हो गया।',
+			});
 			setSelectedTxn(null);
 			setReason('');
 			await loadTransactions();
 		} catch (e) {
-			setMessage({ type: 'error', text: e.message || 'रिवर्ट में त्रुटि हुई।' });
+			setMessage({
+				type: 'error',
+				text: e.message || 'रिवर्ट में त्रुटि हुई।',
+			});
 		} finally {
 			setReverting(false);
 		}
@@ -101,7 +118,9 @@ export default function RevertTransactionsPage({ params }) {
 			<div className='max-w-5xl mx-auto space-y-5'>
 				<div className='flex items-center justify-between'>
 					<div>
-						<h1 className='text-2xl font-black text-slate-900'>ट्रांजेक्शन रिवर्ट</h1>
+						<h1 className='text-2xl font-black text-slate-900'>
+							ट्रांजेक्शन रिवर्ट
+						</h1>
 						<p className='text-sm text-slate-600 mt-1'>
 							किसी गलत एंट्री को प्रकार के अनुसार सुरक्षित तरीके से वापस करें।
 						</p>
@@ -134,7 +153,9 @@ export default function RevertTransactionsPage({ params }) {
 						{loading ? (
 							<p className='text-sm text-slate-500'>लोड हो रहा है...</p>
 						) : filtered.length === 0 ? (
-							<p className='text-sm text-slate-600'>कोई ट्रांजेक्शन नहीं मिला।</p>
+							<p className='text-sm text-slate-600'>
+								कोई ट्रांजेक्शन नहीं मिला।
+							</p>
 						) : (
 							<div className='space-y-2 max-h-[68vh] overflow-y-auto pr-1'>
 								{filtered.map((txn) => {
@@ -174,7 +195,8 @@ export default function RevertTransactionsPage({ params }) {
 										{TYPE_LABELS[selectedTxn.type] || selectedTxn.type}
 									</p>
 									<p className='text-xs text-slate-600 mt-1'>
-										राशि: ₹{Number(selectedTxn.amount || 0).toLocaleString('hi-IN')}
+										राशि: ₹
+										{Number(selectedTxn.amount || 0).toLocaleString('hi-IN')}
 									</p>
 									<p className='text-xs text-slate-600 mt-1'>
 										सदस्य: {selectedTxn.memberName || 'N/A'}
@@ -199,11 +221,15 @@ export default function RevertTransactionsPage({ params }) {
 									disabled={reverting}
 									className='w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold disabled:opacity-60'>
 									<RotateCcw className='w-4 h-4' />
-									{reverting ? 'रिवर्ट हो रहा है...' : 'ट्रांजेक्शन रिवर्ट करें'}
+									{reverting
+										? 'रिवर्ट हो रहा है...'
+										: 'ट्रांजेक्शन रिवर्ट करें'}
 								</button>
 							</>
 						) : (
-							<p className='text-sm text-slate-600'>रिवर्ट करने के लिए बाईं ओर से ट्रांजेक्शन चुनें।</p>
+							<p className='text-sm text-slate-600'>
+								रिवर्ट करने के लिए बाईं ओर से ट्रांजेक्शन चुनें।
+							</p>
 						)}
 					</div>
 				</div>
@@ -232,4 +258,3 @@ export default function RevertTransactionsPage({ params }) {
 		</div>
 	);
 }
-

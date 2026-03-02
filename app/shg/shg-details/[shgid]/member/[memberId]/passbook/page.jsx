@@ -191,7 +191,7 @@ export default function MemberPassbookSummary({ params }) {
 									value={formatMoney(summary?.totalMonthlySavingsPaid)}
 								/>
 								<SummaryRow
-									label='लंपसम हिस्सा'
+									label='शेयर राशि हिस्सा'
 									value={formatMoney(summary?.lumpSumShare)}
 								/>
 							</div>
@@ -254,7 +254,7 @@ export default function MemberPassbookSummary({ params }) {
 										formatMoney={formatMoney}
 									/>
 									<CalcRow
-										label='लंप सम राशि'
+										label='शेयर राशि'
 										sign='+'
 										amount={shgSheet.lumpSum}
 										tone='plus'

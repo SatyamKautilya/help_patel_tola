@@ -801,6 +801,8 @@ async function MemberPassbook(data) {
 	const [
 		transactions,
 		shgLumpSumAgg,
+		memberOwnLumpSumAgg,
+		openingBalanceLumpSumAgg,
 		activeMemberCount,
 		activeLoans,
 		repaymentAgg,
@@ -816,6 +818,40 @@ async function MemberPassbook(data) {
 					shgId: shgObjectId,
 					type: TransactionType.LUMP_SUM_CONTRIBUTION,
 					isReversed: false,
+				},
+			},
+			{
+				$group: {
+					_id: null,
+					totalLumpSum: { $sum: '$amount' },
+				},
+			},
+		]),
+		// Member's own individual LUMP_SUM_CONTRIBUTION transactions
+		Transaction.aggregate([
+			{
+				$match: {
+					shgId: shgObjectId,
+					memberId: memberObjectId,
+					type: TransactionType.LUMP_SUM_CONTRIBUTION,
+					isReversed: false,
+				},
+			},
+			{
+				$group: {
+					_id: null,
+					totalLumpSum: { $sum: '$amount' },
+				},
+			},
+		]),
+		// Opening balance lump sum (shared pool from onboarding)
+		Transaction.aggregate([
+			{
+				$match: {
+					shgId: shgObjectId,
+					isReversed: false,
+					type: TransactionType.OPENING_BALANCE,
+					'meta.category': 'TOTAL_LUMP_SUM_PAYMENTS_TILL_DATE',
 				},
 			},
 			{
@@ -891,8 +927,14 @@ async function MemberPassbook(data) {
 	});
 
 	const totalShgLumpSum = Number(shgLumpSumAgg?.[0]?.totalLumpSum || 0);
-	const perMemberLumpSumShare =
-		activeMemberCount > 0 ? totalShgLumpSum / activeMemberCount : 0;
+	const memberOwnLumpSum = Number(memberOwnLumpSumAgg?.[0]?.totalLumpSum || 0);
+	const sharedPoolLumpSum = Number(
+		openingBalanceLumpSumAgg?.[0]?.totalLumpSum || 0,
+	);
+	// Shared pool (from onboarding) divided equally + member's own individual contributions
+	const perMemberSharedPoolShare =
+		activeMemberCount > 0 ? sharedPoolLumpSum / activeMemberCount : 0;
+	const perMemberLumpSumShare = perMemberSharedPoolShare + memberOwnLumpSum;
 	const totalSavings = totalMonthlySavingsPaid + perMemberLumpSumShare;
 
 	/* Calculate outstanding loan from Loan + LoanRepayment (only active loans, principal only) */
@@ -1818,10 +1860,12 @@ async function buildShgSnapshotData(shgId, month) {
 
 	const memberMap = Object.fromEntries(members.map((m) => [String(m._id), m]));
 	const savingsByMember = {};
-	const lumpSumByMember = {};
+	const lumpSumByMember = {}; // individual LUMP_SUM_CONTRIBUTION per member
 
 	let totalSavings = 0;
 	let totalLumpSum = 0;
+	let sharedPoolLumpSum = 0; // opening balance lump sum (shared equally)
+	let totalIndividualLumpSum = 0; // sum of individual LUMP_SUM_CONTRIBUTION transactions
 	let totalInterest = 0;
 	let totalPenalty = 0;
 	let totalExpense = 0;
@@ -1837,10 +1881,11 @@ async function buildShgSnapshotData(shgId, month) {
 		}
 
 		if (tx.type === TransactionType.LUMP_SUM_CONTRIBUTION) {
-			totalLumpSum += Number(tx.amount || 0);
+			const amt = Number(tx.amount || 0);
+			totalLumpSum += amt;
+			totalIndividualLumpSum += amt;
 			if (memberKey)
-				lumpSumByMember[memberKey] =
-					(lumpSumByMember[memberKey] || 0) + Number(tx.amount || 0);
+				lumpSumByMember[memberKey] = (lumpSumByMember[memberKey] || 0) + amt;
 		}
 
 		if (tx.type === TransactionType.PENALTY_CHARGE) {
@@ -1868,7 +1913,9 @@ async function buildShgSnapshotData(shgId, month) {
 				(String(tx.fromAccount || '') === AccountType.EXTERNAL &&
 					String(tx.toAccount || '') === AccountType.SHG_CASH)
 			) {
-				totalLumpSum += Number(tx.amount || 0);
+				const amt = Number(tx.amount || 0);
+				totalLumpSum += amt;
+				sharedPoolLumpSum += amt; // this is the shared pool from onboarding
 			} else if (
 				tx?.meta?.category === 'TOTAL_EXPENDITURE_TILL_DATE' ||
 				tx?.meta?.category === 'MANUAL_EXPENSE' ||
@@ -1913,14 +1960,20 @@ async function buildShgSnapshotData(shgId, month) {
 	const totalCash = totalSavings + totalLumpSum + totalInterest + totalPenalty;
 	const totalAvailableCash = totalCash - totalOutstandingLoan - totalExpense;
 
+	// Per-member lumpSum = equal share of shared pool (onboarding) + member's own individual contributions
+	const perMemberSharedPoolShare =
+		members.length > 0 ? sharedPoolLumpSum / members.length : 0;
+
 	const memberWise = members.map((member) => {
 		const key = String(member._id);
+		const memberOwnLumpSum = lumpSumByMember[key] || 0;
+		const memberTotalLumpSum = perMemberSharedPoolShare + memberOwnLumpSum;
 		return {
 			memberId: member._id,
 			name: member.name,
 			memberCode: member.memberCode,
 			savings: Number((savingsByMember[key] || 0).toFixed(2)),
-			lumpSum: Number((lumpSumByMember[key] || 0).toFixed(2)),
+			lumpSum: Number(memberTotalLumpSum.toFixed(2)),
 			outstandingLoan: Number((outstandingByMember[key] || 0).toFixed(2)),
 		};
 	});
