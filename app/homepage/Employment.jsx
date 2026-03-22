@@ -49,9 +49,9 @@ const Employment = () => {
 					className='w-full h-full object-cover'
 				/>
 				<div className='absolute inset-0 bg-gray-500/40'></div>
-				<div className='absolute top-4 right-0 bg-green-800 text-white px-8 py-1 shadow-lg w-full transform translate-y-15'>
+				<div className='absolute top-4 right-0 bg-amber-700 text-white px-8 py-1 shadow-lg w-full transform translate-y-15'>
 					<span className='text-xs font-bold tracking-wider'>
-						जल्द आ रहा है
+						करियर मार्गदर्शन ✨
 					</span>
 				</div>
 				<div className='flex absolute bottom-0 w-full flex-row justify-center items-end'>

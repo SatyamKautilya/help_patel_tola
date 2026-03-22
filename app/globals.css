@@ -192,6 +192,29 @@ html {
 	animation: shimmer-text 5s infinite linear;
 }
 
+/* ── Timeline animations ── */
+@keyframes nodeGlow {
+	0%,
+	100% {
+		box-shadow: 0 0 8px rgba(34, 211, 238, 0.2);
+	}
+	50% {
+		box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+	}
+}
+
+.timeline-node-active {
+	animation: nodeGlow 2s ease-in-out infinite;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+.no-scrollbar {
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+}
+
 /* ── Date input calendar icon fix for dark backgrounds ── */
 input[type='date']::-webkit-calendar-picker-indicator {
 	filter: invert(1);
