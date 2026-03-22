@@ -401,8 +401,8 @@ function AIChatSheet({ milestone, onClose, gradient }) {
 					)}
 
 				{/* Input Area */}
-				<div className='px-3 py-3 border-t border-white/5 bg-slate-900/95'>
-					<div className='flex items-end gap-2'>
+				<div className='px-3 pt-3 pb-[env(safe-area-inset-bottom,24px)] border-t border-white/5 bg-slate-900/95'>
+					<div className='flex items-end gap-2 mb-4'>
 						<textarea
 							ref={inputRef}
 							value={input}

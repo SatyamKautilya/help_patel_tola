@@ -1831,6 +1831,569 @@ export const careers = {
 			},
 		],
 	},
+
+	iti: {
+		id: 'iti',
+		title: 'ITI / तकनीकी कारीगर',
+		titleEn: 'ITI - Skilled Trades',
+		emoji: '🔧',
+		gradient: 'from-orange-600 to-amber-400',
+		cardBg: 'from-orange-900/40 to-amber-900/30',
+		description: 'इलेक्ट्रीशियन, फिटर, वेल्डर, मैकेनिक - ITI से कुशल कारीगर बनें',
+		milestones: [
+			{
+				id: 'iti-10th',
+				step: 1,
+				title: '10वीं / 8वीं पास करें',
+				period: 'कक्षा 8वीं - 10वीं',
+				emoji: '📚',
+				summary:
+					'8वीं या 10वीं पास करें। कई ITI trades 8th pass से ही शुरू हो सकती हैं।',
+				details:
+					'ITI (Industrial Training Institute) courses दो प्रकार की eligibility पर available हैं:\n\n8वीं पास trades: Welder, Wireman, Carpenter, Plumber, Sheet Metal Worker\n10वीं पास trades: Electrician, Fitter, Turner, Machinist, Mechanic (Motor Vehicle), COPA, Electronics\n\nITI course 1-2 साल का होता है। MP में 150+ Government ITIs और कई private ITIs हैं।\n\nITI के बाद directly job मिल सकती है या apprenticeship कर सकते हैं। Railway, NTPC, BHEL जैसी सरकारी कंपनियों में ITI holders की भर्ती होती है।',
+				tips: [
+					'10वीं पास करें - ज्यादा और बेहतर trades available होंगी',
+					'Math और Science basics strong करें',
+					'Practical skills में interest develop करें',
+					'Government ITI में admission लें - fees बहुत कम है',
+					'Popular trades: Electrician, Fitter, Mechanic - इनमें सबसे ज्यादा jobs हैं',
+				],
+				importantInfo:
+					'8th pass: Welder, Wireman | 10th pass: Electrician, Fitter, Mechanic | Govt ITI fees: ₹1,000-3,000/year',
+				aiContext:
+					'Student in 8th-10th in MP wants to do ITI. Guide about: ITI courses overview, trades available, government vs private ITI, job opportunities, fee structure, best ITI colleges in MP. Answer in Hindi with English terms. Be MP-specific.',
+				suggestedQuestions: [
+					'ITI में कौन सा trade सबसे अच्छा है?',
+					'ITI की fees कितनी लगती है?',
+					'ITI के बाद कितनी salary मिलती है?',
+				],
+			},
+			{
+				id: 'iti-admission',
+				step: 2,
+				title: 'ITI में Admission लें',
+				period: '10वीं के बाद (जुलाई-अगस्त)',
+				emoji: '🏫',
+				summary:
+					'MP ITI Admission (Online counseling) से Government ITI में admission लें। Trade चुनें।',
+				details:
+					'MP ITI Admission Process:\n1. Online registration (DTE MP website)\n2. Merit list (10th marks based)\n3. Choice filling (ITI + Trade selection)\n4. Seat allotment (multiple rounds)\n5. Document verification और admission\n\nBest Trades (Job demand wise):\n• Electrician (2 years) - सबसे popular, सबसे ज्यादा jobs\n• Fitter (2 years) - Manufacturing, Railway में demand\n• Mechanic Motor Vehicle (2 years) - Automobile sector\n• COPA (1 year) - Computer Operator\n• Welder (1 year) - Construction, manufacturing\n• Turner (2 years) - Machine shops\n• Electronics Mechanic (2 years) - Electronics repair\n\nMP के top Government ITIs: ITI Bhopal, ITI Indore, ITI Jabalpur, ITI Gwalior।',
+				tips: [
+					'Government ITI prefer करें - fees बहुत कम और recognition अच्छा',
+					'Electrician trade सबसे versatile है - government + private दोनों में scope',
+					'Fitter trade Railway और manufacturing में बहुत demand है',
+					'Merit based admission होता है - 10th में अच्छे marks important',
+					'SC/ST/OBC students को fee concession और reservation मिलता है',
+				],
+				importantInfo:
+					'DTE MP online counseling | Merit: 10th marks | Govt ITI fees: ₹1,000-3,000/year | Duration: 1-2 years',
+				aiContext:
+					'Student seeking ITI admission in MP. Guide about: online admission process, best trades to choose, government vs private ITIs, trade comparison by job scope, documents needed. Answer in Hindi with English terms. Be specific to MP DTE process.',
+				suggestedQuestions: [
+					'ITI admission कैसे होता है MP में?',
+					'Electrician vs Fitter - कौन सा trade बेहतर है?',
+					'Government ITI और Private ITI में क्या difference है?',
+				],
+			},
+			{
+				id: 'iti-training',
+				step: 3,
+				title: 'ITI Training (1-2 वर्ष)',
+				period: '1-2 वर्ष (Trade अनुसार)',
+				emoji: '⚡',
+				summary:
+					'Practical skills सीखें - 70% practical, 30% theory। Workshop में hands-on training मिलेगी।',
+				details:
+					'ITI training का focus practical skills पर है:\n\n• Theory: 30% - Basic science, math, trade theory\n• Practical: 70% - Workshop में hands-on training\n\nElectrician trade में सीखेंगे:\n- Wiring (domestic, industrial)\n- Electrical machines (motor, transformer)\n- Electrical installation और maintenance\n- Safety procedures\n\nFitter trade में सीखेंगे:\n- Filing, cutting, drilling\n- Fitting और assembly\n- Blueprint reading\n- Measuring instruments\n\nMechanic Motor Vehicle:\n- Engine repair और maintenance\n- Brake, clutch, gearbox\n- Electrical systems\n- Fuel systems\n\nNCVT (National Council for Vocational Training) certificate मिलता है जो पूरे India में valid है।',
+				tips: [
+					'Practical work में full attention दें - यही आपकी real skill है',
+					'Safety rules strictly follow करें workshop में',
+					'Trade test preparation workshop से ही शुरू करें',
+					'Senior students और instructors से tips लें',
+					'Extra practice करें - skill जितनी अच्छी, job उतनी जल्दी',
+				],
+				importantInfo:
+					'70% Practical + 30% Theory | NCVT Certificate | All India valid | Semester system',
+				aiContext:
+					'Student doing ITI training in MP. Guide about: how to excel in ITI, practical training tips, preparing for trade test, importance of NCVT certificate, industry connections. Answer in Hindi with English terms.',
+				suggestedQuestions: [
+					'ITI में pass होने के लिए कितने marks चाहिए?',
+					'NCVT और SCVT certificate में क्या difference है?',
+					'ITI के दौरान कौन सी extra skills सीखूं?',
+				],
+			},
+			{
+				id: 'iti-apprentice',
+				step: 4,
+				title: 'Apprenticeship (1 वर्ष)',
+				period: 'ITI के बाद (1 वर्ष)',
+				emoji: '🏭',
+				summary:
+					'Government या private company में Apprenticeship करें। Stipend मिलता है और experience बनता है।',
+				details:
+					'ITI के बाद Apprenticeship Act के तहत 1 साल की training कर सकते हैं:\n\nApprentice कहाँ कर सकते हैं:\n• Railway Workshops (Bhopal, Jabalpur, Itarsi)\n• BHEL Bhopal\n• Ordinance Factories\n• NTPC\n• Private companies (Tata, L&T, etc.)\n• State Electricity Board (MPEB/MPPKVVCL)\n\nStipend: ₹7,000-9,000/month (Government notified)\n\nApprentice portal (apprenticeshipindia.gov.in) पर register करें। MP में Railway workshops सबसे popular apprenticeship destination हैं।\n\nApprentice complete करने पर NAC (National Apprenticeship Certificate) मिलता है जो government jobs में extra weightage देता है।',
+				tips: [
+					'Railway workshop में apprentice try करें - सबसे अच्छा experience',
+					'BHEL Bhopal में भी excellent apprenticeship program है',
+					'Apprenticeship portal पर registration जरूर करें',
+					'NAC certificate government jobs में preference देता है',
+					'Apprentice के दौरान से ही competitive exam prep शुरू करें',
+				],
+				importantInfo:
+					'Apprentice: 1 year | Stipend: ₹7,000-9,000/month | NAC certificate | Railway, BHEL Bhopal popular',
+				aiContext:
+					'Student completed ITI and looking for apprenticeship in MP. Guide about: best apprenticeship opportunities in MP, Railway workshop apprenticeship, BHEL Bhopal, registration process, stipend details, NAC certificate importance. Answer in Hindi with English terms.',
+				suggestedQuestions: [
+					'Apprenticeship कैसे मिलेगी?',
+					'Railway apprentice कैसे apply करूं?',
+					'Apprentice की stipend कितनी है?',
+				],
+			},
+			{
+				id: 'iti-jobs',
+				step: 5,
+				title: 'नौकरी और करियर',
+				period: 'ITI + Apprentice के बाद',
+				emoji: '💼',
+				summary:
+					'Government या private sector में नौकरी पाएं। Railway, NTPC, BHEL, State electricity board में बड़ी भर्तियां होती हैं।',
+				details:
+					'ITI के बाद Job Options:\n\nGovernment Jobs:\n• Railway Technician (RRB): ₹20,000-35,000/month\n• NTPC Technician: ₹22,000-30,000/month\n• BHEL Artisan: ₹20,000-28,000/month\n• State Electricity Board (Lineman/Technician): ₹18,000-28,000/month\n• Ordinance Factory: ₹20,000-30,000/month\n• ISRO Technician: ₹22,000-35,000/month\n• SSC Selection Post: ₹20,000-30,000/month\n\nPrivate Sector:\n• Electrician: ₹12,000-25,000/month\n• Automobile Mechanic: ₹12,000-20,000/month\n• Factory Technician: ₹15,000-25,000/month\n• AC/Refrigeration: ₹15,000-30,000/month\n\nSelf-Employment:\n• अपनी electrical/plumbing shop खोलें\n• Motor winding business\n• AC repair service\n• Automobile garage\n\nGulf countries (Dubai, Saudi) में ITI holders की बहुत demand है - ₹40,000-80,000/month salary मिल सकती है।',
+				tips: [
+					'Railway RRB exam जरूर दें - सबसे बड़ी ITI recruitment',
+					'NTPC, BHEL, ISRO technician exams भी apply करें',
+					'Multiple government exams simultaneously prepare करें',
+					'Private sector में experience लें government job आने तक',
+					'Self-employment: PM Mudra Loan से अपना business शुरू कर सकते हैं',
+					'Gulf countries में भी apply करें - salary बहुत अच्छी मिलती है',
+				],
+				importantInfo:
+					'Railway Technician: ₹20,000-35,000/month | Gulf salary: ₹40,000-80,000/month | Self-employment options available',
+				aiContext:
+					'Student completed ITI from MP, looking for jobs. Guide about: government job exams (Railway, NTPC, BHEL), private sector opportunities, self-employment options, Gulf country jobs, salary expectations, career growth for ITI holders. Answer in Hindi with English terms. Be MP-specific.',
+				suggestedQuestions: [
+					'ITI के बाद कौन सी government job best है?',
+					'Railway technician कैसे बनें?',
+					'ITI के बाद अपना business कैसे शुरू करूं?',
+				],
+			},
+			{
+				id: 'iti-growth',
+				step: 6,
+				title: 'आगे की पढ़ाई और Growth',
+				period: 'Job के साथ या बाद में',
+				emoji: '📈',
+				summary:
+					'ITI के बाद Diploma, B.Tech, या CTI करके career को और ऊंचाई दें।',
+				details:
+					'ITI के बाद higher education options:\n\n• Diploma (Lateral Entry): ITI के बाद directly Polytechnic के 2nd year में admission (3 year → 2 year में complete)\n• B.Tech (Lateral Entry): Diploma के बाद B.Tech 2nd year में\n• CTI/CITS: ITI Instructor बनने के लिए (1 year course) - Government ITI में पढ़ा सकते हैं\n• Skill upgradation courses: Advanced ITI courses\n\nCTI (Central Training Institute) course करके Government ITI instructor बन सकते हैं:\n• CTI Instructor salary: ₹35,000-50,000/month (Government)\n\nGovernment job में promotion path:\n• Technician → Senior Technician → Supervisor → Junior Engineer\n\nMP Skill Development Mission के तहत कई free skill upgradation programs available हैं।',
+				tips: [
+					'Diploma (Lateral Entry) करें - engineering degree की राह खुलेगी',
+					'CTI करें - Government ITI में instructor बन सकते हैं (अच्छी salary)',
+					'Job के साथ distance education से graduation करें',
+					'New technologies सीखते रहें (Solar, EV, Automation)',
+					'PM Vishwakarma Yojana और PM-DAKSH जैसी schemes का लाभ लें',
+				],
+				importantInfo:
+					'Diploma lateral entry: 2nd year | CTI instructor: ₹35,000-50,000/month | B.Tech possible after Diploma',
+				aiContext:
+					'Student completed ITI and wants to grow further. Guide about: higher education after ITI (Diploma lateral entry, B.Tech, CTI), career growth paths, government schemes for skill development, how to become ITI instructor. Answer in Hindi with English terms.',
+				suggestedQuestions: [
+					'ITI के बाद Diploma कैसे करूं?',
+					'CTI course क्या है और कैसे करें?',
+					'ITI holder B.Tech कर सकता है क्या?',
+				],
+			},
+		],
+	},
+
+	army: {
+		id: 'army',
+		title: 'सेना (Indian Army)',
+		titleEn: 'Indian Army',
+		emoji: '🎖️',
+		gradient: 'from-yellow-700 to-lime-500',
+		cardBg: 'from-yellow-900/40 to-lime-900/30',
+		description: 'भारतीय सेना में Soldier, JCO या Officer बनें',
+		milestones: [
+			{
+				id: 'army-10th',
+				step: 1,
+				title: '10वीं पास करें',
+				period: 'कक्षा 10वीं',
+				emoji: '📚',
+				summary:
+					'10वीं पास करें और शारीरिक fitness शुरू करें। Army Soldier GD के लिए 10th pass जरूरी है।',
+				details:
+					'Indian Army में 10वीं पास होते ही कई posts के लिए eligible हो जाते हैं:\n\n• Soldier General Duty (GD): 10th pass, 45%+ marks\n• Soldier Tradesman (8th/10th): Cook, Washerman, Barber, etc.\n\nArmy Agniveer scheme (4 year service) के तहत भर्ती होती है। 4 साल बाद 25% Agniveers को permanent service में retain किया जाता है।\n\nPhysical requirements:\n• Height: 170 cm (general), 162-165 cm (hill areas)\n• Weight: Height proportionate\n• Chest: 77 cm (5 cm expansion)\n• Running: 1.6 km in 5 min 30 sec\n• Pull-ups, Sit-ups, 9 feet ditch jump, Balancing beam',
+				tips: [
+					'Daily 5 km running + sprint practice करें',
+					'Pull-ups (minimum 6-10) practice करें',
+					'Height और weight standards check करें',
+					'Math और GK अच्छे से पढ़ें - written test में आता है',
+					'Eyesight maintain करें - 6/6 required for most trades',
+				],
+				importantInfo:
+					'Agniveer GD: 10th pass, 45%+ | Age: 17.5-21 years | Height: 170 cm | 1.6 km run: 5:30',
+				aiContext:
+					'Student in 10th in MP wants to join Indian Army. Guide about: Agniveer scheme, Soldier GD requirements, physical standards, age limits, preparation tips. Answer in Hindi with English terms. Be MP-specific (MP Rally Bharti locations).',
+				suggestedQuestions: [
+					'Army Agniveer कैसे बनें?',
+					'Army physical test में क्या-क्या होता है?',
+					'Army की salary कितनी है?',
+				],
+			},
+			{
+				id: 'army-12th',
+				step: 2,
+				title: '12वीं पास करें',
+				period: 'कक्षा 11वीं - 12वीं',
+				emoji: '📖',
+				summary:
+					'12वीं पास करें। Soldier Technical, Clerk और NDA (Officer) के लिए eligible होंगे।',
+				details:
+					'12वीं pass करने पर और अधिक posts open होते हैं:\n\n• Agniveer Soldier Technical: 12th with PCM, 50%+ marks\n• Agniveer Soldier Clerk/SKT: 12th any stream, 60%+ marks\n• Agniveer Soldier Nursing: 12th with Science (Biology)\n• NDA (National Defence Academy): 12th pass - Officer entry!\n\nNDA सबसे prestigious entry है - 12th के बाद directly officer बन सकते हैं। NDA exam UPSC conduct करता है। 3 years training at NDA Khadakwasla (Pune)।\n\nSoldier Technical में higher pay और better postings मिलती हैं।',
+				tips: [
+					'NDA exam जरूर attempt करें - 12th के बाद officer बनने का सबसे अच्छा मौका',
+					'NDA prep: Math + GK + English + Reasoning',
+					'12th में PCM लें - Technical entry के लिए जरूरी',
+					'SSB Interview preparation भी शुरू करें (NDA के बाद)',
+					'Physical fitness peak level पर रखें',
+				],
+				importantInfo:
+					'NDA: 12th pass (UPSC exam) | Technical: 12th PCM 50%+ | Clerk: 12th 60%+ | NDA age: 16.5-19.5',
+				aiContext:
+					'Student in 11th-12th wanting to join Indian Army, especially through NDA. Guide about: NDA exam, Soldier Technical, Soldier Clerk, exam preparation, SSB interview basics. Answer in Hindi with English terms.',
+				suggestedQuestions: [
+					'NDA exam कैसे crack करूं?',
+					'Soldier Technical और GD में क्या difference है?',
+					'Army officer बनने के कितने ways हैं?',
+				],
+			},
+			{
+				id: 'army-graduation',
+				step: 3,
+				title: 'Graduation (Officer entry)',
+				period: '3-4 वर्ष',
+				emoji: '🎓',
+				summary:
+					'Graduation करें। CDS, TGC, SSC (Short Service Commission) से Officer बन सकते हैं।',
+				details:
+					'Graduation के बाद Army Officer बनने के रास्ते:\n\n• CDS (Combined Defence Services): UPSC exam → SSB Interview → IMA Training\n• TGC (Technical Graduate Course): Engineering graduates → direct entry\n• SSC (Short Service Commission): Graduation → OTA Chennai (14 years service)\n• TES (Technical Entry Scheme): 10+2 PCM → direct officer entry\n• NCC Special Entry: NCC C Certificate holders → SSB direct\n\nCDS Exam: Math, English, GK → SSB Interview (5 days) → Medical\n\nIMA (Indian Military Academy), Dehradun में officer training होती है - 18 months।\nOTA (Officers Training Academy), Chennai - 11 months training।',
+				tips: [
+					'CDS exam जरूर attempt करें - Officer बनने का main route',
+					'SSB Interview preparation seriously करें (5-day process)',
+					'NCC join करें college में - Army entry में बहुत help करता है',
+					'Physical fitness exceptional level पर रखें',
+					'Leadership qualities develop करें - SSB में test होती हैं',
+				],
+				importantInfo:
+					'CDS: UPSC exam, Grad required | TGC: Engineering grad | SSB: 5-day interview | IMA training: 18 months',
+				aiContext:
+					'Student doing graduation wanting to become Army officer. Guide about: CDS exam, SSB interview preparation, different officer entry schemes, NCC importance, IMA vs OTA. Answer in Hindi with English terms.',
+				suggestedQuestions: [
+					'CDS exam कैसे crack करूं?',
+					'SSB interview कैसे clear करूं?',
+					'Army officer की salary कितनी होती है?',
+				],
+			},
+			{
+				id: 'army-rally',
+				step: 4,
+				title: 'Army Rally Bharti / Exam',
+				period: 'Army notification अनुसार',
+				emoji: '🏃',
+				summary:
+					'Agniveer Rally Bharti में participate करें। Physical Test → Written Exam → Medical → Merit।',
+				details:
+					'Agniveer Army Rally Bharti Process:\n\n1. Online Registration (joinindianarmy.nic.in)\n2. Rally Bharti at designated center:\n   a. Document check\n   b. Physical Fitness Test (PFT):\n      - 1.6 km run: Group I (5:30), Group II (5:45)\n      - Pull-ups: 6-10 (marks vary)\n      - 9 feet ditch jump\n      - Balancing beam\n   c. Physical Measurement (Height, Weight, Chest)\n3. Common Entrance Exam (CEE): Online exam\n   - GK, Math, Reasoning, Science (for GD)\n   - GK, Math, Reasoning, English, Computer (for Clerk)\n4. Medical Examination\n5. Merit List → Selection\n\nMP Rally Bharti centers: Bhopal, Jabalpur, Gwalior, Indore region\n\nAgniveer Salary: ₹30,000/month (1st year) → ₹40,000/month (4th year)\nSeva Nidhi (after 4 years): ₹11.71 lakh lump sum',
+				tips: [
+					'joinindianarmy.nic.in पर regularly check करें notifications',
+					'Running practice: 1.6 km under 5 min 30 sec target करें',
+					'Pull-ups: daily practice, minimum 10+ target',
+					'CEE exam: Lucent GK + RS Aggarwal Math + Science NCERT',
+					'Medical: flat feet, color blindness, varicose veins check होता है',
+					'Documents: 10th/12th marksheet, Aadhar, domicile, caste certificate ready रखें',
+				],
+				importantInfo:
+					'Rally Bharti: MP centers - Bhopal, Jabalpur, Gwalior | Agniveer pay: ₹30,000-40,000/month | Seva Nidhi: ₹11.71 lakh',
+				aiContext:
+					'Student appearing for Army Agniveer Rally Bharti from MP. Guide about: rally process in detail, physical test standards, CEE exam preparation, medical standards, MP rally bharti schedule and centers. Answer in Hindi with English terms.',
+				suggestedQuestions: [
+					'Rally Bharti में कैसे select होंगे?',
+					'Physical test कैसे pass करूं?',
+					'Army medical में किन कारणों से reject होते हैं?',
+				],
+			},
+			{
+				id: 'army-career',
+				step: 5,
+				title: 'सेना में करियर',
+				period: 'Selection के बाद',
+				emoji: '⭐',
+				summary:
+					'Indian Army में सेवा करें। Agniveer से permanent, या Officer track में career बनाएं।',
+				details:
+					'Agniveer (4 years):\n• Salary: ₹30,000 → ₹40,000/month (yearly increment)\n• Seva Nidhi: ₹11.71 lakh after 4 years\n• 25% retained as permanent soldiers\n• Retained soldiers → regular career progression\n\nPermanent Soldier Career:\n• Sepoy → Lance Naik → Naik → Havildar → Nb Subedar → Subedar → Subedar Major\n• Salary grows: ₹30,000 → ₹80,000+/month over career\n• Pension after 15-20 years service\n\nOfficer Career:\n• Lieutenant → Captain → Major → Lt. Colonel → Colonel → Brigadier → Major General → Lt. General → General\n• Starting salary (Lieutenant): ₹70,000+/month\n• Colonel: ₹1,40,000+/month\n\nBenefits: Free medical (family भी), Canteen (CSD), Housing, Education allowance for children, Ex-servicemen quota in government jobs, Land allotment (some states)\n\nAfter Army (Agniveer/Retirement):\n• CAPF/State Police में preference\n• Government jobs में reservation\n• Bank, Railway में ex-servicemen quota\n• Skill certificate helps in private sector',
+				tips: [
+					'Agniveer: 4 years में maximum skills और certifications लें',
+					'Permanent retain होने के लिए best performer बनें',
+					'Army में रहते हुए higher education continue करें (IGNOU)',
+					'Officer बनने के लिए ACC exam attempt करें (Army Cadet College)',
+					'Seva Nidhi money wisely invest करें (business या education)',
+				],
+				importantInfo:
+					'Agniveer: ₹30,000-40,000/month + ₹11.71L Seva Nidhi | Permanent: Pension + benefits | Officer: ₹70,000+/month starting',
+				aiContext:
+					'Student selected in Indian Army. Guide about: army life, career progression, salary and benefits, Agniveer scheme details, how to get retained permanently, officer entry from ranks, post-army career options. Answer in Hindi with English terms.',
+				suggestedQuestions: [
+					'Agniveer के बाद permanent कैसे बनें?',
+					'Army में salary और benefits क्या-क्या हैं?',
+					'Army के बाद क्या career options हैं?',
+				],
+			},
+		],
+	},
+
+	nursing: {
+		id: 'nursing',
+		title: 'नर्सिंग / ANM-GNM',
+		titleEn: 'Nursing',
+		emoji: '👩‍⚕️',
+		gradient: 'from-pink-600 to-rose-400',
+		cardBg: 'from-pink-900/40 to-rose-900/30',
+		description: 'ANM, GNM, B.Sc Nursing - स्वास्थ्य सेवा में करियर',
+		milestones: [
+			{
+				id: 'nurse-10th',
+				step: 1,
+				title: '10वीं पास करें',
+				period: 'कक्षा 10वीं',
+				emoji: '📚',
+				summary:
+					'10वीं अच्छे marks से पास करें। ANM course 10th के बाद कर सकते हैं।',
+				details:
+					'Nursing career के लिए 10वीं के बाद ही पहला entry point available है:\n\n• ANM (Auxiliary Nurse Midwife): 10th pass (only for females in most states)\n  Duration: 2 years\n• GNM (General Nursing & Midwifery): 12th pass (PCB preferred)\n  Duration: 3.5 years (3 years + 6 months internship)\n• B.Sc Nursing: 12th pass with PCB, 45%+\n  Duration: 4 years\n\nANM course 10th pass girls के लिए बहुत अच्छा option है। Government hospitals, Primary Health Centers (PHC) में directly job मिलती है।\n\nMP में ANM/GNM training centers Government और private दोनों हैं।',
+				tips: [
+					'Science subjects (Biology especially) अच्छे से पढ़ें',
+					'10th में 50%+ marks लाएं - admission के लिए जरूरी',
+					'ANM: 10th के बाद सबसे quick healthcare career',
+					'GNM/B.Sc Nursing के लिए 12th PCB लें',
+					'Patient care और empathy develop करें',
+				],
+				importantInfo:
+					'ANM: 10th pass (girls) 2 years | GNM: 12th pass 3.5 years | B.Sc Nursing: 12th PCB 4 years',
+				aiContext:
+					'Student in 10th in MP interested in nursing career. Guide about: ANM vs GNM vs B.Sc Nursing, eligibility, duration, fees, job opportunities in MP. Answer in Hindi with English terms. Be MP-specific.',
+				suggestedQuestions: [
+					'ANM और GNM में क्या difference है?',
+					'Nursing में career कैसा है?',
+					'Nursing course की fees कितनी है?',
+				],
+			},
+			{
+				id: 'nurse-course',
+				step: 2,
+				title: 'ANM / GNM / B.Sc Nursing',
+				period: '2-4 वर्ष (Course अनुसार)',
+				emoji: '🏥',
+				summary:
+					'Nursing course complete करें। Clinical training और patient care सीखें।',
+				details:
+					'Nursing Courses Detail:\n\nANM (2 years):\n• Community health, maternal care, child health\n• Government college fees: ₹5,000-15,000/year\n• Job: PHC, Sub-health centers, hospitals\n\nGNM (3 years + 6 months internship):\n• Medical-Surgical Nursing, Community Health, Mental Health\n• Government college fees: ₹10,000-25,000/year\n• Job: Hospitals (govt + private), clinics\n\nB.Sc Nursing (4 years):\n• Comprehensive nursing education\n• Admission: MP NEET UG based / State counseling\n• Government college fees: ₹15,000-30,000/year\n• Private college: ₹50,000-2,00,000/year\n• Job: Hospitals, teaching, research, abroad opportunities\n\nMP Nursing Admission: MP DME counseling (for B.Sc Nursing), DTE MP (for ANM/GNM)\n\nMP Government Nursing Colleges: Bhopal, Indore, Jabalpur, Gwalior, Rewa',
+				tips: [
+					'Government college prefer करें - fees कम और recognition अच्छा',
+					'Clinical postings में active participation रखें',
+					'B.Sc Nursing सबसे अच्छा option है - ज्यादा opportunities',
+					'English improve करें - abroad jobs के लिए जरूरी',
+					'Registration with MP Nurses Registration Council जरूरी है course के बाद',
+				],
+				importantInfo:
+					'ANM: ₹5K-15K/year | GNM: ₹10K-25K/year | B.Sc: NEET based | MP DME counseling',
+				aiContext:
+					'Student doing nursing course in MP. Guide about: course details, clinical training, best nursing colleges in MP, admission process, fees comparison. Answer in Hindi with English terms.',
+				suggestedQuestions: [
+					'MP में best nursing college कौन सा है?',
+					'B.Sc Nursing admission कैसे होता है?',
+					'Nursing course में क्या-क्या सिखाया जाता है?',
+				],
+			},
+			{
+				id: 'nurse-registration',
+				step: 3,
+				title: 'Nursing Council Registration',
+				period: 'Course complete करने के बाद',
+				emoji: '📋',
+				summary:
+					'MP State Nursing Council में registration करें। यह practice के लिए अनिवार्य है।',
+				details:
+					'Nursing course complete करने के बाद registration अनिवार्य है:\n\n• MP Nurses Registration Council में register करें\n• Registration number मिलता है जो job apply करने के लिए जरूरी है\n• Registration हर 5 साल में renew करनी होती है\n\nRegistration के बाद eligible होंगे:\n• Government hospital jobs (NHM, AIIMS, State hospitals)\n• Private hospital jobs\n• Railway Medical\n• Defence Nursing (Military Nursing Service)\n• Staff Nurse exams (AIIMS, JIPMER, PGI, etc.)\n\nB.Sc Nursing holders NEET PG (Nursing) देकर M.Sc Nursing कर सकते हैं।',
+				tips: [
+					'Registration immediately करें course complete होते ही',
+					'Government job exams prepare करें: NHM, AIIMS, Railway',
+					'English और Computer skills improve करें',
+					'NCLEX exam prepare करें (USA/Canada में nursing jobs)',
+					'M.Sc Nursing करने पर teaching और administrative positions मिलती हैं',
+				],
+				importantInfo:
+					'MP Nurses Registration Council | Renewal: every 5 years | Mandatory for practice',
+				aiContext:
+					'Student completed nursing and registering with council. Guide about: registration process, government job exams for nurses, AIIMS Staff Nurse exam, NHM recruitment, career options. Answer in Hindi with English terms.',
+				suggestedQuestions: [
+					'Nursing registration कैसे करें?',
+					'Government hospital में nurse कैसे बनें?',
+					'AIIMS Staff Nurse exam कैसे crack करूं?',
+				],
+			},
+			{
+				id: 'nurse-career',
+				step: 4,
+				title: 'नौकरी और करियर Growth',
+				period: 'Registration के बाद',
+				emoji: '💊',
+				summary:
+					'Government/Private hospital में job करें। Abroad opportunities भी बहुत अच्छी हैं।',
+				details:
+					'Nursing Salary:\n\nGovernment:\n• ANM: ₹18,000-28,000/month\n• Staff Nurse (GNM): ₹25,000-40,000/month\n• Staff Nurse (B.Sc): ₹30,000-45,000/month\n• AIIMS Staff Nurse: ₹44,900+ /month (Level 7)\n• Nursing Superintendent: ₹60,000-80,000/month\n\nPrivate:\n• Staff Nurse: ₹15,000-30,000/month\n• ICU/OT Specialist: ₹25,000-45,000/month\n\nAbroad Opportunities:\n• Gulf (Saudi, UAE, Qatar): ₹60,000-1,50,000/month\n• UK: ₹2,00,000-3,50,000/month (after IELTS + NMC/OSCE)\n• USA/Canada: ₹3,00,000-6,00,000/month (after NCLEX)\n• Australia: ₹3,00,000-5,00,000/month\n\nCareer Growth:\n• Staff Nurse → Ward Sister → Nursing Superintendent → Chief Nursing Officer\n• M.Sc Nursing → Teaching → Professor\n• Public Health Nursing → Community programs',
+				tips: [
+					'IELTS prepare करें - abroad jobs के लिए mandatory',
+					'ICU/OT/Emergency specialization करें - demand highest है',
+					'NCLEX (USA) या NMC OSCE (UK) exam prepare करें abroad के लिए',
+					'Government job: NHM recruitment regularly होती है MP में',
+					'M.Sc Nursing करें - teaching और better positions मिलेंगी',
+				],
+				importantInfo:
+					'Govt Staff Nurse: ₹30,000-45,000/month | Gulf: ₹60,000-1.5L/month | USA/UK: ₹3-6L/month | High demand worldwide',
+				aiContext:
+					'Student completed nursing from MP, exploring career options. Guide about: government vs private jobs, salary comparison, abroad nursing opportunities (Gulf, UK, USA, Australia), IELTS/NCLEX preparation, career growth. Answer in Hindi with English terms.',
+				suggestedQuestions: [
+					'Nursing में salary कितनी मिलती है?',
+					'Abroad nursing job कैसे मिलेगी?',
+					'Government nurse कैसे बनें MP में?',
+				],
+			},
+		],
+	},
+
+	diploma: {
+		id: 'diploma',
+		title: 'पॉलिटेक्निक (Diploma)',
+		titleEn: 'Polytechnic Diploma',
+		emoji: '🔩',
+		gradient: 'from-cyan-700 to-sky-400',
+		cardBg: 'from-cyan-900/40 to-sky-900/30',
+		description: 'Polytechnic Diploma - Engineering का shortcut path',
+		milestones: [
+			{
+				id: 'dip-10th',
+				step: 1,
+				title: '10वीं पास करें',
+				period: 'कक्षा 10वीं',
+				emoji: '📚',
+				summary:
+					'10वीं पास करें। Polytechnic Diploma 10th के बाद directly join कर सकते हैं।',
+				details:
+					'Polytechnic Diploma 10वीं के बाद engineering field में सबसे quick entry है। 3 साल का course है जो practical engineering skills सिखाता है।\n\n12th करने की जरूरत नहीं - 10th → Diploma → Direct job या B.Tech lateral entry।\n\nDiploma Branches:\n• Mechanical Engineering\n• Electrical Engineering\n• Civil Engineering\n• Computer Science Engineering\n• Electronics & Communication\n• Automobile Engineering\n• Mining Engineering (MP specific)\n\nMP Polytechnic (DTE MP) online counseling से admission होता है। 10th marks based merit।',
+				tips: [
+					'10वीं में Math और Science अच्छे marks लाएं',
+					'Government Polytechnic college prefer करें',
+					'Popular branches: CS, Electrical, Mechanical - इनमें सबसे ज्यादा jobs',
+					'Diploma के बाद B.Tech lateral entry (2nd year) possible है',
+					'12th skip करके directly professional course मिलता है',
+				],
+				importantInfo:
+					'10th pass → Direct admission | Duration: 3 years | DTE MP counseling | Govt fees: ₹10,000-20,000/year',
+				aiContext:
+					'Student in 10th in MP considering Polytechnic Diploma. Guide about: Diploma vs 12th+B.Tech path, branches available, admission process in MP, government colleges, career after diploma. Answer in Hindi with English terms. Be MP-specific.',
+				suggestedQuestions: [
+					'Polytechnic Diploma क्या है?',
+					'Diploma vs B.Tech - कौन सा बेहतर है?',
+					'Diploma में कौन सी branch best है?',
+				],
+			},
+			{
+				id: 'dip-admission',
+				step: 2,
+				title: 'Polytechnic में Admission',
+				period: '10वीं के बाद (जून-जुलाई)',
+				emoji: '🏫',
+				summary:
+					'DTE MP Polytechnic counseling से admission लें। 10th marks based merit list बनती है।',
+				details:
+					'MP Polytechnic Admission Process:\n1. DTE MP website पर online registration\n2. 10th marks based merit list\n3. Choice filling (College + Branch)\n4. Seat allotment (multiple rounds)\n5. Document verification और fee payment\n\nMP के Top Government Polytechnics:\n• Government Polytechnic, Bhopal\n• Government Polytechnic, Indore\n• Government Polytechnic, Jabalpur\n• Shri G.S. Institute of Technology, Indore\n• Government Polytechnic, Gwalior\n\nFees:\n• Government: ₹10,000-20,000/year\n• Private: ₹30,000-70,000/year\n\nSC/ST/OBC students को fee concession और reservation available है। MP Pratibha Kiran Yojana (girls) और other scholarships भी available हैं।',
+				tips: [
+					'Government Polytechnic में admission try करें - better placement',
+					'CS/IT branch choose करें अगर software में interest है',
+					'Electrical/Mechanical choose करें government job target करने पर',
+					'Civil Engineering choose करें construction sector में career के लिए',
+					'Early apply करें - popular colleges जल्दी भर जाते हैं',
+				],
+				importantInfo:
+					'DTE MP online counseling | Merit: 10th marks | Govt fees: ₹10,000-20,000/year | Reservation available',
+				aiContext:
+					'Student seeking Polytechnic admission in MP. Guide about: DTE MP counseling process, best government polytechnics in MP, branch selection, fee structure, scholarships. Answer in Hindi with English terms.',
+				suggestedQuestions: [
+					'Polytechnic admission कैसे होता है MP में?',
+					'कौन सी branch में सबसे ज्यादा jobs हैं?',
+					'Government Polytechnic की fees कितनी है?',
+				],
+			},
+			{
+				id: 'dip-study',
+				step: 3,
+				title: 'Diploma Course (3 वर्ष)',
+				period: '3 वर्ष (6 semesters)',
+				emoji: '⚙️',
+				summary:
+					'Practical-focused engineering education लें। Industrial training और projects पर ध्यान दें।',
+				details:
+					'Diploma 3 साल (6 semesters) का course है। 12th + B.Tech (7 years) की बजाय Diploma + B.Tech lateral (5 years) से engineer बन सकते हैं।\n\nCourse structure:\n• 1st year: Basic Engineering (Math, Physics, Chemistry, Drawing, Workshop)\n• 2nd year: Core branch subjects + practicals\n• 3rd year: Advanced subjects + Industrial Training + Project work\n\nIndustrial Training (6th semester) में किसी company/factory में practical training करनी होती है। यह बहुत valuable experience है।\n\nRGPV (Rajiv Gandhi Proudyogiki Vishwavidyalaya) MP का technical university है जो Diploma courses affiliate करता है।',
+				tips: [
+					'Practical subjects पर extra ध्यान दें - यही आपकी strength होगी',
+					'Industrial training seriously लें - future job का foundation है',
+					'Mini projects और final project अच्छे से करें',
+					'Computer skills (AutoCAD, MS Office, Programming) सीखें',
+					'CGPA 7+ maintain करें - B.Tech lateral entry और placements के लिए',
+				],
+				importantInfo:
+					'3 years (6 sem) | RGPV affiliated | Industrial training in 6th sem | Practical focused',
+				aiContext:
+					'Student doing Polytechnic Diploma in MP. Guide about: how to excel in diploma, industrial training importance, projects, preparing for jobs or B.Tech lateral entry. Answer in Hindi with English terms.',
+				suggestedQuestions: [
+					'Diploma में pass होने के लिए कितने marks चाहिए?',
+					'Industrial training कहाँ करूं?',
+					'Diploma के बाद B.Tech कैसे करूं?',
+				],
+			},
+			{
+				id: 'dip-career',
+				step: 4,
+				title: 'नौकरी या B.Tech Lateral Entry',
+				period: 'Diploma के बाद',
+				emoji: '🚀',
+				summary:
+					'Direct job लें या B.Tech 2nd year में lateral entry करें। दोनों options excellent हैं।',
+				details:
+					'Diploma के बाद 2 paths:\n\nPath 1: Direct Job\n• Junior Engineer (State/Central Govt): ₹25,000-45,000/month\n• SSC JE (Junior Engineer): ₹35,000-50,000/month (Central Govt)\n• Railway JE: ₹35,000-45,000/month\n• MPPKVVCL (MP Electricity): ₹25,000-35,000/month\n• Private sector: ₹12,000-25,000/month (starting)\n• Abroad (Gulf): ₹30,000-60,000/month\n\nPath 2: B.Tech Lateral Entry\n• Diploma holders directly B.Tech 2nd year में admission ले सकते हैं\n• Total time: 3 (Diploma) + 3 (B.Tech) = 6 years (vs 2+4 = 6 years traditional path)\n• Better placements with B.Tech degree\n• RGPV colleges में lateral entry available\n\nCompetitive Exams for Diploma holders:\n• SSC JE (Junior Engineer)\n• Railway JE (RRB)\n• State JE exams (MP Vyapam)\n• PSU exams (BHEL, NTPC, ONGC)',
+				tips: [
+					'B.Tech lateral entry करें - long term career growth बेहतर होगी',
+					'SSC JE exam जरूर attempt करें - best government job for diploma',
+					'Railway JE भी excellent option है',
+					'Job + distance B.Tech simultaneously भी कर सकते हैं',
+					'Gulf countries में Diploma engineers की अच्छी demand है',
+				],
+				importantInfo:
+					'SSC JE: ₹35,000-50,000/month | Railway JE: ₹35,000-45,000/month | B.Tech lateral: 2nd year direct | Total: 6 years to B.Tech',
+				aiContext:
+					'Student completed Diploma from MP, choosing between job and B.Tech. Guide about: job opportunities (SSC JE, Railway JE, state exams), B.Tech lateral entry process, salary comparison, career growth with and without B.Tech. Answer in Hindi with English terms.',
+				suggestedQuestions: [
+					'Diploma के बाद job लूं या B.Tech करूं?',
+					'SSC JE exam कैसे crack करूं?',
+					'Diploma holder की salary कितनी होती है?',
+				],
+			},
+		],
+	},
 };
 
 export const careerOrder = [
@@ -1844,4 +2407,8 @@ export const careerOrder = [
 	'ca',
 	'ssc',
 	'paramilitary',
+	'iti',
+	'army',
+	'nursing',
+	'diploma',
 ];

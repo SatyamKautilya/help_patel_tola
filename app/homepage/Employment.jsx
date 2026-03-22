@@ -1,63 +1,90 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+import { Briefcase, GraduationCap, Sparkles, ArrowRight } from 'lucide-react';
 
 const Employment = () => {
 	const router = useRouter();
 	return (
 		<section className='grid grid-cols-2 gap-4'>
+			{/* Employment Card */}
 			<div
-				onClick={() => {
-					router.push('/subcategory/employment');
-				}}
-				className='rounded-2xl overflow-hidden h-48 bg-blue-200 backdrop-blur-md
+				onClick={() => router.push('/employment')}
+				className='rounded-2xl overflow-hidden h-48
 				shadow-[0_10px_20px_rgba(0,0,0,0.40)]
 				hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]
 				hover:-translate-y-1
-				transition-all duration-300 ease-out relative'>
-				<img
-					src='https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/empbg_new.png'
-					alt='Employment'
-					className='w-full h-full -mt-2 object-contain'
-				/>
-				<div className='absolute inset-0 bg-gray-500/40'></div>
-				<div className='absolute top-4 right-0 bg-green-800 text-white px-8 py-1 shadow-lg transform w-full translate-y-15'>
-					<span className='text-xs font-bold tracking-wider'>
-						जल्द आ रहा है
-					</span>
-				</div>
-				<div className='flex absolute bottom-0 w-full flex-row justify-center items-end'>
-					<span className='w-full text-center pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-l from-cyan-600 to-cyan-500 rounded-bl-md rounded-r-md'>
-						रोजगार
-					</span>
+				transition-all duration-300 ease-out relative bg-gradient-to-br from-cyan-700 via-cyan-600 to-blue-700'>
+				<div className='absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.12),transparent_60%)]' />
+				<div className='relative h-full flex flex-col justify-between p-4'>
+					<div>
+						<div className='w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center mb-2'>
+							<Briefcase size={20} className='text-white' />
+						</div>
+						<span className='inline-block text-[9px] font-bold text-cyan-200 uppercase tracking-wider bg-white/10 px-2 py-0.5 rounded-full'>
+							सरकारी नौकरी
+						</span>
+					</div>
+					<div>
+						<div className='flex items-center gap-1 mb-1'>
+							<span className='text-[10px] text-green-300 font-semibold'>
+								● Live भर्तियां
+							</span>
+						</div>
+						<div className='flex items-center justify-between'>
+							<span className='text-white text-lg font-bold'>
+								रोजगार
+							</span>
+							<ArrowRight
+								size={16}
+								className='text-white/50'
+							/>
+						</div>
+					</div>
 				</div>
 			</div>
 
+			{/* Education Card */}
 			<div
-				onClick={() => {
-					router.push('/education');
-				}}
-				className='rounded-2xl bg-white/50 overflow-hidden w-full h-48
-				backdrop-blur-md
+				onClick={() => router.push('/education')}
+				className='rounded-2xl overflow-hidden w-full h-48
 				shadow-[0_10px_20px_rgba(0,0,0,0.40)]
 				hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]
 				hover:-translate-y-1
-				transition-all duration-300 ease-out relative'>
-				<img
-					src='https://8dxblayock8syelc.public.blob.vercel-storage.com/homepage/edubg_new.png'
-					alt='Education'
-					className='w-full h-full object-cover'
-				/>
-				<div className='absolute inset-0 bg-gray-500/40'></div>
-				<div className='absolute top-4 right-0 bg-amber-700 text-white px-8 py-1 shadow-lg w-full transform translate-y-15'>
-					<span className='text-xs font-bold tracking-wider'>
-						करियर मार्गदर्शन ✨
-					</span>
-				</div>
-				<div className='flex absolute bottom-0 w-full flex-row justify-center items-end'>
-					<span className='w-full text-center pr-3 py-2 text-white text-lg font-semibold bg-gradient-to-r from-yellow-700 to-yellow-400 rounded-bl-md rounded-r-md'>
-						शिक्षा
-					</span>
+				transition-all duration-300 ease-out relative bg-gradient-to-br from-amber-600 via-yellow-600 to-orange-600'>
+				<div className='absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(255,255,255,0.12),transparent_60%)]' />
+				<div className='relative h-full flex flex-col justify-between p-4'>
+					<div>
+						<div className='w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center mb-2'>
+							<GraduationCap
+								size={20}
+								className='text-white'
+							/>
+						</div>
+						<span className='inline-block text-[9px] font-bold text-amber-200 uppercase tracking-wider bg-white/10 px-2 py-0.5 rounded-full'>
+							करियर मार्गदर्शन
+						</span>
+					</div>
+					<div>
+						<div className='flex items-center gap-1 mb-1'>
+							<Sparkles
+								size={11}
+								className='text-yellow-200'
+							/>
+							<span className='text-[10px] text-yellow-200 font-semibold'>
+								AI सहायक + 14 करियर
+							</span>
+						</div>
+						<div className='flex items-center justify-between'>
+							<span className='text-white text-lg font-bold'>
+								शिक्षा
+							</span>
+							<ArrowRight
+								size={16}
+								className='text-white/50'
+							/>
+						</div>
+					</div>
 				</div>
 			</div>
 		</section>
