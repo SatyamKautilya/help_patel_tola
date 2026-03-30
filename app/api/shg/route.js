@@ -104,6 +104,8 @@ export async function POST(req) {
 				return listRevertableTransactions(body);
 			case 'revert-transaction':
 				return revertTransaction(body);
+			case 'list-monthly-transactions':
+				return listMonthlyTransactions(body);
 			default:
 				return NextResponse.json(
 					{ error: 'Invalid API action' },
@@ -2392,4 +2394,51 @@ async function dashboardSummary(data) {
 		totalAvailableCash,
 		lastUpdated: new Date().toISOString(),
 	});
+}
+
+async function listMonthlyTransactions(data) {
+	const { shgId, month } = data || {};
+	if (!shgId || !month) {
+		return NextResponse.json({ error: 'shgId and month are required' }, { status: 400 });
+	}
+
+	const shgObjectId = new Types.ObjectId(String(shgId));
+	const monthStart = parseMonthStart(month);
+	const monthEnd = new Date(
+		monthStart.getFullYear(),
+		monthStart.getMonth() + 1,
+		0,
+		23,
+		59,
+		59,
+		999
+	);
+
+	const txns = await Transaction.find({
+		shgId: shgObjectId,
+		isReversed: false,
+		date: { $gte: monthStart, $lte: monthEnd },
+	})
+		.sort({ date: 1, createdAt: 1 })
+		.select('_id type amount date memberId fromAccount toAccount meta')
+		.lean();
+
+	const memberIds = txns
+		.map((t) => t.memberId)
+		.filter(Boolean)
+		.map((id) => String(id));
+
+	const members = await ShgMember.find({ _id: { $in: memberIds } })
+		.select('_id name')
+		.lean();
+	const memberMap = Object.fromEntries(
+		members.map((m) => [String(m._id), m.name])
+	);
+
+	const transactions = txns.map((t) => ({
+		...t,
+		memberName: t.memberId ? memberMap[String(t.memberId)] || '-' : '-',
+	}));
+
+	return NextResponse.json({ transactions });
 }

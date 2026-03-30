@@ -16,9 +16,7 @@ export default function MemberPassbookSummary({ params }) {
 	const router = useRouter();
 
 	const [summary, setSummary] = useState(null);
-	const [shgSummary, setShgSummary] = useState(null);
 	const [loading, setLoading] = useState(true);
-	const [shgSummaryLoading, setShgSummaryLoading] = useState(true);
 
 	useEffect(() => {
 		const defaultSummary = {
@@ -29,96 +27,39 @@ export default function MemberPassbookSummary({ params }) {
 			totalLoanRepayments: 0,
 		};
 
-		const defaultShgSummary = {
-			totalMonthlySavings: 0,
-			totalLumpSum: 0,
-			totalPrincipalRepaid: 0,
-			totalInterestCollected: 0,
-			totalPenalty: 0,
-			totalLoanGiven: 0,
-			totalExpense: 0,
-			totalAvailableCash: 0,
-			lastUpdated: null,
-		};
-
-		const fetchPassbookAndShgSummary = async () => {
+		const fetchPassbook = async () => {
 			try {
 				setLoading(true);
-				setShgSummaryLoading(true);
-
-				const [passbookResp, shgSummaryResp] = await Promise.all([
-					fetch('/api/shg?name=member-passbook', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ shgid, memberId }),
-					}),
-					fetch('/api/shg?name=dashboard-summary', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ shgId: shgid }),
-						cache: 'no-store',
-					}),
-				]);
-
+				const passbookResp = await fetch('/api/shg?name=member-passbook', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ shgid, memberId }),
+				});
 				if (passbookResp.ok) {
 					const passbookData = await passbookResp.json();
 					setSummary(passbookData.summary || defaultSummary);
 				} else {
 					setSummary(defaultSummary);
 				}
-
-				if (shgSummaryResp.ok) {
-					const shgSummaryData = await shgSummaryResp.json();
-					setShgSummary(shgSummaryData || defaultShgSummary);
-				} else {
-					setShgSummary(defaultShgSummary);
-				}
 			} catch (err) {
 				console.error(err);
 				setSummary(defaultSummary);
-				setShgSummary(defaultShgSummary);
 			} finally {
 				setLoading(false);
-				setShgSummaryLoading(false);
 			}
 		};
 
-		fetchPassbookAndShgSummary();
+		fetchPassbook();
 	}, [shgid, memberId]);
 
 	const remainingLoan = useMemo(() => {
-		/* Use the server-calculated outstanding (only active loans, principal only) */
 		if (summary?.outstandingLoan != null) {
 			return Number(summary.outstandingLoan);
 		}
-		/* Fallback for older API responses */
 		const issued = Number(summary?.totalLoansDisbursed || 0);
 		const paid = Number(summary?.totalLoanRepayments || 0);
 		return Math.max(issued - paid, 0);
 	}, [summary]);
-	const shgSheet = useMemo(() => {
-		const monthlySavings = Number(shgSummary?.totalMonthlySavings || 0);
-		const lumpSum = Number(shgSummary?.totalLumpSum || 0);
-		const principalRepaid = Number(shgSummary?.totalPrincipalRepaid || 0);
-		const interest = Number(shgSummary?.totalInterestCollected || 0);
-		const penalty = Number(shgSummary?.totalPenalty || 0);
-		const loanGiven = Number(shgSummary?.totalLoanGiven || 0);
-		const expense = Number(shgSummary?.totalExpense || 0);
-		const inflow = monthlySavings + lumpSum + interest + penalty;
-		const outflow = loanGiven + expense;
-		return {
-			monthlySavings,
-			lumpSum,
-			principalRepaid,
-			interest,
-			penalty,
-			loanGiven,
-			expense,
-			inflow,
-			outflow,
-			calculatedFund: inflow - outflow,
-		};
-	}, [shgSummary]);
 
 	const formatMoney = (amount) =>
 		new Intl.NumberFormat('en-IN', {
@@ -209,119 +150,6 @@ export default function MemberPassbookSummary({ params }) {
 								</button>
 							</div>
 						</motion.div>
-
-						<motion.section
-							initial={{ opacity: 0, y: 8 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ delay: 0.05 }}
-							className='bg-white border border-slate-200 rounded-2xl p-5 md:p-6'>
-							<div className='flex items-center justify-between mb-4'>
-								<h2 className='text-base font-bold text-slate-800'>
-									सारांश स्व सहायता समूह
-								</h2>
-								{shgSummary?.lastUpdated ? (
-									<p className='text-[11px] text-slate-500'>
-										अपडेट:{' '}
-										{new Date(shgSummary.lastUpdated).toLocaleDateString(
-											'hi-IN',
-											{
-												day: '2-digit',
-												month: 'short',
-												year: 'numeric',
-											},
-										)}
-									</p>
-								) : null}
-							</div>
-
-							{shgSummaryLoading ? (
-								<p className='text-sm text-slate-500'>
-									SHG सारांश लोड हो रहा है...
-								</p>
-							) : (
-								<div className='rounded-xl border border-slate-200 overflow-hidden'>
-									<div className='bg-slate-100 px-3 py-2 border-b border-slate-200 grid grid-cols-12 text-[11px] font-bold text-slate-600 uppercase tracking-wide'>
-										<p className='col-span-6'>मद</p>
-										<p className='col-span-2 text-center'>चिन्ह</p>
-										<p className='col-span-4 text-right'>राशि</p>
-									</div>
-
-									<CalcRow
-										label='मासिक बचत'
-										sign='+'
-										amount={shgSheet.monthlySavings}
-										tone='plus'
-										formatMoney={formatMoney}
-									/>
-									<CalcRow
-										label='शेयर राशि'
-										sign='+'
-										amount={shgSheet.lumpSum}
-										tone='plus'
-										formatMoney={formatMoney}
-									/>
-									<CalcRow
-										label='ब्याज संग्रह'
-										sign='+'
-										amount={shgSheet.interest}
-										tone='plus'
-										formatMoney={formatMoney}
-									/>
-									<CalcRow
-										label='पेनल्टी'
-										sign='+'
-										amount={shgSheet.penalty}
-										tone='plus'
-										formatMoney={formatMoney}
-									/>
-
-									<div className='bg-emerald-50/60 border-y border-emerald-100 px-3 py-2 grid grid-cols-12 text-sm font-semibold'>
-										<p className='col-span-8 text-emerald-800'>
-											कुल जमा (Inflow)
-										</p>
-										<p className='col-span-4 text-right text-emerald-800'>
-											{formatMoney(shgSheet.inflow)}
-										</p>
-									</div>
-
-									<CalcRow
-										label='बकाया ऋण'
-										sign='-'
-										amount={shgSheet.loanGiven}
-										tone='minus'
-										formatMoney={formatMoney}
-									/>
-									<CalcRow
-										label='कुल खर्च'
-										sign='-'
-										amount={shgSheet.expense}
-										tone='minus'
-										formatMoney={formatMoney}
-									/>
-
-									<div className='bg-rose-50/60 border-y border-rose-100 px-3 py-2 grid grid-cols-12 text-sm font-semibold'>
-										<p className='col-span-8 text-rose-800'>
-											कुल निकासी (Outflow)
-										</p>
-										<p className='col-span-4 text-right text-rose-800'>
-											{formatMoney(shgSheet.outflow)}
-										</p>
-									</div>
-
-									<div className='bg-slate-900 px-3 py-3 grid grid-cols-12 text-sm font-bold'>
-										<p className='col-span-8 text-white'>
-											उपलब्ध निधि (Available Fund)
-										</p>
-										<p className='col-span-4 text-right text-emerald-300'>
-											{formatMoney(
-												shgSummary?.totalAvailableCash ??
-													shgSheet.calculatedFund,
-											)}
-										</p>
-									</div>
-								</div>
-							)}
-						</motion.section>
 					</>
 				)}
 			</div>
@@ -334,21 +162,6 @@ function SummaryRow({ label, value }) {
 		<div className='rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 flex items-center justify-between gap-3'>
 			<p className='text-xs font-semibold text-slate-600'>{label}</p>
 			<p className='text-sm font-bold text-slate-900'>{value}</p>
-		</div>
-	);
-}
-
-function CalcRow({ label, sign, amount, tone, formatMoney }) {
-	const signClass = tone === 'plus' ? 'text-emerald-600' : 'text-rose-600';
-	return (
-		<div className='px-3 py-2.5 border-b border-slate-100 grid grid-cols-12 items-center'>
-			<p className='col-span-6 text-sm font-medium text-slate-700'>{label}</p>
-			<p className={`col-span-2 text-center text-base font-bold ${signClass}`}>
-				{sign}
-			</p>
-			<p className='col-span-4 text-right text-sm font-semibold text-slate-800'>
-				{formatMoney(amount)}
-			</p>
 		</div>
 	);
 }
