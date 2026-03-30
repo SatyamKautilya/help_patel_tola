@@ -19,6 +19,7 @@ import { Button } from '@heroui/react';
 import { useRouter } from 'next/navigation';
 import VillageGroupRegistration from './homepage/VillageGroupRegistration';
 import SHGSection from './homepage/SHGSection';
+import SkillAndBusiness from './homepage/SkillAndBusiness';
 
 export async function sendTestNotification() {
 	try {
@@ -258,6 +259,28 @@ export default function HomePage() {
 							whileInView='visible'
 							viewport={{ once: true }}>
 							<Employment />
+						</motion.div>
+						<motion.div
+							variants={sectionVariant}
+							initial='hidden'
+							whileInView='visible'
+							viewport={{ once: true }}
+							className='relative '>
+							<div className='absolute inset-0 flex items-center'>
+								<div className='w-full border-t border-white/30'></div>
+							</div>
+							<div className='relative flex justify-center'>
+								<span className='bg-gradient-to-r from-white/5 via-white to-white/5 w-full text-center rounded-xl backdrop-blur-sm px-6 py-1.5  text-sm font-bold text-lime-800 shadow-sm  '>
+									कौशल विकास एवं व्यापार
+								</span>
+							</div>
+						</motion.div>
+						<motion.div
+							variants={sectionVariant}
+							initial='hidden'
+							whileInView='visible'
+							viewport={{ once: true }}>
+							<SkillAndBusiness />
 						</motion.div>
 						<motion.div
 							variants={sectionVariant}
