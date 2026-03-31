@@ -1323,7 +1323,7 @@ async function collectRepayment(data) {
 		}
 
 		if (txnDocs.length > 0) {
-			await Transaction.create(txnDocs, { session });
+			await Transaction.create(txnDocs, { session, ordered: true });
 		}
 
 		/* ---------------- 8ï¸âƒ£ Auto-close loan ---------------- */
