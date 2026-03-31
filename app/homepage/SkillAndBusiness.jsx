@@ -6,7 +6,7 @@ const SkillAndBusiness = () => {
 	const router = useRouter();
 	return (
 		<section className='grid grid-cols-2 gap-4'>
-			{/* Kaushal Vikas Card */}
+			{/* Kaushal Vikas Card  ok */}
 			<motion.div
 				whileTap={{ scale: 0.96 }}
 				onClick={() => router.push('/kaushal-vikas')}
