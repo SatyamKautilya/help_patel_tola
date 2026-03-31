@@ -538,16 +538,40 @@ async function loanRepayment(data) {
 		receivedBy: data.receivedBy,
 	});
 
-	await Transaction.create({
-		shgId: data.shgId,
-		fromAccount: AccountType.MEMBER_CASH,
-		toAccount: AccountType.SHG_CASH,
-		amount: data.amount,
-		type: TransactionType.LOAN_REPAYMENT,
-		memberId: data.memberId,
-		date: paymentDate,
-		meta: { loanId: data.loanId, loanRepaymentId: repayment._id, month },
-	});
+	// Create separate transaction entries for principal and interest
+	const txnDocs = [];
+	const principalAmount = Number(data.principal || 0);
+	const interestAmount = Number(data.interest || 0);
+
+	if (principalAmount > 0) {
+		txnDocs.push({
+			shgId: data.shgId,
+			fromAccount: AccountType.MEMBER_CASH,
+			toAccount: AccountType.SHG_CASH,
+			amount: principalAmount,
+			type: TransactionType.LOAN_REPAYMENT,
+			memberId: data.memberId,
+			date: paymentDate,
+			meta: { loanId: data.loanId, loanRepaymentId: repayment._id, month },
+		});
+	}
+
+	if (interestAmount > 0) {
+		txnDocs.push({
+			shgId: data.shgId,
+			fromAccount: AccountType.MEMBER_CASH,
+			toAccount: AccountType.INTEREST_INCOME,
+			amount: interestAmount,
+			type: TransactionType.INTEREST_PAYMENT,
+			memberId: data.memberId,
+			date: paymentDate,
+			meta: { loanId: data.loanId, loanRepaymentId: repayment._id, month },
+		});
+	}
+
+	if (txnDocs.length > 0) {
+		await Transaction.insertMany(txnDocs);
+	}
 
 	/* Auto-close loan if outstanding principal becomes zero */
 	if (loan) {
@@ -917,6 +941,7 @@ async function MemberPassbook(data) {
 				break;
 
 			case TransactionType.LOAN_REPAYMENT:
+			case TransactionType.INTEREST_PAYMENT:
 				totalLoanRepayments += tx.amount;
 				break;
 
@@ -1260,25 +1285,46 @@ async function collectRepayment(data) {
 			{ session },
 		);
 
-		await Transaction.create(
-			[
-				{
-					shgId: loan.shgId,
-					fromAccount: AccountType.MEMBER_CASH,
-					toAccount: AccountType.SHG_CASH,
-					amount: totalAmount,
-					type: TransactionType.LOAN_REPAYMENT,
-					memberId: loan.memberId,
-					date: new Date(),
-					meta: {
-						loanId: loan._id,
-						loanRepaymentId: repayment[0]._id,
-						month: currentMonth,
-					},
+		// Create separate transaction entries for principal and interest
+		const txnDocs = [];
+
+		if (principalComponent > 0) {
+			txnDocs.push({
+				shgId: loan.shgId,
+				fromAccount: AccountType.MEMBER_CASH,
+				toAccount: AccountType.SHG_CASH,
+				amount: principalComponent,
+				type: TransactionType.LOAN_REPAYMENT,
+				memberId: loan.memberId,
+				date: new Date(),
+				meta: {
+					loanId: loan._id,
+					loanRepaymentId: repayment[0]._id,
+					month: currentMonth,
 				},
-			],
-			{ session },
-		);
+			});
+		}
+
+		if (interestComponent > 0) {
+			txnDocs.push({
+				shgId: loan.shgId,
+				fromAccount: AccountType.MEMBER_CASH,
+				toAccount: AccountType.INTEREST_INCOME,
+				amount: interestComponent,
+				type: TransactionType.INTEREST_PAYMENT,
+				memberId: loan.memberId,
+				date: new Date(),
+				meta: {
+					loanId: loan._id,
+					loanRepaymentId: repayment[0]._id,
+					month: currentMonth,
+				},
+			});
+		}
+
+		if (txnDocs.length > 0) {
+			await Transaction.create(txnDocs, { session });
+		}
 
 		/* ---------------- 8ï¸âƒ£ Auto-close loan ---------------- */
 		if (principalComponent === outstandingPrincipal) {
@@ -1514,7 +1560,7 @@ async function revertTransaction(data) {
 			);
 		}
 
-		if (txn.type === TransactionType.LOAN_REPAYMENT) {
+		if (txn.type === TransactionType.LOAN_REPAYMENT || txn.type === TransactionType.INTEREST_PAYMENT) {
 			const repayment = await findLinkedRepaymentForTxn(txn, session);
 			if (!repayment) {
 				throw new Error('Linked loan repayment not found');
@@ -1525,6 +1571,35 @@ async function revertTransaction(data) {
 				{ $set: { isReversed: true } },
 				{ session },
 			);
+
+			// Also reverse the sibling transaction (principal ↔ interest) that shares the same loanRepaymentId
+			const siblingType = txn.type === TransactionType.LOAN_REPAYMENT
+				? TransactionType.INTEREST_PAYMENT
+				: TransactionType.LOAN_REPAYMENT;
+			const siblingTxn = await Transaction.findOne({
+				shgId: txn.shgId,
+				'meta.loanRepaymentId': repayment._id,
+				type: siblingType,
+				isReversed: false,
+			}).session(session);
+
+			if (siblingTxn) {
+				await Transaction.updateOne(
+					{ _id: siblingTxn._id },
+					{
+						$set: {
+							isReversed: true,
+							meta: {
+								...(siblingTxn.meta || {}),
+								revertedAt: new Date().toISOString(),
+								revertedBy: revertedBy || 'SYSTEM',
+								revertReason: String(reason || '').trim() || 'Sibling transaction reverted',
+							},
+						},
+					},
+					{ session },
+				);
+			}
 
 			const loan = await Loan.findById(repayment.loanId).session(session);
 			if (loan) {
@@ -2378,7 +2453,8 @@ async function dashboardSummary(data) {
 				totalLumpSum += tx.amount;
 				break;
 			case TransactionType.LOAN_REPAYMENT:
-				// Loan repayments are accounted via LoanRepayment records above.
+			case TransactionType.INTEREST_PAYMENT:
+				// Loan principal repayments & interest are accounted via LoanRepayment records above.
 				break;
 			case TransactionType.PENALTY_CHARGE:
 				totalPenalty += tx.amount;
@@ -2463,10 +2539,45 @@ async function listMonthlyTransactions(data) {
 		members.map((m) => [String(m._id), m.name])
 	);
 
-	const transactions = txns.map((t) => ({
-		...t,
-		memberName: t.memberId ? memberMap[String(t.memberId)] || '-' : '-',
-	}));
+	// Fetch loan repayment breakdown for LOAN_REPAYMENT transactions
+	const loanRepaymentIds = txns
+		.filter((t) => t.type === 'LOAN_REPAYMENT' && t.meta?.loanRepaymentId)
+		.map((t) => t.meta.loanRepaymentId);
+
+	let repaymentMap = {};
+	if (loanRepaymentIds.length > 0) {
+		const repayments = await LoanRepayment.find({
+			_id: { $in: loanRepaymentIds },
+		})
+			.select('_id principalComponent interestComponent')
+			.lean();
+		repaymentMap = Object.fromEntries(
+			repayments.map((r) => [
+				String(r._id),
+				{
+					principalComponent: r.principalComponent || 0,
+					interestComponent: r.interestComponent || 0,
+				},
+			])
+		);
+	}
+
+	const transactions = txns.map((t) => {
+		const base = {
+			...t,
+			memberName: t.memberId ? memberMap[String(t.memberId)] || '-' : '-',
+		};
+		// Attach loan repayment breakdown if available
+		if (t.type === 'LOAN_REPAYMENT' && t.meta?.loanRepaymentId) {
+			const breakdown = repaymentMap[String(t.meta.loanRepaymentId)];
+			if (breakdown) {
+				base.principalComponent = breakdown.principalComponent;
+				base.interestComponent = breakdown.interestComponent;
+			}
+		}
+		return base;
+	});
 
 	return NextResponse.json({ transactions });
 }
+

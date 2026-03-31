@@ -11,6 +11,8 @@ import {
 	Download,
 	X,
 	FileText,
+	ChevronDown,
+	ChevronUp,
 } from 'lucide-react';
 import HindiMonthYearPicker from '@/components/HindiMonthYearPicker';
 
@@ -38,6 +40,152 @@ async function triggerServerFileDownload(blob, fileName) {
 	window.location.assign(url);
 }
 
+/* ==================== Type config for color coding ==================== */
+const TX_TYPE_CONFIG = {
+	MONTHLY_DEPOSIT: {
+		label: 'मासिक बचत',
+		bg: 'bg-emerald-50',
+		border: 'border-emerald-200',
+		text: 'text-emerald-800',
+		dot: 'bg-emerald-500',
+		headerBg: 'bg-emerald-100',
+		pdfColor: '#059669',
+		pdfBg: '#ecfdf5',
+	},
+	LUMP_SUM_CONTRIBUTION: {
+		label: 'शेयर राशि',
+		bg: 'bg-blue-50',
+		border: 'border-blue-200',
+		text: 'text-blue-800',
+		dot: 'bg-blue-500',
+		headerBg: 'bg-blue-100',
+		pdfColor: '#2563eb',
+		pdfBg: '#eff6ff',
+	},
+	LOAN_DISBURSEMENT: {
+		label: 'ऋण वितरण',
+		bg: 'bg-rose-50',
+		border: 'border-rose-200',
+		text: 'text-rose-800',
+		dot: 'bg-rose-500',
+		headerBg: 'bg-rose-100',
+		pdfColor: '#e11d48',
+		pdfBg: '#fff1f2',
+	},
+	LOAN_REPAYMENT: {
+		label: 'ऋण भुगतान',
+		bg: 'bg-amber-50',
+		border: 'border-amber-200',
+		text: 'text-amber-800',
+		dot: 'bg-amber-500',
+		headerBg: 'bg-amber-100',
+		pdfColor: '#d97706',
+		pdfBg: '#fffbeb',
+	},
+	INTEREST_PAYMENT: {
+		label: 'ब्याज भुगतान',
+		bg: 'bg-orange-50',
+		border: 'border-orange-200',
+		text: 'text-orange-800',
+		dot: 'bg-orange-500',
+		headerBg: 'bg-orange-100',
+		pdfColor: '#ea580c',
+		pdfBg: '#fff7ed',
+	},
+	BANK_LOAN_RECEIVED: {
+		label: 'बैंक ऋण प्राप्त',
+		bg: 'bg-sky-50',
+		border: 'border-sky-200',
+		text: 'text-sky-800',
+		dot: 'bg-sky-500',
+		headerBg: 'bg-sky-100',
+		pdfColor: '#0284c7',
+		pdfBg: '#f0f9ff',
+	},
+	BANK_LOAN_REPAYMENT: {
+		label: 'बैंक ऋण भुगतान',
+		bg: 'bg-cyan-50',
+		border: 'border-cyan-200',
+		text: 'text-cyan-800',
+		dot: 'bg-cyan-500',
+		headerBg: 'bg-cyan-100',
+		pdfColor: '#0891b2',
+		pdfBg: '#ecfeff',
+	},
+	OPENING_BALANCE: {
+		label: 'प्रारंभिक शेष',
+		bg: 'bg-slate-50',
+		border: 'border-slate-200',
+		text: 'text-slate-700',
+		dot: 'bg-slate-400',
+		headerBg: 'bg-slate-100',
+		pdfColor: '#475569',
+		pdfBg: '#f8fafc',
+	},
+	PENALTY_CHARGE: {
+		label: 'दंड शुल्क',
+		bg: 'bg-red-50',
+		border: 'border-red-200',
+		text: 'text-red-800',
+		dot: 'bg-red-500',
+		headerBg: 'bg-red-100',
+		pdfColor: '#dc2626',
+		pdfBg: '#fef2f2',
+	},
+};
+
+const getTypeConfig = (type) =>
+	TX_TYPE_CONFIG[type] || {
+		label: type,
+		bg: 'bg-gray-50',
+		border: 'border-gray-200',
+		text: 'text-gray-700',
+		dot: 'bg-gray-400',
+		headerBg: 'bg-gray-100',
+		pdfColor: '#6b7280',
+		pdfBg: '#f9fafb',
+	};
+
+/* ==================== Group transactions by type ==================== */
+function groupTransactionsByType(transactions) {
+	const groups = {};
+	const typeOrder = [
+		'MONTHLY_DEPOSIT',
+		'LUMP_SUM_CONTRIBUTION',
+		'LOAN_DISBURSEMENT',
+		'LOAN_REPAYMENT',
+		'INTEREST_PAYMENT',
+		'PENALTY_CHARGE',
+		'BANK_LOAN_RECEIVED',
+		'BANK_LOAN_REPAYMENT',
+		'OPENING_BALANCE',
+	];
+
+	for (const tx of transactions) {
+		const type = tx.type || 'UNKNOWN';
+		if (!groups[type]) {
+			groups[type] = { type, txns: [], total: 0, totalPrincipal: 0, totalInterest: 0 };
+		}
+		groups[type].txns.push(tx);
+		groups[type].total += Number(tx.amount || 0);
+		if (type === 'LOAN_REPAYMENT') {
+			groups[type].totalPrincipal += Number(tx.principalComponent || 0);
+			groups[type].totalInterest += Number(tx.interestComponent || 0);
+		}
+	}
+
+	// Sort by predefined order
+	const sorted = [];
+	for (const type of typeOrder) {
+		if (groups[type]) sorted.push(groups[type]);
+	}
+	// Add any remaining types not in the predefined order
+	for (const type of Object.keys(groups)) {
+		if (!typeOrder.includes(type)) sorted.push(groups[type]);
+	}
+	return sorted;
+}
+
 export default function ReportsPage({ params }) {
 	const { shgid } = params;
 	const router = useRouter();
@@ -54,6 +202,9 @@ export default function ReportsPage({ params }) {
 	const [snapshotPreview, setSnapshotPreview] = useState(null);
 	const [previewMonth, setPreviewMonth] = useState(null);
 	const [showReportModal, setShowReportModal] = useState(false);
+	const [txnData, setTxnData] = useState(null); // transactions for the report modal
+	const [loadingTxns, setLoadingTxns] = useState(false);
+	const [collapsedGroups, setCollapsedGroups] = useState({});
 	const reportRef = useRef(null);
 
 	const loadSnapshots = async () => {
@@ -86,13 +237,29 @@ export default function ReportsPage({ params }) {
 		return data?.snapshot;
 	};
 
+	const fetchTransactions = async (targetMonth) => {
+		const resp = await fetch('/api/shg?name=list-monthly-transactions', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ shgId: shgid, month: targetMonth }),
+		});
+		const data = await resp.json();
+		if (!resp.ok) throw new Error(data?.error || 'लेन-देन डेटा नहीं मिला');
+		return data.transactions || [];
+	};
+
 	const openReportPreview = async ({ targetMonth, snapshotData }) => {
 		setLoadingSnapshot(true);
 		setMessage(null);
 		try {
-			const snapshot = snapshotData || (await fetchSnapshotData(targetMonth));
+			const [snapshot, txns] = await Promise.all([
+				snapshotData || fetchSnapshotData(targetMonth),
+				fetchTransactions(targetMonth),
+			]);
 			setSnapshotPreview(snapshot);
+			setTxnData(txns);
 			setPreviewMonth(targetMonth);
+			setCollapsedGroups({});
 			setShowReportModal(true);
 		} catch (e) {
 			setMessage({ type: 'error', text: e.message || 'रिपोर्ट डेटा लोड नहीं हुआ।' });
@@ -210,57 +377,70 @@ export default function ReportsPage({ params }) {
 		}
 	};
 
-	const txTypeMap = {
-		MONTHLY_DEPOSIT: 'मासिक बचत',
-		LUMP_SUM_CONTRIBUTION: 'शेयर राशि',
-		LOAN_DISBURSEMENT: 'ऋण वितरण',
-		LOAN_REPAYMENT: 'ऋण भुगतान',
-		INTEREST_PAYMENT: 'ब्याज भुगतान',
-		BANK_LOAN_RECEIVED: 'बैंक ऋण प्राप्त',
-		BANK_LOAN_REPAYMENT: 'बैंक ऋण भुगतान',
-		OPENING_BALANCE: 'प्रारंभिक शेष',
-		PENALTY_CHARGE: 'दंड शुल्क',
-	};
-
+	/* =============== Transaction PDF (Grouped by Type) =============== */
 	const buildTransactionPdfHtml = (transactions, monthStr, shgNameStr) => {
-		const rows = transactions
-			.map((tx, idx) => {
+		const groups = groupTransactionsByType(transactions);
+		let groupsHtml = '';
+
+		for (const group of groups) {
+			const cfg = getTypeConfig(group.type);
+			let rowsHtml = '';
+			group.txns.forEach((tx, idx) => {
 				const txDate = new Date(tx.date).toLocaleDateString('hi-IN');
-				const txType = txTypeMap[tx.type] || tx.type;
 				const memberName = tx.memberName && tx.memberName !== '-' ? tx.memberName : 'संस्था';
-				return `
+				// For LOAN_REPAYMENT, show breakdown
+				let amountDisplay = escapeHtml(formatMoney(tx.amount));
+				if (group.type === 'LOAN_REPAYMENT' && (tx.principalComponent || tx.interestComponent)) {
+					amountDisplay = `${escapeHtml(formatMoney(tx.amount))}<br/><span style="font-size:9px;color:#92400e;">मूलधन: ${escapeHtml(formatMoney(tx.principalComponent))} | ब्याज: ${escapeHtml(formatMoney(tx.interestComponent))}</span>`;
+				}
+				rowsHtml += `
 				<tr>
-					<td style="border:1px solid #334155;padding:6px;text-align:center;">${idx + 1}</td>
-					<td style="border:1px solid #334155;padding:6px;">${escapeHtml(txDate)}</td>
-					<td style="border:1px solid #334155;padding:6px;">${escapeHtml(memberName)}</td>
-					<td style="border:1px solid #334155;padding:6px;">${escapeHtml(txType)}</td>
-					<td style="border:1px solid #334155;padding:6px;text-align:right;">${escapeHtml(formatMoney(tx.amount))}</td>
-				</tr>
-			`;
-			})
-			.join('');
+					<td style="border:1px solid #cbd5e1;padding:5px;text-align:center;font-size:10px;">${idx + 1}</td>
+					<td style="border:1px solid #cbd5e1;padding:5px;font-size:10px;">${escapeHtml(txDate)}</td>
+					<td style="border:1px solid #cbd5e1;padding:5px;font-size:10px;">${escapeHtml(memberName)}</td>
+					<td style="border:1px solid #cbd5e1;padding:5px;text-align:right;font-size:10px;">${amountDisplay}</td>
+				</tr>`;
+			});
+
+			let subtotalLine = `कुल: ${escapeHtml(formatMoney(group.total))}`;
+			if (group.type === 'LOAN_REPAYMENT' && (group.totalPrincipal || group.totalInterest)) {
+				subtotalLine += ` (मूलधन: ${escapeHtml(formatMoney(group.totalPrincipal))} | ब्याज: ${escapeHtml(formatMoney(group.totalInterest))})`;
+			}
+
+			groupsHtml += `
+			<div style="margin-bottom:16px;">
+				<div style="background:${cfg.pdfBg};border-left:4px solid ${cfg.pdfColor};padding:6px 10px;font-weight:800;font-size:12px;color:${cfg.pdfColor};margin-bottom:2px;">
+					${escapeHtml(cfg.label)} (${group.txns.length})
+				</div>
+				<table style="width:100%;border-collapse:collapse;">
+					<thead><tr style="background:#f8fafc;">
+						<th style="border:1px solid #cbd5e1;padding:5px;text-align:center;width:34px;font-size:10px;">क्र.</th>
+						<th style="border:1px solid #cbd5e1;padding:5px;text-align:left;width:70px;font-size:10px;">दिनांक</th>
+						<th style="border:1px solid #cbd5e1;padding:5px;text-align:left;font-size:10px;">सदस्य</th>
+						<th style="border:1px solid #cbd5e1;padding:5px;text-align:right;font-size:10px;">राशि</th>
+					</tr></thead>
+					<tbody>${rowsHtml}</tbody>
+				</table>
+				<div style="text-align:right;font-size:11px;font-weight:700;padding:4px 8px;color:${cfg.pdfColor};">
+					${subtotalLine}
+				</div>
+			</div>`;
+		}
+
 		const totalAmount = transactions.reduce((sum, tx) => sum + (Number(tx.amount) || 0), 0);
 		return `
 			<div class="transaction-pdf-root" style="width:760px;background:#ffffff;color:#0f172a;padding:10px;font-family:'Noto Sans Devanagari','Mangal',sans-serif;box-sizing:border-box;overflow:hidden;">
 				<div style="border:2px solid #334155;padding:14px;box-sizing:border-box;">
-					<h1 style="margin:0;text-align:center;font-size:24px;font-weight:800;">मासिक लेन-देन रिपोर्ट</h1>
-					<div style="margin-top:8px;display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;font-size:12px;">
+					<h1 style="margin:0;text-align:center;font-size:22px;font-weight:800;">मासिक लेन-देन रिपोर्ट</h1>
+					<div style="margin-top:6px;display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;font-size:11px;">
 						<p style="margin:0;">समूह: <strong>${escapeHtml(shgNameStr || '-')}</strong></p>
 						<p style="margin:0;">माह: <strong>${escapeHtml(monthStr || '-')}</strong></p>
 						<p style="margin:0;">Generated: <strong>${escapeHtml(new Date().toLocaleString('hi-IN'))}</strong></p>
 					</div>
-					<h3 style="margin:14px 0 8px 0;font-size:14px;">लेन-देन विवरण</h3>
-					<table style="width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px;">
-						<thead><tr style="background:#f8fafc;">
-							<th style="border:1px solid #334155;padding:6px;text-align:center;width:40px;">क्र.</th>
-							<th style="border:1px solid #334155;padding:6px;text-align:left;width:80px;">दिनांक</th>
-							<th style="border:1px solid #334155;padding:6px;text-align:left;">सदस्य / विवरण</th>
-							<th style="border:1px solid #334155;padding:6px;text-align:left;">प्रकार</th>
-							<th style="border:1px solid #334155;padding:6px;text-align:right;">राशि</th>
-						</tr></thead>
-						<tbody>${rows || `<tr><td colspan="5" style="border:1px solid #334155;padding:6px;text-align:center;">इस माह कोई लेन-देन नहीं हुआ</td></tr>`}</tbody>
-					</table>
-					<div style="margin-top:14px;text-align:right;font-size:12px;font-weight:bold;">
+					<div style="margin-top:14px;">
+						${groupsHtml || '<p style="text-align:center;color:#94a3b8;font-size:12px;">इस माह कोई लेन-देन नहीं हुआ</p>'}
+					</div>
+					<div style="margin-top:10px;text-align:right;font-size:13px;font-weight:800;border-top:2px solid #334155;padding-top:8px;">
 						कुल लेनदेन राशि: ${escapeHtml(formatMoney(totalAmount))}
 					</div>
 				</div>
@@ -274,14 +454,7 @@ export default function ReportsPage({ params }) {
 		setMessage(null);
 		let wrapper = null;
 		try {
-			const resp = await fetch('/api/shg?name=list-monthly-transactions', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ shgId: shgid, month: previewMonth || month }),
-			});
-			const data = await resp.json();
-			if (!resp.ok) throw new Error(data?.error || 'लेन-देन डेटा नहीं मिला');
-			const txns = data.transactions || [];
+			const txns = txnData || (await fetchTransactions(previewMonth || month));
 			const html2pdfModule = await import('html2pdf.js');
 			const html2pdf = html2pdfModule.default || html2pdfModule;
 			wrapper = document.createElement('div');
@@ -303,9 +476,14 @@ export default function ReportsPage({ params }) {
 		}
 	};
 
+	const toggleGroup = (type) => {
+		setCollapsedGroups((prev) => ({ ...prev, [type]: !prev[type] }));
+	};
+
 	const canPreviewReport = Boolean(snapshotPreview);
 	const members = snapshotPreview?.memberWise || [];
 	const totals = snapshotPreview?.shgTotals || {};
+	const txnGroups = useMemo(() => groupTransactionsByType(txnData || []), [txnData]);
 
 	return (
 		<div className='min-h-screen bg-[#f1f5fb] pb-24 overflow-x-hidden'>
@@ -578,6 +756,118 @@ export default function ReportsPage({ params }) {
 												<span className='text-sm font-black text-emerald-900'>{formatMoney(totals.totalAvailableCash)}</span>
 											</div>
 										</div>
+									</div>
+
+									{/* ============ Grouped Transactions Section ============ */}
+									<div className='bg-white rounded-2xl border border-slate-100 overflow-hidden'>
+										<div className='px-5 py-3 border-b border-slate-100 flex items-center justify-between'>
+											<p className='text-sm font-black text-slate-800'>लेन-देन (प्रकार अनुसार)</p>
+											<span className='text-[10px] font-bold text-slate-400 uppercase'>
+												{(txnData || []).length} लेन-देन
+											</span>
+										</div>
+
+										{txnGroups.length === 0 ? (
+											<div className='px-5 py-8 text-center text-sm text-slate-400 font-medium'>
+												इस माह कोई लेन-देन नहीं हुआ
+											</div>
+										) : (
+											<div className='divide-y divide-slate-100'>
+												{txnGroups.map((group) => {
+													const cfg = getTypeConfig(group.type);
+													const isCollapsed = collapsedGroups[group.type];
+													return (
+														<div key={group.type}>
+															{/* Group header */}
+															<button
+																onClick={() => toggleGroup(group.type)}
+																className={`w-full flex items-center justify-between px-4 py-3 ${cfg.headerBg} hover:opacity-90 transition-opacity`}>
+																<div className='flex items-center gap-2.5'>
+																	<div className={`w-2.5 h-2.5 rounded-full ${cfg.dot}`} />
+																	<span className={`text-sm font-black ${cfg.text}`}>
+																		{cfg.label}
+																	</span>
+																	<span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.border} border ${cfg.text}`}>
+																		{group.txns.length}
+																	</span>
+																</div>
+																<div className='flex items-center gap-2'>
+																	<span className={`text-sm font-black ${cfg.text}`}>
+																		{formatMoney(group.total)}
+																	</span>
+																	{isCollapsed ? (
+																		<ChevronDown className={`w-4 h-4 ${cfg.text}`} />
+																	) : (
+																		<ChevronUp className={`w-4 h-4 ${cfg.text}`} />
+																	)}
+																</div>
+															</button>
+
+															{/* Loan repayment subtotals */}
+															{group.type === 'LOAN_REPAYMENT' && !isCollapsed && (group.totalPrincipal > 0 || group.totalInterest > 0) && (
+																<div className='flex items-center gap-4 px-5 py-2 bg-amber-50/60 border-b border-amber-100'>
+																	<div className='flex items-center gap-1.5'>
+																		<div className='w-1.5 h-1.5 rounded-full bg-emerald-500' />
+																		<span className='text-[11px] font-bold text-emerald-700'>
+																			मूलधन: {formatMoney(group.totalPrincipal)}
+																		</span>
+																	</div>
+																	<div className='flex items-center gap-1.5'>
+																		<div className='w-1.5 h-1.5 rounded-full bg-orange-500' />
+																		<span className='text-[11px] font-bold text-orange-700'>
+																			ब्याज: {formatMoney(group.totalInterest)}
+																		</span>
+																	</div>
+																</div>
+															)}
+
+															{/* Group transactions */}
+															<AnimatePresence>
+																{!isCollapsed && (
+																	<motion.div
+																		initial={{ height: 0, opacity: 0 }}
+																		animate={{ height: 'auto', opacity: 1 }}
+																		exit={{ height: 0, opacity: 0 }}
+																		transition={{ duration: 0.2 }}
+																		className='overflow-hidden'>
+																		{group.txns.map((tx, idx) => {
+																			const txDate = new Date(tx.date).toLocaleDateString('hi-IN');
+																			const memberName = tx.memberName && tx.memberName !== '-' ? tx.memberName : 'संस्था';
+																			const isLoanRepayment = group.type === 'LOAN_REPAYMENT' && (tx.principalComponent || tx.interestComponent);
+																			return (
+																				<div
+																					key={tx._id || idx}
+																					className={`flex items-center justify-between px-5 py-2.5 border-b border-slate-50 ${cfg.bg} bg-opacity-30 hover:bg-opacity-60 transition-colors`}>
+																					<div className='flex-1 min-w-0'>
+																						<div className='flex items-center gap-2'>
+																							<span className='text-xs text-slate-400 font-mono w-5 shrink-0'>{idx + 1}</span>
+																							<span className='text-sm font-semibold text-slate-800 truncate'>{memberName}</span>
+																						</div>
+																						<div className='flex items-center gap-2 mt-0.5 ml-7'>
+																							<span className='text-[10px] text-slate-400'>{txDate}</span>
+																							{isLoanRepayment && (
+																								<span className='text-[10px] font-medium text-slate-500'>
+																									मूलधन: <span className='text-emerald-700 font-bold'>{formatMoney(tx.principalComponent)}</span>
+																									{' | '}
+																									ब्याज: <span className='text-orange-700 font-bold'>{formatMoney(tx.interestComponent)}</span>
+																								</span>
+																							)}
+																						</div>
+																					</div>
+																					<span className={`text-sm font-bold ${cfg.text} shrink-0 ml-2`}>
+																						{formatMoney(tx.amount)}
+																					</span>
+																				</div>
+																			);
+																		})}
+																	</motion.div>
+																)}
+															</AnimatePresence>
+														</div>
+													);
+												})}
+											</div>
+										)}
 									</div>
 								</>
 							) : (
