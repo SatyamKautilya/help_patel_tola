@@ -1055,8 +1055,20 @@ async function ListActiveLoans(data) {
 		const outstandingPrincipal = Math.max(principal - principalPaid, 0);
 
 		// Full interest for the month
-		const fullMonthlyInterest =
+		let fullMonthlyInterest =
 			outstandingPrincipal * (loan.interestRate / 100);
+
+		// 📌 Minimum 1-month interest rule:
+		// If loan was issued this month, charge at least 1 full month interest on original principal
+		const issuedMonth = loan.issuedDate
+			? new Date(loan.issuedDate).toISOString().slice(0, 7)
+			: loan.createdAt
+				? new Date(loan.createdAt).toISOString().slice(0, 7)
+				: null;
+		const minimumInterest = principal * (loan.interestRate / 100);
+		if (issuedMonth === currentMonth && fullMonthlyInterest < minimumInterest) {
+			fullMonthlyInterest = minimumInterest;
+		}
 
 		// Interest already paid this month
 		const interestPaidThisMonth =
@@ -1085,7 +1097,7 @@ async function ListActiveLoans(data) {
 }
 
 async function collectRepayment(data) {
-	const { shgId, loanId, memberId, amount, principal, interest, receivedBy } =
+	const { shgId, loanId, memberId, amount, principal, interest, receivedBy, forceOverride } =
 		data;
 
 	if (
@@ -1154,9 +1166,22 @@ async function collectRepayment(data) {
 	}
 
 	/* ---------------- 4ï¸âƒ£ Monthly interest calculation ---------------- */
-	const fullMonthlyInterest = outstandingPrincipal * (loan.interestRate / 100);
+	/* ---------------- Minimum-1-month interest + monthly calculation ---- */
+	let fullMonthlyInterest = outstandingPrincipal * (loan.interestRate / 100);
 
-	/* ---------------- 5ï¸âƒ£ Interest already paid THIS MONTH ---------------- */
+	// Minimum 1-month interest rule:
+	// If loan was issued this month, charge at least 1 full month interest on original principal
+	const issuedMonth = loan.issuedDate
+		? new Date(loan.issuedDate).toISOString().slice(0, 7)
+		: loan.createdAt
+			? new Date(loan.createdAt).toISOString().slice(0, 7)
+			: null;
+	const minimumInterest = loan.principal * (loan.interestRate / 100);
+	if (issuedMonth === currentMonth && fullMonthlyInterest < minimumInterest) {
+		fullMonthlyInterest = minimumInterest;
+	}
+
+	/* ---------------- Interest already paid THIS MONTH ---------------- */
 	const interestMonthAgg = await LoanRepayment.aggregate([
 		{
 			$match: {
@@ -1180,24 +1205,27 @@ async function collectRepayment(data) {
 		0,
 	);
 
-	/* ---------------- 6ï¸âƒ£ Business validations ---------------- */
+	/* ---------------- Business validations ---------------- */
 
-	// â— Interest cannot exceed remaining interest for this month
-	if (interestComponent > remainingInterestThisMonth) {
-		throw new Error(
-			`Interest exceeds remaining monthly interest Rs ${remainingInterestThisMonth.toFixed(
-				2,
-			)}`,
-		);
-	}
-
-	// â— Principal cannot exceed outstanding
+	// Principal cannot exceed outstanding
 	if (principalComponent > outstandingPrincipal) {
 		throw new Error('Principal exceeds outstanding amount');
 	}
 
-	// â— If principal is being paid, interest must be fully settled first
+	// Interest mismatch: return a warning so the frontend can show a confirmation popup
+	if (!forceOverride && interestComponent !== Number(remainingInterestThisMonth.toFixed(2))) {
+		return NextResponse.json({
+			interestMismatch: true,
+			expectedInterest: Number(remainingInterestThisMonth.toFixed(2)),
+			enteredInterest: interestComponent,
+			outstandingPrincipal,
+			message: `अपेक्षित ब्याज ₹${remainingInterestThisMonth.toFixed(2)} है, लेकिन ₹${interestComponent.toFixed(2)} दर्ज किया गया है। क्या आप जारी रखना चाहते हैं?`,
+		});
+	}
+
+	// If principal is being paid and not force-overriding, interest must be fully settled first
 	if (
+		!forceOverride &&
 		principalComponent > 0 &&
 		remainingInterestThisMonth > 0 &&
 		interestComponent < remainingInterestThisMonth

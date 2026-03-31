@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -12,6 +12,8 @@ import {
 	ArrowRight,
 	Users,
 	ListChecks,
+	AlertTriangle,
+	X,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -27,6 +29,9 @@ export default function LoanRepaymentPage({ params }) {
 	const [loading, setLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [uiMessage, setUiMessage] = useState(null);
+
+	// Interest mismatch confirmation popup state
+	const [mismatchPopup, setMismatchPopup] = useState(null);
 
 	const loadLoans = async () => {
 		setLoading(true);
@@ -110,7 +115,7 @@ export default function LoanRepaymentPage({ params }) {
 		setPayment({ principal: '', interest: nextLoan?.monthlyInterest || '' });
 	};
 
-	const submitPayment = async () => {
+	const doSubmit = async (forceOverride = false) => {
 		if (validationError || !selectedLoan) {
 			setUiMessage({ type: 'error', text: validationError || 'कृपया सही जानकारी भरें' });
 			return;
@@ -128,9 +133,17 @@ export default function LoanRepaymentPage({ params }) {
 					principal: principalPaid,
 					interest: interestPaid,
 					amount: totalPayment,
+					forceOverride,
 				}),
 			});
 			const data = await resp.json();
+
+			// Handle interest mismatch popup
+			if (data.interestMismatch) {
+				setMismatchPopup(data);
+				return;
+			}
+
 			if (!resp.ok) throw new Error(data?.error || 'भुगतान सहेजने में त्रुटि');
 
 			setUiMessage({ type: 'success', text: 'भुगतान सफलतापूर्वक सहेजा गया' });
@@ -144,6 +157,17 @@ export default function LoanRepaymentPage({ params }) {
 		} finally {
 			setSaving(false);
 		}
+	};
+
+	const submitPayment = () => doSubmit(false);
+
+	const confirmMismatch = async () => {
+		setMismatchPopup(null);
+		await doSubmit(true);
+	};
+
+	const cancelMismatch = () => {
+		setMismatchPopup(null);
 	};
 
 	return (
@@ -332,12 +356,103 @@ export default function LoanRepaymentPage({ params }) {
 				</div>
 			) : null}
 
+			{/* ==================== Interest Mismatch Confirmation Popup ==================== */}
+			<AnimatePresence>
+				{mismatchPopup ? (
+					<motion.div
+						initial={{ opacity: 0 }}
+						animate={{ opacity: 1 }}
+						exit={{ opacity: 0 }}
+						className='fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm'>
+						<motion.div
+							initial={{ scale: 0.9, opacity: 0, y: 20 }}
+							animate={{ scale: 1, opacity: 1, y: 0 }}
+							exit={{ scale: 0.9, opacity: 0, y: 20 }}
+							transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+							className='bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden'>
+
+							{/* Popup header */}
+							<div className='bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-4 flex items-center gap-3'>
+								<div className='w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center'>
+									<AlertTriangle className='w-5 h-5 text-white' />
+								</div>
+								<div>
+									<p className='text-base font-black text-white'>ब्याज मेल नहीं खाता</p>
+									<p className='text-[11px] font-semibold text-white/80'>कृपया पुष्टि करें</p>
+								</div>
+								<button
+									onClick={cancelMismatch}
+									className='ml-auto p-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition-colors'>
+									<X className='w-4 h-4 text-white' />
+								</button>
+							</div>
+
+							{/* Popup body */}
+							<div className='px-5 py-5 space-y-4'>
+								{/* Mismatch details */}
+								<div className='grid grid-cols-2 gap-3'>
+									<div className='rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-center'>
+										<p className='text-[10px] font-semibold text-amber-600 uppercase tracking-wide'>अपेक्षित ब्याज</p>
+										<p className='text-lg font-black text-amber-800 mt-0.5'>₹{mismatchPopup.expectedInterest}</p>
+									</div>
+									<div className='rounded-xl border border-blue-200 bg-blue-50 px-3 py-2.5 text-center'>
+										<p className='text-[10px] font-semibold text-blue-600 uppercase tracking-wide'>दर्ज ब्याज</p>
+										<p className='text-lg font-black text-blue-800 mt-0.5'>₹{mismatchPopup.enteredInterest}</p>
+									</div>
+								</div>
+
+								<p className='text-sm text-slate-600 font-medium leading-relaxed'>
+									{mismatchPopup.message}
+								</p>
+
+								{/* Warning note */}
+								<div className='rounded-xl border border-amber-200 bg-amber-50/50 px-3 py-2 flex items-start gap-2'>
+									<AlertTriangle size={14} className='text-amber-500 mt-0.5 shrink-0' />
+									<p className='text-xs text-amber-700 font-medium'>
+										यदि ब्याज अलग है तो कृपया सुनिश्चित करें कि यह सही है। एक बार जमा होने पर इसे रिवर्ट करना होगा।
+									</p>
+								</div>
+							</div>
+
+							{/* Popup actions */}
+							<div className='px-5 pb-5 grid grid-cols-2 gap-3'>
+								<motion.button
+									whileTap={{ scale: 0.95 }}
+									onClick={cancelMismatch}
+									className='py-3 rounded-2xl border border-slate-200 bg-white text-slate-700 font-bold text-sm hover:bg-slate-50 transition-colors'>
+									रद्द करें
+								</motion.button>
+								<motion.button
+									whileTap={{ scale: 0.95 }}
+									onClick={confirmMismatch}
+									disabled={saving}
+									className='py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-sm shadow-lg shadow-amber-200 disabled:opacity-50 flex items-center justify-center gap-2'>
+									{saving ? (
+										<Loader2 size={16} className='animate-spin' />
+									) : (
+										<>
+											<CheckCircle2 size={16} /> जारी रखें
+										</>
+									)}
+								</motion.button>
+							</div>
+						</motion.div>
+					</motion.div>
+				) : null}
+			</AnimatePresence>
+
+			{/* ==================== Toast Messages ==================== */}
 			<AnimatePresence>
 				{uiMessage ? (
 					<motion.div
 						initial={{ y: 100, opacity: 0 }}
 						animate={{ y: 0, opacity: 1 }}
 						exit={{ y: 100, opacity: 0 }}
+						onAnimationComplete={() => {
+							if (uiMessage) {
+								setTimeout(() => setUiMessage(null), 3000);
+							}
+						}}
 						className={`fixed bottom-24 inset-x-6 z-[60] p-4 rounded-2xl shadow-2xl flex items-center gap-3 border backdrop-blur-md ${
 							uiMessage.type === 'error'
 								? 'bg-red-50/95 border-red-200 text-red-800'
