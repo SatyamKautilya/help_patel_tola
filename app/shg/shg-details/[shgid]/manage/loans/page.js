@@ -159,6 +159,28 @@ export default function BulkLoanPage({ params }) {
 			.replace(/-+/g, '-')
 			.replace(/^-+|-+$/g, '');
 
+	const PRASTAV_SIGNATURE_ORDER = {
+		PRESIDENT: 0,
+		SECRETARY: 1,
+		TREASURER: 2,
+		MEMBER: 3,
+	};
+
+	const membersSortedForPrastav = (list) =>
+		[...(list || [])].sort((a, b) => {
+			const ra = PRASTAV_SIGNATURE_ORDER[a?.role] ?? 99;
+			const rb = PRASTAV_SIGNATURE_ORDER[b?.role] ?? 99;
+			if (ra !== rb) return ra - rb;
+			return String(a?.name || '').localeCompare(String(b?.name || ''), 'hi');
+		});
+
+	const prastavSignatureNameWithRole = (m) => {
+		const base = String(m?.name || '-').trim() || '-';
+		if (m?.role === 'PRESIDENT') return `${base} (अध्यक्ष)`;
+		if (m?.role === 'SECRETARY') return `${base} (सचिव)`;
+		return base;
+	};
+
 	const buildProposalHtml = (member, loan) => {
 		const amount = Number(loan?.principal || 0).toLocaleString('hi-IN');
 		const rate = Number(loan?.interestRate || 0);
@@ -167,44 +189,41 @@ export default function BulkLoanPage({ params }) {
 		const objectiveText = `सदस्य ${memberName} को आवश्यक कार्य हेतु ऋण प्रदान करना।`;
 		const discussionText = `कारण: ${reason} | मांग: ₹${amount} | प्रस्तावित मासिक ब्याज दर: ${rate}%`;
 		const resolutionText = `समूह सर्वसम्मति से सदस्य ${memberName} को ₹${amount} का ऋण ${rate}% मासिक ब्याज दर पर स्वीकृत करता है।`;
-		const signatureRows = (members || [])
-			.slice(0, 18)
-			.map(
+		const signatureRows = membersSortedForPrastav(members).map(
 				(rowMember, idx) => `
           <tr>
-					<td style="border:1px solid #334155;padding:8px;">${idx + 1}</td>
-					<td style="border:1px solid #334155;padding:8px;">${escapeHtml(rowMember?.name || '-')}</td>
-					<td style="border:1px solid #334155;padding:8px;min-height:26px;">&nbsp;</td>
+					<td style="border:1px solid #334155;padding:6px 7px;font-size:11px;line-height:1.35;vertical-align:middle;">${idx + 1}</td>
+					<td style="border:1px solid #334155;padding:6px 7px;font-size:11px;line-height:1.35;vertical-align:middle;">${escapeHtml(prastavSignatureNameWithRole(rowMember))}</td>
+					<td style="border:1px solid #334155;padding:6px 7px;font-size:11px;min-height:22px;vertical-align:middle;">&nbsp;</td>
           </tr>
         `,
 			)
 			.join('');
 		return `
-			<div class="proposal-root" style="width:760px;background:#ffffff;color:#0f172a;padding:8px;font-family:'Noto Sans Devanagari','Mangal',sans-serif;box-sizing:border-box;overflow:hidden;">
-				<div style="border:2px solid #334155;padding:14px;box-sizing:border-box;">
-          <h1 style="margin:0;text-align:center;font-size:28px;font-weight:700;">${escapeHtml(shgName || 'SHG')} - प्रस्ताव</h1>
-          <p style="margin:8px 0 0 0;text-align:center;font-size:14px;">दिनांक: ${escapeHtml(todayLabel)}</p>
-		  <table style="width:100%;border-collapse:collapse;margin-top:14px;table-layout:fixed;">
+			<div class="proposal-root" style="width:760px;background:#ffffff;color:#0f172a;padding:4px;font-family:'Noto Sans Devanagari','Mangal',sans-serif;box-sizing:border-box;overflow:visible;">
+				<div style="border:2px solid #334155;padding:10px 10px 18px 10px;box-sizing:border-box;">
+          <h1 style="margin:0;text-align:center;font-size:24px;font-weight:700;line-height:1.2;">${escapeHtml(shgName || 'SHG')} - प्रस्ताव</h1>
+          <p style="margin:4px 0 0 0;text-align:center;font-size:13px;">दिनांक: ${escapeHtml(todayLabel)}</p>
+		  <table style="width:100%;border-collapse:collapse;margin-top:8px;table-layout:fixed;">
             <thead><tr>
-                <th style="border:1px solid #334155;padding:8px;font-size:13px;">उद्देश्य</th>
-                <th style="border:1px solid #334155;padding:8px;font-size:13px;">चर्चा</th>
-                <th style="border:1px solid #334155;padding:8px;font-size:13px;">प्रस्ताव / संकल्प</th>
+                <th style="border:1px solid #334155;padding:5px 6px;font-size:12px;">उद्देश्य</th>
+                <th style="border:1px solid #334155;padding:5px 6px;font-size:12px;">चर्चा</th>
+                <th style="border:1px solid #334155;padding:5px 6px;font-size:12px;">प्रस्ताव / संकल्प</th>
               </tr></thead>
             <tbody><tr>
-					<td style="border:1px solid #334155;padding:10px;font-size:12px;vertical-align:top;line-height:1.45;word-break:break-word;">${escapeHtml(objectiveText)}</td>
-					<td style="border:1px solid #334155;padding:10px;font-size:12px;vertical-align:top;line-height:1.45;word-break:break-word;">${escapeHtml(discussionText)}</td>
-					<td style="border:1px solid #334155;padding:10px;font-size:12px;vertical-align:top;line-height:1.45;word-break:break-word;">${escapeHtml(resolutionText)}</td>
+					<td style="border:1px solid #334155;padding:6px 7px;font-size:11px;vertical-align:top;line-height:1.35;word-break:break-word;">${escapeHtml(objectiveText)}</td>
+					<td style="border:1px solid #334155;padding:6px 7px;font-size:11px;vertical-align:top;line-height:1.35;word-break:break-word;">${escapeHtml(discussionText)}</td>
+					<td style="border:1px solid #334155;padding:6px 7px;font-size:11px;vertical-align:top;line-height:1.35;word-break:break-word;">${escapeHtml(resolutionText)}</td>
               </tr></tbody>
           </table>
-				<table style="width:100%;border-collapse:collapse;margin-top:14px;table-layout:fixed;border:1px solid #334155;">
+				<table style="width:100%;border-collapse:collapse;margin-top:8px;margin-bottom:4px;table-layout:fixed;border:1px solid #334155;">
             <thead><tr>
-                <th style="border:1px solid #334155;padding:8px;width:56px;font-size:12px;">क्रम</th>
-                <th style="border:1px solid #334155;padding:8px;font-size:12px;text-align:left;">सदस्य का नाम</th>
-                <th style="border:1px solid #334155;padding:8px;width:180px;font-size:12px;">हस्ताक्षर</th>
+                <th style="border:1px solid #334155;padding:6px 7px;width:44px;font-size:11px;">क्रम</th>
+                <th style="border:1px solid #334155;padding:6px 7px;font-size:11px;text-align:left;">सदस्य का नाम</th>
+                <th style="border:1px solid #334155;padding:6px 7px;width:160px;font-size:11px;">हस्ताक्षर</th>
               </tr></thead>
-            <tbody>${signatureRows || `<tr><td style="border:1px solid #334155;padding:8px;">1</td><td style="border:1px solid #334155;padding:8px;">-</td><td style="border:1px solid #334155;padding:8px;">&nbsp;</td></tr>`}</tbody>
+            <tbody>${signatureRows || `<tr><td style="border:1px solid #334155;padding:6px 7px;">1</td><td style="border:1px solid #334155;padding:6px 7px;">-</td><td style="border:1px solid #334155;padding:6px 7px;">&nbsp;</td></tr>`}</tbody>
           </table>
-          <p style="margin:16px 0 0 0;font-size:11px;color:#334155;">नोट: यह प्रस्ताव SHG बैठक में पारित करने हेतु तैयार किया गया है।</p>
         </div>
       </div>
     `;
@@ -229,7 +248,13 @@ export default function BulkLoanPage({ params }) {
 			const proposalRoot = wrapper.querySelector('.proposal-root');
 			if (!proposalRoot) throw new Error('प्रस्ताव टेम्पलेट तैयार नहीं हुआ');
 			const pdfBlob = await html2pdf()
-				.set({ margin: [2,2,2,2], image: { type:'jpeg', quality:0.95 }, html2canvas: { scale:2, useCORS:true, backgroundColor:'#ffffff' }, jsPDF: { unit:'mm', format:'a4', orientation:'portrait' } })
+				.set({
+					margin: [1.5, 1.5, 1.5, 1.5],
+					pagebreak: { mode: ['css', 'legacy'] },
+					image: { type: 'jpeg', quality: 0.92 },
+					html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollY: 0 },
+					jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+				})
 				.from(proposalRoot).outputPdf('blob');
 			if (!pdfBlob) throw new Error('PDF बनाने में त्रुटि हुई');
 			await triggerServerFileDownload(pdfBlob, `Prastav-${sanitizeFilePart(member.name || 'sadasya')}-${sanitizeFilePart(todayLabel)}.pdf`);
