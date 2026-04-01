@@ -493,6 +493,12 @@ async function saveExpense(data) {
 
 async function createLoan(data) {
 	const issuedDate = data.issuedDate ? new Date(data.issuedDate) : new Date();
+	if (Number.isNaN(issuedDate.getTime())) {
+		return NextResponse.json(
+			{ error: 'Invalid issuedDate' },
+			{ status: 400 },
+		);
+	}
 	const reportMonth = reportMonthForTxn(data.month, issuedDate);
 	const loan = await Loan.create({
 		shgId: data.shgId,
@@ -517,6 +523,7 @@ async function createLoan(data) {
 			loanId: loan._id,
 			reason: data.reason || '',
 			month: reportMonth,
+			issuedDate,
 		},
 	});
 
@@ -989,10 +996,16 @@ async function MemberPassbook(data) {
 		outstandingLoan: Number(outstandingLoan.toFixed(2)),
 		totalPenalties,
 	};
+	const recentTx = transactions.filter(
+		(tx) => effectiveTransactionDate(tx) >= sixMonthsAgo,
+	);
+	const transactionsForClient = recentTx.map((tx) => ({
+		...tx,
+		date: effectiveTransactionDate(tx),
+	}));
+
 	return NextResponse.json({
-		transactions: transactions.filter(
-			(tx) => new Date(tx.date) >= sixMonthsAgo,
-		),
+		transactions: transactionsForClient,
 		summary,
 	});
 }
@@ -1469,6 +1482,7 @@ async function listRevertableTransactions(data) {
 
 	const transactions = txns.map((t) => ({
 		...t,
+		date: effectiveTransactionDate(t),
 		memberName: t.memberId ? memberMap[String(t.memberId)]?.name || null : null,
 		memberCode: t.memberId
 			? memberMap[String(t.memberId)]?.memberCode || null
@@ -1714,6 +1728,16 @@ function normalizeMonthKeyInput(value) {
 	return `${year}-${String(mo).padStart(2, '0')}`;
 }
 
+/** Loan issue date from txn meta (authoritative for LOAN_DISBURSEMENT display & month). */
+function effectiveTransactionDate(tx) {
+	if (tx?.type === 'LOAN_DISBURSEMENT' && tx?.meta?.issuedDate != null) {
+		const d = new Date(tx.meta.issuedDate);
+		if (!Number.isNaN(d.getTime())) return d;
+	}
+	if (tx?.date) return new Date(tx.date);
+	return new Date(tx?.createdAt || 0);
+}
+
 /**
  * Inclusive UTC instant range for the civil month in Asia/Kolkata (correct for txn `date` queries).
  */
@@ -1765,7 +1789,7 @@ function reportMonthForTxn(explicitMonth, anchorDate) {
 }
 
 /**
- * Business month for reporting: meta.month (YYYY-MM) when set, else IST month from date.
+ * Business month for reporting: meta.month if set; else IST month from meta.issuedDate (loans) or txn date.
  */
 function getTransactionReportMonth(tx) {
 	const raw = tx?.meta?.month;
@@ -1773,8 +1797,7 @@ function getTransactionReportMonth(tx) {
 		const norm = normalizeMonthKeyInput(raw);
 		if (norm) return norm;
 	}
-	const d = tx?.date ? new Date(tx.date) : new Date(tx?.createdAt || 0);
-	return monthKeyIST(d);
+	return monthKeyIST(effectiveTransactionDate(tx));
 }
 
 function parseMonthStart(month) {
@@ -2623,6 +2646,7 @@ async function listMonthlyTransactions(data) {
 	const transactions = txns.map((t) => {
 		const base = {
 			...t,
+			date: effectiveTransactionDate(t),
 			memberName: t.memberId ? memberMap[String(t.memberId)] || '-' : '-',
 		};
 		// Attach loan repayment breakdown if available
