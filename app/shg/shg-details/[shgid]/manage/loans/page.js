@@ -18,6 +18,7 @@ import {
 	CircleDot,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import HindiDatePicker from '@/components/HindiDatePicker';
 
 export default function BulkLoanPage({ params }) {
 	const urlParams = useParams();
@@ -76,7 +77,12 @@ export default function BulkLoanPage({ params }) {
 		if (!loanSettings[id]) {
 			setLoanSettings((p) => ({
 				...p,
-				[id]: { principal: '', interestRate: '', reason: '' },
+				[id]: {
+					principal: '',
+					interestRate: '',
+					reason: '',
+					issuedDate: new Date().toISOString().slice(0, 10),
+				},
 			}));
 		}
 	};
@@ -111,7 +117,9 @@ export default function BulkLoanPage({ params }) {
 				Number(l.principal) <= 0 ||
 				!l.interestRate ||
 				Number(l.interestRate) <= 0 ||
-				!String(l.reason || '').trim()
+				!String(l.reason || '').trim() ||
+				!l.issuedDate ||
+				Number.isNaN(new Date(l.issuedDate).getTime())
 			) {
 				return false;
 			}
@@ -239,6 +247,7 @@ export default function BulkLoanPage({ params }) {
 			principal: Number(loanSettings[id].principal),
 			interestRate: Number(loanSettings[id].interestRate),
 			reason: String(loanSettings[id].reason || '').trim(),
+			issuedDate: loanSettings[id].issuedDate,
 		}));
 		try {
 			setSaving(true);
@@ -492,6 +501,19 @@ export default function BulkLoanPage({ params }) {
 												/>
 											</div>
 
+											{/* Issue date */}
+											<div className='space-y-1.5'>
+												<label className='text-[10px] font-black text-slate-400 uppercase tracking-wider'>
+													ऋण जारी करने की तिथि
+												</label>
+												<HindiDatePicker
+													value={l.issuedDate || new Date().toISOString().slice(0, 10)}
+													onChange={(v) => updateLoan(id, 'issuedDate', v)}
+													id={`loan-issue-${id}`}
+													label='ऋण जारी तिथि'
+												/>
+											</div>
+
 											{/* PDF Download */}
 											<button
 												type='button'
@@ -555,8 +577,18 @@ export default function BulkLoanPage({ params }) {
 											<p className='text-emerald-600 font-black text-lg tracking-tight'>
 												₹{Number(l.principal).toLocaleString('hi-IN')}
 											</p>
-											<p className='text-[10px] text-slate-400 font-medium mt-0.5 max-w-[100px] truncate'>
+											<p className='text-[10px] text-slate-400 font-medium mt-0.5 max-w-[140px] truncate'>
 												{l.reason}
+											</p>
+											<p className='text-[10px] text-slate-500 font-semibold mt-0.5'>
+												जारी:{' '}
+												{l.issuedDate
+													? new Date(l.issuedDate + 'T12:00:00').toLocaleDateString('hi-IN', {
+															day: '2-digit',
+															month: 'short',
+															year: 'numeric',
+														})
+													: '-'}
 											</p>
 										</div>
 									</motion.div>

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { displayTransactionDate } from '@/lib/shgTransactionDisplayDate';
 
 const TYPE_LABELS = {
 	OPENING_BALANCE: 'प्रारंभिक शेष',
@@ -126,7 +127,7 @@ export default function MemberPassbookTransactions({ params }) {
 												</div>
 												<div className='flex-1'>
 													<p className='text-sm text-slate-700 font-medium'>
-														{new Date(tx.date).toLocaleDateString('hi-IN', {
+														{displayTransactionDate(tx).toLocaleDateString('hi-IN', {
 															day: '2-digit',
 															month: 'short',
 															year: 'numeric',

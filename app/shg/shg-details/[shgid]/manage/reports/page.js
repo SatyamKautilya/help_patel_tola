@@ -15,6 +15,7 @@ import {
 	ChevronUp,
 } from 'lucide-react';
 import HindiMonthYearPicker from '@/components/HindiMonthYearPicker';
+import { displayTransactionDate } from '@/lib/shgTransactionDisplayDate';
 
 function formatMoney(value) {
 	return `Rs ${Number(value || 0).toLocaleString('en-IN', {
@@ -386,7 +387,7 @@ export default function ReportsPage({ params }) {
 			const cfg = getTypeConfig(group.type);
 			let rowsHtml = '';
 			group.txns.forEach((tx, idx) => {
-				const txDate = new Date(tx.date).toLocaleDateString('hi-IN');
+				const txDate = displayTransactionDate(tx).toLocaleDateString('hi-IN');
 				const memberName = tx.memberName && tx.memberName !== '-' ? tx.memberName : 'संस्था';
 				// For LOAN_REPAYMENT, show breakdown
 				let amountDisplay = escapeHtml(formatMoney(tx.amount));
@@ -831,7 +832,7 @@ export default function ReportsPage({ params }) {
 																		transition={{ duration: 0.2 }}
 																		className='overflow-hidden'>
 																		{group.txns.map((tx, idx) => {
-																			const txDate = new Date(tx.date).toLocaleDateString('hi-IN');
+																			const txDate = displayTransactionDate(tx).toLocaleDateString('hi-IN');
 																			const memberName = tx.memberName && tx.memberName !== '-' ? tx.memberName : 'संस्था';
 																			const isLoanRepayment = group.type === 'LOAN_REPAYMENT' && (tx.principalComponent || tx.interestComponent);
 																			return (

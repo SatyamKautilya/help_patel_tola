@@ -10,6 +10,7 @@ import {
 	RotateCcw,
 	Search,
 } from 'lucide-react';
+import { displayTransactionDate } from '@/lib/shgTransactionDisplayDate';
 
 const TYPE_LABELS = {
 	MONTHLY_DEPOSIT: 'मासिक बचत',
@@ -177,7 +178,7 @@ export default function RevertTransactionsPage({ params }) {
 												{txn.memberName || 'सामान्य एंट्री'}
 											</p>
 											<p className='text-[11px] text-slate-500 mt-1'>
-												{new Date(txn.date).toLocaleString('hi-IN')}
+												{displayTransactionDate(txn).toLocaleString('hi-IN')}
 											</p>
 										</button>
 									);
