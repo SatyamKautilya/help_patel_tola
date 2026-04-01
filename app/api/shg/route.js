@@ -98,8 +98,6 @@ export async function POST(req) {
 				return listShgSnapshots(body);
 			case 'get-shg-snapshot-data':
 				return getShgSnapshotData(body);
-			case 'generate-monthly-snapshots':
-				return generateMonthlySnapshots(body);
 			case 'list-revertable-transactions':
 				return listRevertableTransactions(body);
 			case 'revert-transaction':
@@ -495,6 +493,7 @@ async function saveExpense(data) {
 
 async function createLoan(data) {
 	const issuedDate = data.issuedDate ? new Date(data.issuedDate) : new Date();
+	const reportMonth = reportMonthForTxn(data.month, issuedDate);
 	const loan = await Loan.create({
 		shgId: data.shgId,
 		memberId: data.memberId,
@@ -514,7 +513,11 @@ async function createLoan(data) {
 		type: TransactionType.LOAN_DISBURSEMENT,
 		memberId: data.memberId,
 		date: issuedDate,
-		meta: { loanId: loan._id, reason: data.reason || '' },
+		meta: {
+			loanId: loan._id,
+			reason: data.reason || '',
+			month: reportMonth,
+		},
 	});
 
 	return NextResponse.json(loan);
@@ -525,7 +528,7 @@ async function loanRepayment(data) {
 	const paymentDate = data.paymentDate
 		? new Date(data.paymentDate)
 		: new Date();
-	const month = data.month || paymentDate.toISOString().slice(0, 7);
+	const month = reportMonthForTxn(data.month, paymentDate);
 	const repayment = await LoanRepayment.create({
 		loanId: data.loanId,
 		shgId: data.shgId,
@@ -1350,7 +1353,8 @@ async function collectRepayment(data) {
 }
 
 async function lumpSumContribution(data) {
-	const { shgId, date, purpose, deposits, receivedBy } = data;
+	const { shgId, date, month: monthParam, purpose, deposits, receivedBy } =
+		data;
 
 	if (!shgId || !Array.isArray(deposits) || deposits.length === 0) {
 		throw new Error('Invalid request data');
@@ -1358,6 +1362,7 @@ async function lumpSumContribution(data) {
 
 	const shgObjectId = new Types.ObjectId(String(shgId));
 	const depositDate = date ? new Date(date) : new Date();
+	const reportMonth = reportMonthForTxn(monthParam, depositDate);
 
 	// Basic validation
 	deposits.forEach((d) => {
@@ -1400,6 +1405,7 @@ async function lumpSumContribution(data) {
 			meta: {
 				lumpSumDepositId: dep._id,
 				purpose,
+				month: reportMonth,
 			},
 		}));
 
@@ -1694,6 +1700,81 @@ async function revertTransaction(data) {
 
 function monthKeyFromDate(date) {
 	return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+/** Normalize any YYYY-M or YYYY-MM string to YYYY-MM (fixes strict === mismatches). */
+function normalizeMonthKeyInput(value) {
+	if (value == null) return null;
+	const s = String(value).trim();
+	const match = s.match(/^(\d{4})-(\d{1,2})$/);
+	if (!match) return null;
+	const year = Number(match[1]);
+	const mo = Number(match[2]);
+	if (!Number.isInteger(year) || mo < 1 || mo > 12) return null;
+	return `${year}-${String(mo).padStart(2, '0')}`;
+}
+
+/**
+ * Inclusive UTC instant range for the civil month in Asia/Kolkata (correct for txn `date` queries).
+ */
+function istMonthUtcRange(monthNorm) {
+	const mNorm = normalizeMonthKeyInput(monthNorm);
+	if (!mNorm) return null;
+	const [yStr, moStr] = mNorm.split('-');
+	const y = Number(yStr);
+	const m = Number(moStr);
+	const lastDay = new Date(y, m, 0).getDate();
+	const start = new Date(`${mNorm}-01T00:00:00+05:30`);
+	const end = new Date(
+		`${yStr}-${moStr}-${String(lastDay).padStart(2, '0')}T23:59:59.999+05:30`,
+	);
+	if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null;
+	return { start, end };
+}
+
+/** YYYY-MM in Asia/Kolkata (matches how users expect “monthly” reports). */
+function monthKeyIST(dateInput) {
+	const date =
+		dateInput instanceof Date ? dateInput : new Date(dateInput);
+	if (Number.isNaN(date.getTime())) return null;
+	const parts = new Intl.DateTimeFormat('en-CA', {
+		timeZone: 'Asia/Kolkata',
+		year: 'numeric',
+		month: '2-digit',
+	}).formatToParts(date);
+	const y = parts.find((p) => p.type === 'year')?.value;
+	const mRaw = parts.find((p) => p.type === 'month')?.value;
+	if (y == null || mRaw == null) return null;
+	const mo = parseInt(String(mRaw), 10);
+	if (!Number.isFinite(mo) || mo < 1 || mo > 12) return null;
+	return `${y}-${String(mo).padStart(2, '0')}`;
+}
+
+/**
+ * Same rule as loan repayment: optional `month` (YYYY-MM) on the payload wins;
+ * otherwise derive month in Asia/Kolkata from the anchor date (issued / payment / deposit).
+ */
+function reportMonthForTxn(explicitMonth, anchorDate) {
+	const fromExplicit = normalizeMonthKeyInput(explicitMonth);
+	if (fromExplicit) return fromExplicit;
+	const d =
+		anchorDate instanceof Date ? anchorDate : new Date(anchorDate);
+	const fromDate = monthKeyIST(d);
+	if (fromDate) return fromDate;
+	return monthKeyFromDate(Number.isNaN(d.getTime()) ? new Date() : d);
+}
+
+/**
+ * Business month for reporting: meta.month (YYYY-MM) when set, else IST month from date.
+ */
+function getTransactionReportMonth(tx) {
+	const raw = tx?.meta?.month;
+	if (raw != null && typeof raw === 'string') {
+		const norm = normalizeMonthKeyInput(raw);
+		if (norm) return norm;
+	}
+	const d = tx?.date ? new Date(tx.date) : new Date(tx?.createdAt || 0);
+	return monthKeyIST(d);
 }
 
 function parseMonthStart(month) {
@@ -2210,10 +2291,8 @@ async function generateShgSnapshot(data) {
 		const storage = await saveSnapshotToCloudStorage(snapshot, {
 			triggerType: 'ON_DEMAND',
 		});
-		const proxyUrl = `/api/shg/snapshot-pdf?shgId=${encodeURIComponent(String(shgId))}&month=${encodeURIComponent(String(snapshot.month))}`;
 		const responseStorage = {
 			...storage,
-			proxyUrl,
 			cloudUrl: null,
 		};
 		return NextResponse.json({
@@ -2248,7 +2327,6 @@ async function listShgSnapshots(data) {
 				month: r.month,
 				generatedAt: r.generatedAt,
 				cloudUrl: null,
-				proxyUrl: `/api/shg/snapshot-pdf?shgId=${encodeURIComponent(String(shgId))}&month=${encodeURIComponent(String(r.month))}`,
 				storageProvider: r.storageProvider,
 				path: r.cloudPath,
 			})),
@@ -2275,7 +2353,6 @@ async function listShgSnapshots(data) {
 					month: d.name,
 					generatedAt: dataObj.generatedAt,
 					cloudUrl: `dummy://shg-snapshots/${shgId}/${d.name}/snapshot.pdf`,
-					proxyUrl: null,
 					storageProvider: 'dummy-cloud',
 					path: `shg-snapshots/${shgId}/${d.name}/snapshot.pdf`,
 				});
@@ -2318,44 +2395,6 @@ async function getShgSnapshotData(data) {
 		month: report.month,
 		generatedAt: report.generatedAt,
 		snapshot: report.snapshot,
-	});
-}
-
-async function generateMonthlySnapshots(data) {
-	const { month, force = false } = data || {};
-	const runDate = month ? parseMonthStart(month) : new Date();
-
-	if (!force && runDate.getDate() !== 31) {
-		return NextResponse.json(
-			{
-				error: 'Monthly snapshot run is allowed only on 31st unless force=true',
-			},
-			{ status: 400 },
-		);
-	}
-
-	const shgs = await Shg.find({ status: 'ACTIVE' }).select('_id').lean();
-	const results = [];
-	for (const shg of shgs) {
-		try {
-			const snapshot = await buildShgSnapshotData(
-				shg._id,
-				monthKeyFromDate(runDate),
-			);
-			const storage = await saveSnapshotToCloudStorage(snapshot, {
-				triggerType: 'SCHEDULED',
-			});
-			results.push({ shgId: shg._id, success: true, storage });
-		} catch (e) {
-			results.push({ shgId: shg._id, success: false, error: e.message });
-		}
-	}
-
-	return NextResponse.json({
-		success: true,
-		month: monthKeyFromDate(runDate),
-		totalShgs: shgs.length,
-		results,
 	});
 }
 
@@ -2506,26 +2545,45 @@ async function listMonthlyTransactions(data) {
 		return NextResponse.json({ error: 'shgId and month are required' }, { status: 400 });
 	}
 
-	const shgObjectId = new Types.ObjectId(String(shgId));
-	const monthStart = parseMonthStart(month);
-	const monthEnd = new Date(
-		monthStart.getFullYear(),
-		monthStart.getMonth() + 1,
-		0,
-		23,
-		59,
-		59,
-		999
-	);
+	const monthNorm = normalizeMonthKeyInput(month);
+	if (!monthNorm) {
+		return NextResponse.json(
+			{ error: 'Invalid month format. Expected YYYY-MM' },
+			{ status: 400 },
+		);
+	}
 
-	const txns = await Transaction.find({
+	const shgObjectId = new Types.ObjectId(String(shgId));
+	const istRange = istMonthUtcRange(monthNorm);
+	const monthStart = istRange?.start ?? parseMonthStart(monthNorm);
+	const monthEnd =
+		istRange?.end ??
+		new Date(
+			monthStart.getFullYear(),
+			monthStart.getMonth() + 1,
+			0,
+			23,
+			59,
+			59,
+			999,
+		);
+
+	const txnsRaw = await Transaction.find({
 		shgId: shgObjectId,
 		isReversed: false,
-		date: { $gte: monthStart, $lte: monthEnd },
+		$or: [
+			{ date: { $gte: monthStart, $lte: monthEnd } },
+			{ 'meta.month': monthNorm },
+			{ 'meta.month': month },
+		],
 	})
 		.sort({ date: 1, createdAt: 1 })
-		.select('_id type amount date memberId fromAccount toAccount meta')
+		.select('_id type amount date memberId fromAccount toAccount meta createdAt')
 		.lean();
+
+	const txns = txnsRaw.filter(
+		(t) => getTransactionReportMonth(t) === monthNorm,
+	);
 
 	const memberIds = txns
 		.map((t) => t.memberId)
