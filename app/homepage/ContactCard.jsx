@@ -12,7 +12,8 @@ const ContactCard = () => {
 			}}
 			className='
     relative overflow-hidden rounded-2xl p-5
-    bg-gradient-to-br from-[#f6f2ea] via-[#ece4d7] to-[#dbae60] 
+    bg-gradient-to-br from-[#f6f2ea] via-[#ece4d7] to-[#dbae60]
+    border-1 border-[#d4c4a8] border-b-3 border-b-[#c9a855]
     shadow-[0_10px_20px_rgba(0,0,0,0.40)]
   	hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]
   	hover:-translate-y-1

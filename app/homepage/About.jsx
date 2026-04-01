@@ -13,6 +13,7 @@ const About = () => {
 					group flex-1 cursor-pointer
 					rounded-2xl p-5 text-center
 					bg-gradient-to-br from-[#f7dc9c] to-[#e8b85c]
+					border-1 border-amber-400/70 border-b-3 border-b-amber-600
 					shadow-[0_8px_24px_rgba(120,80,20,0.35)]
 					hover:shadow-[0_14px_40px_rgba(120,80,20,0.45)]
 					hover:-translate-y-1
@@ -34,6 +35,7 @@ const About = () => {
 					group flex-1 cursor-pointer
 					rounded-2xl p-5 text-center
 					bg-gradient-to-br from-[#f7dc9c] to-[#e8b85c]
+					border-1 border-amber-400/70 border-b-3 border-b-amber-600
 					shadow-[0_8px_24px_rgba(120,80,20,0.35)]
 					hover:shadow-[0_14px_40px_rgba(120,80,20,0.45)]
 					hover:-translate-y-1

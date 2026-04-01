@@ -10,6 +10,7 @@ const Employment = () => {
 			<div
 				onClick={() => router.push('/employment')}
 				className='rounded-2xl overflow-hidden h-48 backdrop-blur-md
+				border-1 border-cyan-400/80 border-b-3 border-b-cyan-500
 				shadow-[0_10px_20px_rgba(0,0,0,0.40)]
 				hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]
 				hover:-translate-y-1
@@ -38,6 +39,7 @@ const Employment = () => {
 				onClick={() => router.push('/education')}
 				className='rounded-2xl overflow-hidden w-full h-48
 				backdrop-blur-md
+				border-1 border-amber-400/80 border-b-3 border-b-amber-500
 				shadow-[0_10px_20px_rgba(0,0,0,0.40)]
 				hover:shadow-[0_16px_40px_rgba(0,0,0,0.22)]
 				hover:-translate-y-1

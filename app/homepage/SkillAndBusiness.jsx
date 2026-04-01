@@ -11,6 +11,7 @@ const SkillAndBusiness = () => {
 				whileTap={{ scale: 0.96 }}
 				onClick={() => router.push('/kaushal-vikas')}
 				className='rounded-2xl overflow-hidden h-48 backdrop-blur-md
+				border-1 border-orange-300/90 border-b-3 border-b-orange-400
 				shadow-[0_10px_20px_rgba(0,0,0,0.40)]
 				hover:-translate-y-1
 				transition-all duration-300 ease-out relative cursor-pointer
@@ -44,6 +45,7 @@ const SkillAndBusiness = () => {
 				whileTap={{ scale: 0.96 }}
 				onClick={() => router.push('/vyapar')}
 				className='rounded-2xl overflow-hidden h-48 backdrop-blur-md
+				border-1 border-emerald-300/90 border-b-3 border-b-emerald-400
 				shadow-[0_10px_20px_rgba(0,0,0,0.40)]
 				hover:-translate-y-1
 				transition-all duration-300 ease-out relative cursor-pointer
