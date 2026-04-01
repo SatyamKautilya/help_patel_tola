@@ -3,18 +3,15 @@
 import { useEffect, useState } from 'react';
 import {
 	Users,
-	MapPin,
 	ChevronLeft,
 	BookOpen,
 	Settings2,
-	Users2,
 	LayoutDashboard,
-	CheckCircle2,
+	Lock,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import mongoose from 'mongoose';
-import { useSelector } from 'react-redux';
 
 export const MemberRole = Object.freeze({
 	PRESIDENT: 'अध्यक्ष',
@@ -22,35 +19,6 @@ export const MemberRole = Object.freeze({
 	TREASURER: 'कोषाध्यक्ष',
 	MEMBER: 'सदस्य',
 });
-
-const ROLE_CONFIG = {
-	PRESIDENT: {
-		gradient: 'from-blue-600 to-indigo-700',
-		badge: 'bg-blue-500/20 text-blue-100 border-blue-400/30',
-		dot: 'bg-blue-300',
-		icon: 'bg-blue-500/30',
-	},
-	SECRETARY: {
-		gradient: 'from-purple-600 to-violet-700',
-		badge: 'bg-purple-500/20 text-purple-100 border-purple-400/30',
-		dot: 'bg-purple-300',
-		icon: 'bg-purple-500/30',
-	},
-	TREASURER: {
-		gradient: 'from-emerald-600 to-teal-700',
-		badge: 'bg-emerald-500/20 text-emerald-100 border-emerald-400/30',
-		dot: 'bg-emerald-300',
-		icon: 'bg-emerald-500/30',
-	},
-	MEMBER: {
-		gradient: 'from-slate-700 to-indigo-800',
-		badge: 'bg-white/10 text-slate-100 border-white/20',
-		dot: 'bg-slate-300',
-		icon: 'bg-white/20',
-	},
-};
-
-const getRoleConfig = (role) => ROLE_CONFIG[role] || ROLE_CONFIG.MEMBER;
 
 export default function UserHomePage() {
 	const [shgs, setShgs] = useState([]);
@@ -128,7 +96,11 @@ export default function UserHomePage() {
 								className='flex flex-col items-center justify-center py-20 gap-4'>
 								<motion.div
 									animate={{ rotate: 360 }}
-									transition={{ duration: 1.6, repeat: Infinity, ease: 'linear' }}
+									transition={{
+										duration: 1.6,
+										repeat: Infinity,
+										ease: 'linear',
+									}}
 									className='w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full'
 								/>
 								<p className='text-slate-500 font-semibold text-sm'>
@@ -137,83 +109,92 @@ export default function UserHomePage() {
 							</motion.div>
 						) : (
 							shgs.map((shg, index) => {
-								const cfg = getRoleConfig(shg.role);
-								const isAdmin = ['PRESIDENT', 'SECRETARY', 'TREASURER'].includes(shg.role);
+								const isAdmin = [
+									'PRESIDENT',
+									'SECRETARY',
+									'TREASURER',
+								].includes(shg.role);
 
 								return (
 									<motion.div
 										key={shg.shgId}
-										initial={{ opacity: 0, y: 24 }}
+										initial={{ opacity: 0, y: 20 }}
 										animate={{ opacity: 1, y: 0 }}
-										transition={{ delay: index * 0.08, type: 'spring', stiffness: 260, damping: 20 }}
-										className='rounded-3xl overflow-hidden shadow-[0_8px_32px_-8px_rgba(0,0,0,0.14)] border border-white/60'>
-
-										{/* Banner */}
-										<div className={`relative bg-gradient-to-br ${cfg.gradient} px-5 pt-5 pb-6 overflow-hidden`}>
-											<div className='absolute -top-6 -right-6 w-28 h-28 rounded-full bg-white/5 pointer-events-none' />
-											<div className='absolute top-4 right-10 w-12 h-12 rounded-full bg-white/5 pointer-events-none' />
-
-											<div className='relative z-10 flex items-start justify-between'>
-												<div className='flex items-center gap-3'>
-													<div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${cfg.icon} shrink-0`}>
-														<Users2 className='w-6 h-6 text-white' />
-													</div>
-													<div>
-														<h2 className='text-[17px] font-black text-white leading-snug tracking-tight'>
-															{shg.name}
-														</h2>
-														<div className='flex items-center gap-1 mt-0.5'>
-															<MapPin className='w-3 h-3 text-white/60' />
-															<span className='text-[11px] font-semibold text-white/70 uppercase tracking-wider'>
-																{shg.village}
-															</span>
-														</div>
-													</div>
-												</div>
-
-												<div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-[10px] font-black uppercase tracking-wider shrink-0 ${cfg.badge}`}>
-													<div className={`w-1.5 h-1.5 rounded-full animate-pulse ${cfg.dot}`} />
-													{MemberRole[shg.role]}
-												</div>
-											</div>
-
-											<div className='relative z-10 flex items-center gap-1.5 mt-4'>
-												<CheckCircle2 className='w-3.5 h-3.5 text-emerald-300' />
-												<span className='text-[11px] font-bold text-emerald-200 tracking-wide'>
-													सक्रिय समूह
-												</span>
-											</div>
+										transition={{
+											delay: index * 0.06,
+											type: 'spring',
+											stiffness: 280,
+											damping: 24,
+										}}
+										className='rounded-[1.35rem] bg-white border border-slate-200/90 shadow-[0_4px_24px_-6px_rgba(15,23,42,0.12)] overflow-hidden'>
+										{/* Name + role */}
+										<div className='px-5 pt-5 pb-4 border-b border-slate-100'>
+											<h2 className='text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-snug break-words'>
+												{shg.name || 'समूह'}
+											</h2>
+											<p className='mt-2 text-[11px] font-bold text-slate-400 uppercase tracking-widest'>
+												{MemberRole[shg.role] || MemberRole.MEMBER}
+												{shg.village ? (
+													<span className='text-slate-300 font-semibold normal-case tracking-normal'>
+														{' '}
+														· {shg.village}
+													</span>
+												) : null}
+											</p>
 										</div>
 
-										{/* Body */}
-										<div className='bg-white px-4 pt-4 pb-5 space-y-2.5'>
-											<div className='grid grid-cols-2 gap-2.5'>
-												<motion.button
-													whileTap={{ scale: 0.95 }}
-													onClick={() => router.push(`/shg/shg-details/${shg.shgId}/dashboard`)}
-													className='flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-wider shadow-sm shadow-indigo-200 hover:shadow-indigo-300 transition-shadow'>
-													<LayoutDashboard className='w-4 h-4' />
+										{/* Three actions */}
+										<div className='p-4 grid grid-cols-3 gap-2'>
+											<motion.button
+												type='button'
+												whileTap={{ scale: 0.96 }}
+												onClick={() =>
+													router.push(`/shg/shg-details/${shg.shgId}/dashboard`)
+												}
+												className='flex flex-col items-center justify-center gap-1.5 py-3.5 px-1 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-200/60 hover:shadow-lg hover:shadow-indigo-300/50 transition-shadow'>
+												<LayoutDashboard className='w-5 h-5 shrink-0 opacity-95' />
+												<span className='text-[10px] font-black uppercase tracking-wide leading-tight text-center'>
 													डैशबोर्ड
-												</motion.button>
-												<motion.button
-													whileTap={{ scale: 0.95 }}
-													onClick={() =>
-														router.push(`/shg/shg-details/${shg.shgId}/member/${shg.memberId}/passbook`)
-													}
-													className='flex items-center justify-center gap-2 py-3 bg-slate-50 border border-slate-200 text-slate-700 rounded-2xl font-black text-[11px] uppercase tracking-wider hover:bg-slate-100 transition-colors'>
-													<BookOpen className='w-4 h-4' />
+												</span>
+											</motion.button>
+											<motion.button
+												type='button'
+												whileTap={{ scale: 0.96 }}
+												onClick={() =>
+													router.push(
+														`/shg/shg-details/${shg.shgId}/member/${shg.memberId}/passbook`,
+													)
+												}
+												className='flex flex-col items-center justify-center gap-1.5 py-3.5 px-1 rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 hover:bg-slate-100 hover:border-slate-300 transition-colors'>
+												<BookOpen className='w-5 h-5 shrink-0 text-indigo-600' />
+												<span className='text-[10px] font-black uppercase tracking-wide leading-tight text-center'>
 													पासबुक
-												</motion.button>
-											</div>
-
-											{isAdmin && (
+												</span>
+											</motion.button>
+											{isAdmin ? (
 												<motion.button
-													whileTap={{ scale: 0.97 }}
-													onClick={() => router.push(`/shg/shg-details/${shg.shgId}/manage`)}
-													className='w-full flex items-center justify-center gap-2 py-2.5 border border-dashed border-slate-300 text-slate-500 rounded-2xl font-black text-[11px] uppercase tracking-wider hover:bg-slate-50 hover:border-indigo-300 hover:text-indigo-600 transition-all'>
-													<Settings2 className='w-3.5 h-3.5' />
-													समूह संचालन
+													type='button'
+													whileTap={{ scale: 0.96 }}
+													onClick={() =>
+														router.push(`/shg/shg-details/${shg.shgId}/manage`)
+													}
+													className='flex flex-col items-center justify-center gap-1.5 py-3.5 px-1 rounded-2xl bg-white border-2 border-emerald-200 text-emerald-800 hover:bg-emerald-50 hover:border-emerald-300 transition-colors'>
+													<Settings2 className='w-5 h-5 shrink-0 text-emerald-600' />
+													<span className='text-[10px] font-black uppercase tracking-wide leading-tight text-center'>
+														संचालन
+													</span>
 												</motion.button>
+											) : (
+												<button
+													type='button'
+													disabled
+													title='केवल पदाधिकारी (अध्यक्ष / सचिव / कोषाध्यक्ष)'
+													className='flex flex-col items-center justify-center gap-1.5 py-3.5 px-1 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-slate-400 cursor-not-allowed opacity-80'>
+													<Lock className='w-5 h-5 shrink-0' />
+													<span className='text-[10px] font-black uppercase tracking-wide leading-tight text-center'>
+														संचालन
+													</span>
+												</button>
 											)}
 										</div>
 									</motion.div>
