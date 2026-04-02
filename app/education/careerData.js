@@ -5,7 +5,8 @@ export const careers = {
 		titleEn: 'Engineer',
 		emoji: '⚙️',
 		gradient: 'from-blue-600 to-cyan-400',
-		cardBg: 'from-blue-900/40 to-cyan-900/30',
+		cardBg: 'from-blue-100 via-sky-50 to-cyan-100',
+		cardBorder: 'border-blue-200/80',
 		description: 'IIT, NIT और अन्य टॉप कॉलेजों से इंजीनियरिंग करें',
 		milestones: [
 			{
@@ -258,7 +259,8 @@ export const careers = {
 		titleEn: 'Doctor',
 		emoji: '🩺',
 		gradient: 'from-emerald-600 to-teal-400',
-		cardBg: 'from-emerald-900/40 to-teal-900/30',
+		cardBg: 'from-emerald-100 via-teal-50 to-cyan-50',
+		cardBorder: 'border-emerald-200/80',
 		description: 'MBBS, MD/MS - मेडिकल क्षेत्र में करियर बनाएं',
 		milestones: [
 			{
@@ -457,7 +459,8 @@ export const careers = {
 		titleEn: 'IAS/IPS Officer',
 		emoji: '🏛️',
 		gradient: 'from-amber-600 to-yellow-400',
-		cardBg: 'from-amber-900/40 to-yellow-900/30',
+		cardBg: 'from-amber-100 via-orange-50 to-yellow-100',
+		cardBorder: 'border-amber-200/80',
 		description: 'UPSC Civil Services - देश की सबसे प्रतिष्ठित परीक्षा',
 		milestones: [
 			{
@@ -682,7 +685,8 @@ export const careers = {
 		titleEn: 'Teacher',
 		emoji: '👨‍🏫',
 		gradient: 'from-violet-600 to-purple-400',
-		cardBg: 'from-violet-900/40 to-purple-900/30',
+		cardBg: 'from-violet-100 via-purple-50 to-fuchsia-100',
+		cardBorder: 'border-violet-200/80',
 		description: 'सरकारी शिक्षक बनें - MP संविदा शाला शिक्षक',
 		milestones: [
 			{
@@ -881,7 +885,8 @@ export const careers = {
 		titleEn: 'Police',
 		emoji: '👮',
 		gradient: 'from-red-600 to-orange-400',
-		cardBg: 'from-red-900/40 to-orange-900/30',
+		cardBg: 'from-red-100 via-orange-50 to-amber-50',
+		cardBorder: 'border-red-200/80',
 		description: 'MP Police - Constable, SI, DSP बनें',
 		milestones: [
 			{
@@ -1027,7 +1032,8 @@ export const careers = {
 		titleEn: 'Bank Officer',
 		emoji: '🏦',
 		gradient: 'from-indigo-600 to-blue-400',
-		cardBg: 'from-indigo-900/40 to-blue-900/30',
+		cardBg: 'from-indigo-100 via-blue-50 to-sky-100',
+		cardBorder: 'border-indigo-200/80',
 		description: 'IBPS/SBI PO/Clerk - बैंकिंग क्षेत्र में करियर',
 		milestones: [
 			{
@@ -1173,7 +1179,8 @@ export const careers = {
 		titleEn: 'Lawyer',
 		emoji: '⚖️',
 		gradient: 'from-slate-600 to-zinc-400',
-		cardBg: 'from-slate-900/40 to-zinc-900/30',
+		cardBg: 'from-indigo-100 via-slate-50 to-violet-100',
+		cardBorder: 'border-indigo-200/80',
 		description: 'वकालत, न्यायिक सेवा, या कॉर्पोरेट लॉ में करियर',
 		milestones: [
 			{
@@ -1319,7 +1326,8 @@ export const careers = {
 		titleEn: 'Chartered Accountant',
 		emoji: '📊',
 		gradient: 'from-teal-600 to-green-400',
-		cardBg: 'from-teal-900/40 to-green-900/30',
+		cardBg: 'from-teal-100 via-emerald-50 to-green-100',
+		cardBorder: 'border-teal-200/80',
 		description: 'CA बनें - Finance और Accounting का सबसे प्रतिष्ठित career',
 		milestones: [
 			{
@@ -1491,7 +1499,8 @@ export const careers = {
 		titleEn: 'SSC - Govt Jobs',
 		emoji: '🏢',
 		gradient: 'from-rose-600 to-pink-400',
-		cardBg: 'from-rose-900/40 to-pink-900/30',
+		cardBg: 'from-rose-100 via-pink-50 to-fuchsia-100',
+		cardBorder: 'border-rose-200/80',
 		description: 'SSC CGL, CHSL, MTS - केंद्र सरकार की नौकरियां',
 		milestones: [
 			{
@@ -1664,7 +1673,8 @@ export const careers = {
 		titleEn: 'Paramilitary Forces',
 		emoji: '🪖',
 		gradient: 'from-green-700 to-emerald-500',
-		cardBg: 'from-green-900/40 to-emerald-900/30',
+		cardBg: 'from-green-100 via-emerald-50 to-teal-50',
+		cardBorder: 'border-green-200/80',
 		description: 'अर्धसैनिक बल - CRPF, BSF, CISF, ITBP, SSB में भर्ती',
 		milestones: [
 			{
@@ -1838,7 +1848,8 @@ export const careers = {
 		titleEn: 'ITI - Skilled Trades',
 		emoji: '🔧',
 		gradient: 'from-orange-600 to-amber-400',
-		cardBg: 'from-orange-900/40 to-amber-900/30',
+		cardBg: 'from-orange-100 via-amber-50 to-yellow-50',
+		cardBorder: 'border-orange-200/80',
 		description: 'इलेक्ट्रीशियन, फिटर, वेल्डर, मैकेनिक - ITI से कुशल कारीगर बनें',
 		milestones: [
 			{
@@ -2013,7 +2024,8 @@ export const careers = {
 		titleEn: 'Indian Army',
 		emoji: '🎖️',
 		gradient: 'from-yellow-700 to-lime-500',
-		cardBg: 'from-yellow-900/40 to-lime-900/30',
+		cardBg: 'from-yellow-100 via-lime-50 to-emerald-50',
+		cardBorder: 'border-lime-200/80',
 		description: 'भारतीय सेना में Soldier, JCO या Officer बनें',
 		milestones: [
 			{
@@ -2161,7 +2173,8 @@ export const careers = {
 		titleEn: 'Nursing',
 		emoji: '👩‍⚕️',
 		gradient: 'from-pink-600 to-rose-400',
-		cardBg: 'from-pink-900/40 to-rose-900/30',
+		cardBg: 'from-pink-100 via-rose-50 to-fuchsia-100',
+		cardBorder: 'border-pink-200/80',
 		description: 'ANM, GNM, B.Sc Nursing - स्वास्थ्य सेवा में करियर',
 		milestones: [
 			{
@@ -2281,7 +2294,8 @@ export const careers = {
 		titleEn: 'Polytechnic Diploma',
 		emoji: '🔩',
 		gradient: 'from-cyan-700 to-sky-400',
-		cardBg: 'from-cyan-900/40 to-sky-900/30',
+		cardBg: 'from-cyan-100 via-sky-50 to-blue-100',
+		cardBorder: 'border-cyan-200/80',
 		description: 'Polytechnic Diploma - Engineering का shortcut path',
 		milestones: [
 			{

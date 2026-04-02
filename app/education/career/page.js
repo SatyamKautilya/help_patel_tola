@@ -58,9 +58,9 @@ export default function CareerPage() {
 								onClick={() => router.push(`/education/${career.id}`)}
 								className='group relative cursor-pointer'>
 								<div
-									className='relative overflow-hidden rounded-2xl bg-white border border-slate-200/90 shadow-sm p-4 h-[152px] flex flex-col justify-between transition-all duration-300 group-active:border-slate-300 group-hover:shadow-md'>
+									className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${career.cardBg} border ${career.cardBorder ?? 'border-slate-200/90'} shadow-sm ring-1 ring-white/60 p-4 h-[152px] flex flex-col justify-between transition-all duration-300 group-active:border-slate-300/90 group-hover:shadow-md`}>
 									<div
-										className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-gradient-to-br ${career.gradient} opacity-[0.12] blur-2xl group-hover:opacity-[0.18] transition-opacity`}
+										className={`absolute -top-10 -right-10 w-28 h-28 rounded-full bg-gradient-to-br ${career.gradient} opacity-[0.22] blur-2xl group-hover:opacity-[0.32] transition-opacity`}
 									/>
 									<div className='text-3xl relative z-[1]'>{career.emoji}</div>
 									<div className='relative z-[1]'>
