@@ -34,7 +34,7 @@ export default function CollegesPage() {
 			setExpandedCollegeId(null);
 			return;
 		}
-		router.back();
+		router.push('/education');
 	};
 
 	const toggleCollege = (id) => {

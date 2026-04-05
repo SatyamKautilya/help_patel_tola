@@ -137,8 +137,10 @@ export default function RouteChangeLoader() {
 					style={{ width: `${progress}%` }}
 				/>
 			</div>
-			<div className='pointer-events-none fixed -top-20 left-1/2 -translate-x-1/2 z-[10001]'>
-				<div className='h-7 w-7 rounded-full border-2 border-indigo-500/30 border-t-indigo-600 animate-spin bg-white/75 backdrop-blur-sm shadow-sm' />
+			<div className='pointer-events-none fixed inset-0 z-[10000] flex sm:hidden flex-col items-center justify-center bg-white/30 backdrop-blur-[2px] transition-all duration-200'>
+				<div className='flex items-center justify-center rounded-2xl bg-white/90 p-4 shadow-xl ring-1 ring-slate-900/5 backdrop-blur-md'>
+					<div className='h-8 w-8 rounded-full border-[3px] border-indigo-100 border-t-indigo-600 animate-spin' />
+				</div>
 			</div>
 		</>
 	);

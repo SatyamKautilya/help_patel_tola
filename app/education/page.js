@@ -66,7 +66,7 @@ export default function EducationPage() {
 				<div className='mx-auto flex max-w-lg items-center gap-3 px-4 py-3'>
 					<button
 						type='button'
-						onClick={() => router.back()}
+						onClick={() => router.push('/')}
 						className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200/90 bg-white text-slate-700 shadow-sm transition-transform active:scale-95'>
 						<ArrowLeft size={18} />
 					</button>

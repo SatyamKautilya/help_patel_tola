@@ -39,21 +39,18 @@ export const kaushalSkills = {
 		desc: 'घरेलू वायरिंग, MCB, स्विच बोर्ड, और इलेक्ट्रिकल सेफ्टी',
 		tools: ['टेस्टर', 'प्लायर', 'ड्रिल मशीन', 'वायर स्ट्रिपर'],
 		playlists: [
-
-
-
 			{
-				title: 'इलेक्ट्रिकल प्रैक्टिकल (P8FfLMKgL_4)',
+				title: 'इलेक्ट्रिकल प्रैक्टिकल',
 				videoId: 'P8FfLMKgL_4',
 			},
-			{ title: 'Piping and Wall Cutting', listId: 'PLMXaytkNqdSPyWl_Pq90govw167VsNn2g' },
-			{ title: 'Chhat me Pipe Dalna', listId: 'PLMXaytkNqdSP9E2ZGKuOoJz3c0dG0srYM' },
-			{ title: 'House Wiring', listId: 'PLMXaytkNqdSMc3CkYDvDElqTqwADv9nTZ' },
-			{ title: 'Motor Winding', listId: 'PLMXaytkNqdSPDRTUtH44FxyUWM26k28EC' },
-			{ title: 'Pump Starter and Wiring', listId: 'PLMXaytkNqdSMvAJCFEKvlW5T2almBBYjO' },
-			{ title: 'AC Repairing', listId: 'PLMXaytkNqdSMHN94zIhGUCxAIob-ocwY6' },
-			{ title: 'Fridge Repairing', listId: 'PLMXaytkNqdSPlxtMPq7ROe8rcXViEZWhD' },
-			{ title: 'Washing Machine Repairing', listId: 'PLMXaytkNqdSO69sEMvB6JMCzv-H4kvCrz' },
+			{ title: 'पाइपिंग और वॉल कटिंग', listId: 'PLMXaytkNqdSPyWl_Pq90govw167VsNn2g' },
+			{ title: 'छत में पाइप डालना', listId: 'PLMXaytkNqdSP9E2ZGKuOoJz3c0dG0srYM' },
+			{ title: 'हाउस वायरिंग', listId: 'PLMXaytkNqdSMc3CkYDvDElqTqwADv9nTZ' },
+			{ title: 'मोटर वाइंडिंग', listId: 'PLMXaytkNqdSPDRTUtH44FxyUWM26k28EC' },
+			{ title: 'पंप स्टार्टर और वायरिंग', listId: 'PLMXaytkNqdSMvAJCFEKvlW5T2almBBYjO' },
+			{ title: 'एसी (AC) रिपेयरिंग', listId: 'PLMXaytkNqdSMHN94zIhGUCxAIob-ocwY6' },
+			{ title: 'फ्रिज रिपेयरिंग', listId: 'PLMXaytkNqdSPlxtMPq7ROe8rcXViEZWhD' },
+			{ title: 'वाशिंग मशीन रिपेयरिंग', listId: 'PLMXaytkNqdSO69sEMvB6JMCzv-H4kvCrz' },
 		],
 	},
 	plumber: {

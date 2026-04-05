@@ -14,7 +14,7 @@ export default function CareerPage() {
 				<div className='flex items-center gap-3 px-4 py-3'>
 					<button
 						type='button'
-						onClick={() => router.back()}
+						onClick={() => router.push('/education')}
 						className='w-10 h-10 rounded-full bg-slate-100 border border-slate-200/80 text-slate-700 flex items-center justify-center active:scale-90 transition-transform shadow-sm'>
 						<ArrowLeft size={18} />
 					</button>
