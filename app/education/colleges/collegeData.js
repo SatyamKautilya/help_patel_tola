@@ -5,6 +5,9 @@ import {
 	Palette,
 	Briefcase,
 	FlaskConical,
+	Sprout,
+	MonitorSmartphone,
+	HeartPulse,
 } from 'lucide-react';
 
 /** @typedef {'govt' | 'private'} CollegeOwnership */
@@ -358,21 +361,31 @@ export const collegeCategories = [
 			// ⭐ BALAGHAT (MANDATORY)
 			{
 				id: 'balaghat-poly',
-				name: 'Govt Polytechnic Balaghat',
+				name: 'Govt Polytechnic College Balaghat',
 				city: 'बालाघाट',
 				established: '1962',
 				type: 'govt',
-				description: 'डिप्लोमा इंजीनियरिंग',
-				contact: { address: 'बालाघाट' },
+				description: 'बालाघाट जिले का सबसे पुराना और प्रमुख तकनीकी संस्थान। यह सिविल, मैकेनिकल, इलेक्ट्रिकल और कंप्यूटर साइंस में डिप्लोमा पाठ्यक्रम प्रदान करता है।',
+				contact: { 
+					address: 'गोंदिया रोड, भटेरा चौकी, बालाघाट, मध्य प्रदेश 481001',
+					phone: '07632-248386',
+					email: 'prinpoly.bgt@mp.gov.in',
+					website: 'https://gpcbalaghat.ac.in/'
+				},
 			},
 			{
 				id: 'balaghat-tech',
-				name: 'Balaghat Institute of Tech',
+				name: 'Sardar Patel University / Institute',
 				city: 'बालाघाट',
-				established: '2009',
+				established: '2011',
 				type: 'private',
-				description: 'स्थानीय इंजीनियरिंग कॉलेज',
-				contact: { address: 'बालाघाट' },
+				description: 'बालाघाट क्षेत्र में इंजीनियरिंग और प्रौद्योगिकी शिक्षा का एक उभरता हुआ केंद्र। यहां बी.टेक, एम.टेक और प्रबंधन पाठ्यक्रम की सुविधा है।',
+				contact: { 
+					address: 'सरदार पटेल नॉलेज सिटी, डोंगरीपाली, बालाघाट',
+					phone: '07632-234255',
+					email: 'info@spu.edu.in',
+					website: 'https://www.spubgh.ac.in'
+				},
 			},
 
 			// ➕ EXTRA DISTRICT COVERAGE
@@ -552,6 +565,58 @@ export const collegeCategories = [
 					address: 'Bhanpur, भोपाल',
 				},
 			},
+			{
+				id: 'nscb-jabalpur',
+				name: 'Netaji Subhash Chandra Bose Medical College',
+				city: 'जबलपुर',
+				established: '1955',
+				type: 'govt',
+				description: 'महाकौशल क्षेत्र का सबसे बड़ा और प्रमुख चिकित्सा महाविद्यालय एवं अस्पताल।',
+				contact: {
+					phone: '0761-2371334',
+					address: 'Tilhari, जबलपुर',
+					website: 'http://www.nscbmc.ac.in/'
+				},
+			},
+			{
+				id: 'ssmc-rewa',
+				name: 'Shyam Shah Medical College',
+				city: 'रीवा',
+				established: '1963',
+				type: 'govt',
+				description: 'विंध्य क्षेत्र का प्रतिष्ठित सरकारी मेडिकल कॉलेज, संजय गांधी मेमोरियल अस्पताल से सम्बद्ध।',
+				contact: {
+					phone: '07662-251006',
+					address: 'Sanjay Nagar, रीवा',
+					website: 'http://ssmcrewa.com/'
+				},
+			},
+			{
+				id: 'gmc-ratlam',
+				name: 'Government Medical College Ratlam',
+				city: 'रतलाम',
+				established: '2018',
+				type: 'govt',
+				description: 'पश्चिम मध्य प्रदेश में स्थापित आधुनिक चिकित्सा शिक्षा और स्वास्थ्य सेवा संस्थान।',
+				contact: {
+					phone: '07412-280222',
+					address: 'Banjali, रतलाम',
+					website: 'http://www.gmcratlam.org/'
+				},
+			},
+			{
+				id: 'gmc-khandwa',
+				name: 'Nandkumar Singh Chouhan Govt. Medical College',
+				city: 'खंडवा',
+				established: '2018',
+				type: 'govt',
+				description: 'निमाड़ अंचल का प्रमुख चिकित्सा महाविद्यालय।',
+				contact: {
+					phone: '0733-2940222',
+					address: 'Khandwa Hoshangabad State Highway, खंडवा',
+					website: 'http://www.gmckhandwa.org/'
+				},
+			},
 		],
 	},
 	{
@@ -709,6 +774,32 @@ export const collegeCategories = [
 					address: 'कोह-ए-फिज़ा, भोपाल',
 				},
 			},
+			{
+				id: 'jst-balaghat',
+				name: 'Govt. Jata Shankar Trivedi PG College',
+				city: 'बालाघाट',
+				established: '1958',
+				type: 'govt',
+				description: 'बालाघाट जिले का मुख्य और सबसे बड़ा स्नातकोत्तर (PG) शासकीय महाविद्यालय। कला, विज्ञान और वाणिज्य संकाय में उत्कृष्ट शिक्षा।',
+				contact: {
+					address: 'जबलपुर रोड, बालाघाट, मध्य प्रदेश 481001',
+					phone: '07632-240156',
+					email: 'hegacbal@mp.gov.in',
+					website: 'http://www.govtpgcollegebalaghat.com/'
+				},
+			},
+			{
+				id: 'kamla-nehru-balaghat',
+				name: 'Kamla Nehru Mahila Mahavidyalaya',
+				city: 'बालाघाट',
+				established: '1971',
+				type: 'private',
+				description: 'बालाघाट में महिला शिक्षा को प्रोत्साहन देने वाला प्रमुख निजी महाविद्यालय। कला तथा गृह विज्ञान में विशेष पाठ्यक्रम।',
+				contact: {
+					address: 'मेन रोड, बालाघाट',
+					phone: '07632-243220'
+				},
+			},
 		],
 	},
 	{
@@ -795,6 +886,178 @@ export const collegeCategories = [
 					address: 'आयुर्वेदिक ग्राम, भोपाल',
 				},
 			},
+			{
+				id: 'ims-davv-indore',
+				name: 'Institute of Management Studies (DAVV)',
+				city: 'इंदौर',
+				established: '1969',
+				type: 'govt',
+				description: 'देवी अहिल्या विश्वविद्यालय का प्रतिष्टित प्रबंधन संस्थान।',
+				contact: {
+					address: 'Takshashila Campus, Indore',
+					website: 'http://www.ims.dauniv.ac.in/'
+				},
+			},
+			{
+				id: 'fms-bhopal',
+				name: 'Faculty of Management (Barkatullah University)',
+				city: 'भोपाल',
+				established: '1970',
+				type: 'govt',
+				description: 'बरकतुल्लाह विश्वविद्यालय का प्रबंधन संकाय।',
+				contact: {
+					address: 'Hoshangabad Road, Bhopal',
+				},
+			},
+			{
+				id: 'nmims-indore',
+				name: 'SVKM’s NMIMS',
+				city: 'इंदौर',
+				established: '2017',
+				type: 'private',
+				description: 'मुंबई स्थित प्रसिद्ध NMIMS का इंदौर कैंपस, BBA व MBA कोर्सेज के लिए मशहूर।',
+				contact: {
+					address: 'Bada Bangadda, Super Corridor, Indore',
+					website: 'https://indore.nmims.edu/'
+				},
+			},
+			{
+				id: 'symbiosis-indore',
+				name: 'Symbiosis University of Applied Sciences',
+				city: 'इंदौर',
+				established: '2016',
+				type: 'private',
+				description: 'प्रबंधन व तकनीक में कौशल आधारित शिक्षा प्रदान करने वाला पहला विश्वविद्यालय।',
+				contact: {
+					address: 'Bada Bangadda, Super Corridor, Indore',
+					website: 'https://www.suas.ac.in/'
+				},
+			},
+			{
+				id: 'jlu-bhopal',
+				name: 'Jagran Lakecity University (JLU)',
+				city: 'भोपाल',
+				established: '2013',
+				type: 'private',
+				description: 'प्रबंधन और संचार मीडिया में अग्रणी निजी विश्वविद्यालय।',
+				contact: {
+					address: 'Mugaliyachhap, Bhopal',
+					website: 'https://jlu.edu.in/'
+				},
+			},
+			{
+				id: 'bsss-bhopal',
+				name: 'BSSS (Bhopal School of Social Sciences)',
+				city: 'भोपाल',
+				established: '1972',
+				type: 'private',
+				description: 'मध्य भारत में मैनेजमेंट और सोशल साइंसेज का एक बेहद प्रतिष्ठित कॉलेज।',
+				contact: {
+					address: 'Habibganj, Bhopal',
+					website: 'https://bsssbhopal.edu.in/'
+				},
+			},
+			{
+				id: 'iper-bhopal',
+				name: 'IPER (Institute of Professional Education and Research)',
+				city: 'भोपाल',
+				established: '1996',
+				type: 'private',
+				description: 'मध्य प्रदेश का एक प्रमुख और विश्वसनीय मैनेजमेंट (MBA) कॉलेज।',
+				contact: {
+					address: 'Bhaironpur, Bhopal',
+					website: 'https://iper.ac.in/'
+				},
+			},
+			{
+				id: 'medicaps-mba-indore',
+				name: 'Faculty of Management (Medi-Caps University)',
+				city: 'इंदौर',
+				established: '2000',
+				type: 'private',
+				description: 'विभिन्न प्रबंधन (MBA/BBA) कोर्सेज के लिए जाना-माना संस्थान।',
+				contact: {
+					address: 'A.B. Road, Rau, Indore',
+				},
+			},
+			{
+				id: 'sage-indore',
+				name: 'SAGE University',
+				city: 'इंदौर / भोपाल',
+				established: '2017',
+				type: 'private',
+				description: 'तेजी से उभरता हुआ निजी विश्वविद्यालय (SAGE ग्रुप)।',
+				contact: {
+					address: 'Rau Bypass, Indore',
+					website: 'https://sageuniversity.in/'
+				},
+			},
+			{
+				id: 'prestige-gwalior',
+				name: 'Prestige Institute of Management',
+				city: 'ग्वालियर',
+				established: '1997',
+				type: 'private',
+				description: 'ग्वालियर में BBA / MBA / BCA के लिए प्रमुख विकल्प।',
+				contact: {
+					address: 'Airport Road, Gwalior',
+				},
+			},
+			{
+				id: 'itm-mba-gwalior',
+				name: 'ITM School of Business',
+				city: 'ग्वालियर',
+				established: '1997',
+				type: 'private',
+				description: 'ITM विश्वविद्यालय के अंतर्गत प्रतिष्ठित बिज़नेस स्कूल।',
+				contact: {
+					address: 'Sithouli, Gwalior',
+				},
+			},
+			{
+				id: 'gyan-ganga-jbp',
+				name: 'Gyan Ganga Institute of Tech & Science (MBA)',
+				city: 'जबलपुर',
+				established: '2003',
+				type: 'private',
+				description: 'जबलपुर क्षेत्र में तकनीक और प्रबंधन शिक्षा के लिए प्रतिष्ठित।',
+				contact: {
+					address: 'Tilhari, Jabalpur',
+				},
+			},
+			{
+				id: 'global-mba-jbp',
+				name: 'Global Nature Care (MBA)',
+				city: 'जबलपुर',
+				established: '2008',
+				type: 'private',
+				description: 'जबलपुर का एक और आधुनिक मैनेजमेंट कॉलेज।',
+				contact: {
+					address: 'Jabalpur',
+				},
+			},
+			{
+				id: 'ch-institute-indore',
+				name: 'CH Institute of Management and Commerce',
+				city: 'इंदौर',
+				established: '2006',
+				type: 'private',
+				description: 'MBA और प्रबंधन शिक्षा का जाना-माना संस्थान।',
+				contact: {
+					address: 'Indore, MP',
+				},
+			},
+			{
+				id: 'vaisnav-indore',
+				name: 'Shri Vaishnav Vidyapeeth Vishwavidyalaya',
+				city: 'इंदौर',
+				established: '2015',
+				type: 'private',
+				description: 'प्रमुख मल्टी-डिसिप्लिनरी विश्वविद्यालय जिसमें बड़ा प्रबंधन संकाय है।',
+				contact: {
+					address: 'Sanwer Road, Indore',
+				},
+			},
 		],
 	},
 	{
@@ -863,6 +1126,435 @@ export const collegeCategories = [
 				description: 'जिले का प्रमुख सरकारी विज्ञान महाविद्यालय।',
 				contact: {
 					address: 'जबलपुर',
+				},
+			},
+		],
+	},
+	{
+		id: 'agriculture',
+		name: 'कृषि (Agriculture)',
+		icon: Sprout,
+		count: '15+',
+		gradient: 'from-green-500 to-emerald-600',
+		shadow: 'shadow-green-500/25',
+		colleges: [
+			{
+				id: 'jnkvv-jabalpur',
+				name: 'Jawaharlal Nehru Krishi Vishwa Vidyalaya (JNKVV)',
+				city: 'जबलपुर',
+				established: '1964',
+				type: 'govt',
+				description: 'मध्य प्रदेश का प्रमुख और सबसे बड़ा कृषि विश्वविद्यालय।',
+				contact: {
+					phone: '0761-2681773',
+					address: 'Krishi Nagar, Adhartal, जबलपुर',
+					website: 'http://jnkvv.org/'
+				},
+			},
+			{
+				id: 'rvskvv-gwalior',
+				name: 'Rajmata Vijayaraje Scindia Krishi Vishwa Vidyalaya',
+				city: 'ग्वालियर',
+				established: '2008',
+				type: 'govt',
+				description: 'उत्तरी मध्य प्रदेश के लिए उच्च कृषि शिक्षा और अनुसंधान का महत्वपूर्ण केंद्र।',
+				contact: {
+					phone: '0751-2467673',
+					address: 'Race Course Road, ग्वालियर',
+					website: 'http://www.rvskvv.net/'
+				},
+			},
+			{
+				id: 'agri-college-indore',
+				name: 'College of Agriculture',
+				city: 'इंदौर',
+				established: '1959',
+				type: 'govt',
+				description: 'मालवा क्षेत्र का प्रमुख कृषि महाविद्यालय, RVSKVV के अंतर्गत।',
+				contact: {
+					phone: '0731-2701505',
+					address: 'Indore, मध्य प्रदेश',
+				},
+			},
+			{
+				id: 'agri-college-balaghat',
+				name: 'College of Agriculture, Balaghat',
+				city: 'बालाघाट',
+				established: '2012',
+				type: 'govt',
+				description: 'JNKVV के अंतर्गत स्थापित एक महत्वपूर्ण कृषि महाविद्यालय, जो इस धान उत्पादक क्षेत्र के लिए विशेष उपयोगी है।',
+				contact: {
+					address: 'Murjhad Farm, Waraseoni Road, बालाघाट',
+					website: 'http://jnkvv.org/'
+				},
+			},
+			{
+				id: 'itm-agri-gwalior',
+				name: 'School of Agriculture (ITM University)',
+				city: 'ग्वालियर',
+				established: '2013',
+				type: 'private',
+				description: 'ITM विश्वविद्यालय के अंतर्गत कार्यरत प्रतिष्ठित कृषि विज्ञान संस्थान।',
+				contact: {
+					phone: '0751-2440057',
+					address: 'Turari, NH-44 Bypass, ग्वालियर',
+					website: 'https://itmuniversity.ac.in/'
+				},
+			},
+			{
+				id: 'rkdf-agri-bhopal',
+				name: 'Faculty of Agriculture (RKDF University)',
+				city: 'भोपाल',
+				established: '2011',
+				type: 'private',
+				description: 'निजी क्षेत्र में कृषि शिक्षा (B.Sc Ag.) प्रदान करने वाला प्रमुख विश्वविद्यालय संकाय।',
+				contact: {
+					phone: '0755-2740304',
+					address: 'Airport Bypass Road, Gandhi Nagar, भोपाल',
+					website: 'https://rkdf.ac.in/'
+				},
+			},
+			{
+				id: 'aks-agri-satna',
+				name: 'Faculty of Agriculture (AKS University)',
+				city: 'सतना',
+				established: '2011',
+				type: 'private',
+				description: 'विंध्य क्षेत्र में निजी कृषि शिक्षा (B.Sc / M.Sc Agriculture) का प्रमुख केंद्र।',
+				contact: {
+					phone: '09893540003',
+					address: 'Sherganj, सतना',
+					website: 'https://aksuniversity.ac.in/'
+				},
+			},
+			{
+				id: 'agri-college-sagar',
+				name: 'College of Agriculture, Sagar',
+				city: 'सागर',
+				established: '2018',
+				type: 'govt',
+				description: 'बुंदेलखंड क्षेत्र में कृषि शिक्षा और अनुसंधान को बढ़ावा देने हेतु स्थापित (JNKVV के अंतर्गत) महत्वपूर्ण महाविद्यालय।',
+				contact: {
+					address: 'Khurai Road, सागर',
+					website: 'http://jnkvv.org/'
+				},
+			},
+		],
+	},
+	{
+		id: 'mca_bca',
+		name: 'कंप्यूटर एप्लीकेशन (MCA/BCA)',
+		icon: MonitorSmartphone,
+		count: '25+',
+		gradient: 'from-blue-500 to-indigo-600',
+		shadow: 'shadow-blue-500/25',
+		colleges: [
+			{
+				id: 'manit-mca-bhopal',
+				name: 'MANIT Bhopal',
+				city: 'भोपाल',
+				established: '1960',
+				type: 'govt',
+				description: 'NIT में चलने वाला राष्ट्रीय स्तर का MCA प्रोग्राम।',
+				contact: {
+					address: 'भोपाल',
+					website: 'http://www.manit.ac.in/'
+				},
+			},
+			{
+				id: 'sgsits-mca-indore',
+				name: 'SGSITS (MCA Dept)',
+				city: 'इंदौर',
+				established: '1956',
+				type: 'govt',
+				description: 'प्रदेश के सबसे प्रमुख सरकारी इंजीनियरिंग कॉलेज का कम्प्यूटर एप्लीकेशन विभाग।',
+				contact: {
+					address: 'इंदौर',
+					website: 'http://www.sgsits.ac.in/'
+				},
+			},
+			{
+				id: 'scsit-davv-indore',
+				name: 'SCSIT & IIPS (DAVV)',
+				city: 'इंदौर',
+				established: '1986',
+				type: 'govt',
+				description: 'देवी अहिल्या विश्वविद्यालय का स्कूल ऑफ कंप्यूटर साइंस एंड आईटी — MCA और BCA के लिए प्रतिष्ठित।',
+				contact: {
+					address: 'Khandwa Road Campus, इंदौर',
+					website: 'http://www.scs.dauniv.ac.in/'
+				},
+			},
+			{
+				id: 'mits-mca-gwalior',
+				name: 'MITS Gwalior (MCA)',
+				city: 'ग्वालियर',
+				established: '1957',
+				type: 'govt',
+				description: 'माधव इंस्टीट्यूट ऑफ टेक्नोलॉजी एंड साइंस का प्रतिष्ठित MCA विभाग।',
+				contact: {
+					address: 'Gola Ka Mandir, ग्वालियर',
+					website: 'http://mitsgwalior.in/'
+				},
+			},
+			{
+				id: 'lnct-mca-bhopal',
+				name: 'LNCT Group (MCA)',
+				city: 'भोपाल',
+				established: '1994',
+				type: 'private',
+				description: 'भोपाल के सबसे बड़े निजी तकनीकी कॉलेज का MCA संकाय।',
+				contact: {
+					address: 'Kalchuri Nagar, भोपाल',
+					website: 'https://lnct.ac.in/'
+				},
+			},
+			{
+				id: 'prestige-bca-indore',
+				name: 'Prestige Institute of Management & Research (UG Campus)',
+				city: 'इंदौर',
+				established: '1994',
+				type: 'private',
+				description: 'इंदौर में BBA और BCA के लिए अत्यधिक लोकप्रिय निजी संस्थान।',
+				contact: {
+					address: 'Vijay Nagar, इंदौर',
+					website: 'https://www.pimrindore.ac.in/'
+				},
+			},
+			{
+				id: 'bsss-bca-bhopal',
+				name: 'BSSS College (BCA)',
+				city: 'भोपाल',
+				established: '1972',
+				type: 'private',
+				description: 'भोपाल में कंप्यूटर एप्लीकेशन और आर्ट्स/कॉमर्स का प्रसिद्ध निजी कॉलेज।',
+				contact: {
+					address: 'Habibganj, भोपाल',
+					website: 'https://bsssbhopal.edu.in/'
+				},
+			},
+			{
+				id: 'acropolis-mca-indore',
+				name: 'Acropolis Institute (MCA/BCA)',
+				city: 'इंदौर',
+				established: '2005',
+				type: 'private',
+				description: 'कंप्यूटर साइंस और आईटी में आधुनिक शिक्षा प्रदान करने वाला निजी संस्थान।',
+				contact: {
+					address: 'Bypass Road, Manglia, इंदौर',
+					website: 'https://acropolis.in/'
+				},
+			},
+			{
+				id: 'st-aloysius-jbp',
+				name: 'St. Aloysius College (BCA)',
+				city: 'जबलपुर',
+				established: '1951',
+				type: 'private',
+				description: 'जबलपुर का अत्यंत प्रतिष्ठित और पुराना कॉलेज जो BCA व अन्य कोर्सेज लिए प्रसिद्ध है।',
+				contact: {
+					address: 'Cantonment, जबलपुर',
+					website: 'http://www.staloysiuscollege.ac.in/'
+				},
+			},
+			{
+				id: 'mata-gujri-jbp',
+				name: 'Mata Gujri Mahila Mahavidyalaya (BCA)',
+				city: 'जबलपुर',
+				established: '1994',
+				type: 'private',
+				description: 'महिलाओं हेतु जबलपुर में कंप्यूटर एप्लीकेशन (BCA) का श्रेष्ठ निजी महाविद्यालय।',
+				contact: {
+					address: 'Marhatal, जबलपुर',
+					website: 'http://matagujricollege.edu.in/'
+				},
+			},
+			{
+				id: 'srit-mca-jbp',
+				name: 'Shri Ram Institute of Technology (MCA)',
+				city: 'जबलपुर',
+				established: '2001',
+				type: 'private',
+				description: 'जबलपुर में इंजीनियरिंग के साथ MCA का प्रतिष्ठित तकनीकी संस्थान समूह।',
+				contact: {
+					address: 'Madhotāl, जबलपुर',
+					website: 'http://sritgroup.net/'
+				},
+			},
+		],
+	},
+	{
+		id: 'nursing',
+		name: 'नर्सिंग कॉलेज (Nursing)',
+		icon: HeartPulse,
+		count: '15',
+		gradient: 'from-pink-500 to-rose-600',
+		shadow: 'shadow-pink-500/25',
+		colleges: [
+			{
+				id: 'govt-nursing-indore',
+				name: 'Government College of Nursing, Indore',
+				city: 'इंदौर',
+				established: '1960',
+				type: 'govt',
+				description: 'प्रदेश का सबसे पुराना और प्रतिष्ठित सरकारी नर्सिंग कॉलेज, MY अस्पताल से सम्बद्ध।',
+				contact: {
+					address: 'M.Y. Hospital Campus, Indore',
+				},
+			},
+			{
+				id: 'govt-nursing-bhopal',
+				name: 'Government College of Nursing, Bhopal',
+				city: 'भोपाल',
+				established: '2006',
+				type: 'govt',
+				description: 'हमीदिया अस्पताल (गांधी मेडिकल कॉलेज) से सम्बद्ध प्रमुख नर्सिंग संस्थान।',
+				contact: {
+					address: 'Sultania Zanana Hospital Campus, Bhopal',
+				},
+			},
+			{
+				id: 'govt-nursing-jbp',
+				name: 'Government College of Nursing, Jabalpur',
+				city: 'जबलपुर',
+				established: '2007',
+				type: 'govt',
+				description: 'NSCB मेडिकल कॉलेज के अंतर्गत संचालित सरकारी नर्सिंग कॉलेज।',
+				contact: {
+					address: 'Medical College Campus, Jabalpur',
+				},
+			},
+			{
+				id: 'govt-nursing-gwl',
+				name: 'Government College of Nursing, Gwalior',
+				city: 'ग्वालियर',
+				established: '2007',
+				type: 'govt',
+				description: 'JAH अस्पताल और GR मेडिकल कॉलेज परिसर में स्थित नर्सिंग कॉलेज।',
+				contact: {
+					address: 'JAH Campus, Gwalior',
+				},
+			},
+			{
+				id: 'govt-nursing-rewa',
+				name: 'Government College of Nursing, Rewa',
+				city: 'रीवा',
+				established: '2007',
+				type: 'govt',
+				description: 'संजय गांधी मेमोरियल अस्पताल और SSMC रीवा से सम्बद्ध।',
+				contact: {
+					address: 'Sanjay Gandhi Hospital Campus, Rewa',
+				},
+			},
+			{
+				id: 'aurobindo-nursing-indore',
+				name: 'Sri Aurobindo Institute of Nursing',
+				city: 'इंदौर',
+				established: '2003',
+				type: 'private',
+				description: 'SAIMS अस्पताल से सम्बद्ध इंदौर का अत्यंत उच्च स्तरीय निजी नर्सिंग कॉलेज।',
+				contact: {
+					address: 'Sanwer Road, Indore',
+				},
+			},
+			{
+				id: 'choithram-nursing-indore',
+				name: 'Choithram College of Nursing',
+				city: 'इंदौर',
+				established: '1996',
+				type: 'private',
+				description: 'अपनी बेहतरीन सुविधाओं और क्लिनिकल प्रैक्टिस के लिए चर्चित निजी संस्थान।',
+				contact: {
+					address: 'Manik Bagh Road, Indore',
+					website: 'https://www.choithramnursing.com/'
+				},
+			},
+			{
+				id: 'rd-memorial-bhopal',
+				name: 'R.D. Memorial College of Nursing',
+				city: 'भोपाल',
+				established: '2001',
+				type: 'private',
+				description: 'भोपाल में स्थापित सबसे पुराने और सम्मानित निजी नर्सिंग कॉलेजों में से एक।',
+				contact: {
+					address: 'Barkhedi Kalan, Bhopal',
+				},
+			},
+			{
+				id: 'chirayu-nursing-bhopal',
+				name: 'Chirayu College of Nursing',
+				city: 'भोपाल',
+				established: '2012',
+				type: 'private',
+				description: 'चिरायु मेडिकल कॉलेज एवं अस्पताल से सम्बद्ध आधुनिक नर्सिंग संस्थान।',
+				contact: {
+					address: 'Bhaisakhedi, Bhopal-Indore Highway',
+				},
+			},
+			{
+				id: 'ln-nursing-bhopal',
+				name: 'L.N. Nursing College',
+				city: 'भोपाल',
+				established: '2015',
+				type: 'private',
+				description: 'एलएनसीटी विश्वविद्यालय समूह के अंतर्गत प्रमुख नर्सिंग संस्थान।',
+				contact: {
+					address: 'Kolar Road / LNCT Campus, Bhopal',
+				},
+			},
+			{
+				id: 'bimr-nursing-gwl',
+				name: 'B.I.M.R. Nursing College',
+				city: 'ग्वालियर',
+				established: '2004',
+				type: 'private',
+				description: 'बिरला इंस्टिट्यूट ऑफ़ मेडिकल रिसर्च (BIMR) अस्पताल से सम्बद्ध गुणवत्तापूर्ण शिक्षा।',
+				contact: {
+					address: 'Surya Mandir Road, Gwalior',
+				},
+			},
+			{
+				id: 'pragyan-nursing-bhopal',
+				name: 'Pragyan College of Nursing',
+				city: 'भोपाल',
+				established: '2002',
+				type: 'private',
+				description: 'नर्सिंग के क्षेत्र में विभिन्न (B.Sc, M.Sc, GNM) कोर्स प्रदान करने वाला प्रसिद्ध कॉलेज।',
+				contact: {
+					address: 'Khajuri Kalan, Bhopal',
+				},
+			},
+			{
+				id: 'index-nursing-indore',
+				name: 'Index Nursing College',
+				city: 'इंदौर',
+				established: '2007',
+				type: 'private',
+				description: 'इंडेक्स मेडिकल कॉलेज और अस्पताल (मालवांचल विश्वविद्यालय) से सम्बद्ध बड़ा परिसर।',
+				contact: {
+					address: 'Nemawar Road, Indore',
+				},
+			},
+			{
+				id: 'bombay-hospital-nursing',
+				name: 'Bombay Hospital College of Nursing',
+				city: 'इंदौर',
+				established: '2009',
+				type: 'private',
+				description: 'प्रतिष्ठित बॉम्बे हॉस्पिटल द्वारा संचालित उच्च गुणवत्ता वाला नर्सिंग कॉलेज।',
+				contact: {
+					address: 'Ring Road, Indore',
+				},
+			},
+			{
+				id: 'jabalpur-institute-nursing',
+				name: 'Jabalpur Institute of Nursing Sciences',
+				city: 'जबलपुर',
+				established: '2001',
+				type: 'private',
+				description: 'जबलपुर में स्वास्थ्य शिक्षा के लिए एक प्रमुख निजी संस्थान।',
+				contact: {
+					address: 'Wright Town, Jabalpur',
 				},
 			},
 		],

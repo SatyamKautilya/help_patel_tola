@@ -130,33 +130,20 @@ export default function SkillHubClient({ skillId }) {
 						</Link>
 					</motion.div>
 
-					<motion.div
-						initial={{ opacity: 0, y: 12 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: 0.1 }}>
-						<Link
-							href={`${base}/materials`}
-							className={`group flex items-center gap-4 overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-4 shadow-md shadow-slate-900/[0.05] ring-1 ring-white/90 transition-all hover:border-slate-300 hover:shadow-lg`}>
-							<span
-								className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${skill.gradient} text-white shadow-lg ring-2 ring-white/50`}>
-								<ClipboardList className='h-7 w-7' strokeWidth={2} />
-							</span>
-							<div className='min-w-0 flex-1'>
-								<h2 className='text-base font-bold text-slate-900'>
-									उपकरण व सामग्री
-								</h2>
-								<p className='text-[11px] font-medium text-slate-500'>
-									Equipments &amp; materials · {nTools} आइटम
-								</p>
-							</div>
-							<ChevronRight className='h-5 w-5 shrink-0 text-slate-300 transition-colors group-hover:text-slate-600' />
-						</Link>
-					</motion.div>
 				</div>
 
-				<p className='mt-10 text-center text-[11px] leading-relaxed text-slate-400'>
-					कार्ड पर टैप करके अंदर का पेज खोलें।
-				</p>
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ delay: 0.15 }}
+					className='mt-8 rounded-xl border border-dashed border-slate-300 bg-slate-50/50 p-4 text-center'>
+					<p className='text-sm font-bold text-slate-600'>
+						अन्य जानकारी शीघ्र जोड़ी जाएगी
+					</p>
+					<p className='mt-1 text-[11px] font-medium text-slate-400'>
+						Other information will be added soon
+					</p>
+				</motion.div>
 			</main>
 		</div>
 	);

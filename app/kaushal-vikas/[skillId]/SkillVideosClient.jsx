@@ -7,6 +7,8 @@ import {
 	kaushalSkills,
 	getPlaylistUrl,
 	getPlaylistEmbedUrl,
+	getVideoUrl,
+	getVideoEmbedUrl,
 } from '../kaushalData';
 
 export default function SkillVideosClient({ skillId }) {
@@ -28,7 +30,7 @@ export default function SkillVideosClient({ skillId }) {
 		);
 	}
 
-	const playlists = skill.playlists ?? [];
+	const items = skill.playlists ?? [];
 	const hub = `/kaushal-vikas/${skill.id}`;
 
 	return (
@@ -68,53 +70,60 @@ export default function SkillVideosClient({ skillId }) {
 
 			<main className='relative mx-auto max-w-lg px-4 pb-8 pt-5'>
 				<div className='flex flex-col gap-6'>
-					{playlists.length === 0 ? (
+					{items.length === 0 ? (
 						<p className='text-center text-sm text-slate-500'>
-							प्लेलिस्ट जल्द जोड़ी जाएगी।
+							वीडियो जल्द जोड़े जाएंगे।
 						</p>
 					) : (
-						playlists.map((pl, i) => (
-							<motion.section
-								key={`${pl.listId}-${i}`}
-								initial={{ opacity: 0, y: 14 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ delay: 0.05 * i }}
-								className='overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-md shadow-slate-900/[0.05] ring-1 ring-white/90'>
-								<div className='border-b border-slate-100 bg-slate-50/80 px-4 py-3'>
-									<p className='text-[10px] font-semibold text-slate-400'>
-										प्लेलिस्ट {i + 1}
-									</p>
-									<h2 className='text-[15px] font-bold leading-snug text-slate-900'>
-										{pl.title}
-									</h2>
-									{pl.listId ? (
-										<a
-											href={getPlaylistUrl(pl.listId)}
-											target='_blank'
-											rel='noopener noreferrer'
-											className='mt-2 inline-flex w-fit items-center gap-1.5 text-[12px] font-semibold text-red-600 hover:text-red-700'>
-											YouTube पर खोलें
-											<ExternalLink className='h-3.5 w-3.5' />
-										</a>
-									) : null}
-								</div>
-								{pl.listId ? (
-									<div className='aspect-video w-full bg-black'>
-										<iframe
-											title={pl.title}
-											src={getPlaylistEmbedUrl(pl.listId)}
-											className='h-full w-full'
-											allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
-											allowFullScreen
-										/>
+						items.map((item, i) => {
+							const isPlaylist = !!item.listId;
+							const hasMedia = !!item.listId || !!item.videoId;
+							const url = isPlaylist ? getPlaylistUrl(item.listId) : (item.videoId ? getVideoUrl(item.videoId) : '#');
+							const embedUrl = isPlaylist ? getPlaylistEmbedUrl(item.listId) : (item.videoId ? getVideoEmbedUrl(item.videoId) : '#');
+
+							return (
+								<motion.section
+									key={`${item.listId || item.videoId}-${i}`}
+									initial={{ opacity: 0, y: 14 }}
+									animate={{ opacity: 1, y: 0 }}
+									transition={{ delay: 0.05 * i }}
+									className='overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-md shadow-slate-900/[0.05] ring-1 ring-white/90'>
+									<div className='border-b border-slate-100 bg-slate-50/80 px-4 py-3'>
+										<p className='text-[10px] font-semibold text-slate-400'>
+											{isPlaylist ? 'प्लेलिस्ट' : 'वीडियो'} {i + 1}
+										</p>
+										<h2 className='text-[15px] font-bold leading-snug text-slate-900'>
+											{item.title}
+										</h2>
+										{hasMedia ? (
+											<a
+												href={url}
+												target='_blank'
+												rel='noopener noreferrer'
+												className='mt-2 inline-flex w-fit items-center gap-1.5 text-[12px] font-semibold text-red-600 hover:text-red-700'>
+												YouTube पर खोलें
+												<ExternalLink className='h-3.5 w-3.5' />
+											</a>
+										) : null}
 									</div>
-								) : (
-									<div className='bg-slate-100 px-4 py-6 text-center text-sm text-slate-600'>
-										प्लेलिस्ट ID जोड़ें (kaushalData.js)
-									</div>
-								)}
-							</motion.section>
-						))
+									{hasMedia ? (
+										<div className='aspect-video w-full bg-black'>
+											<iframe
+												title={item.title}
+												src={embedUrl}
+												className='h-full w-full'
+												allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+												allowFullScreen
+											/>
+										</div>
+									) : (
+										<div className='bg-slate-100 px-4 py-6 text-center text-sm text-slate-600'>
+											URL ID जोड़ें (kaushalData.js)
+										</div>
+									)}
+								</motion.section>
+							);
+						})
 					)}
 				</div>
 

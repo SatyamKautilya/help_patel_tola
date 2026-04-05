@@ -40,6 +40,7 @@ const sections = [
 		description: 'NEET, JEE, CUET जैसी परीक्षाओं की जानकारी',
 		icon: BookOpenCheck,
 		href: '/education/entrance-exams',
+		upcoming: true,
 		gradient: 'from-amber-500 to-orange-600',
 		cardBg: 'from-amber-50/90 via-white to-orange-50/70',
 		cardBorder: 'border-amber-200/75',
@@ -127,6 +128,7 @@ export default function EducationPage() {
 							<motion.button
 								type='button'
 								key={section.href}
+								disabled={section.upcoming}
 								initial={{ opacity: 0, y: 22 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{
@@ -135,9 +137,15 @@ export default function EducationPage() {
 									stiffness: 280,
 									damping: 24,
 								}}
-								whileTap={{ scale: 0.985 }}
-								onClick={() => router.push(section.href)}
-								className={`group relative w-full overflow-hidden rounded-2xl border bg-gradient-to-br ${section.cardBg} ${section.cardBorder} p-4 text-left shadow-md shadow-slate-900/[0.04] ring-1 ring-white/70 transition-all duration-300 hover:shadow-lg hover:shadow-slate-900/[0.07]`}>
+								whileTap={!section.upcoming ? { scale: 0.985 } : undefined}
+								onClick={() => {
+									if (!section.upcoming) router.push(section.href);
+								}}
+								className={`group relative w-full overflow-hidden rounded-2xl border bg-gradient-to-br ${section.cardBg} ${section.cardBorder} p-4 text-left ring-1 ring-white/70 transition-all duration-300 ${
+									section.upcoming 
+										? 'opacity-70 grayscale-[0.25] cursor-not-allowed shadow-sm shadow-slate-900/[0.02]' 
+										: 'hover:shadow-lg hover:shadow-slate-900/[0.07] shadow-md shadow-slate-900/[0.04]'
+								}`}>
 								<div
 									className={`pointer-events-none absolute -right-6 -top-8 h-28 w-28 rounded-full bg-gradient-to-br ${section.glow} blur-2xl transition-opacity duration-300 group-hover:opacity-100`}
 								/>
@@ -169,11 +177,17 @@ export default function EducationPage() {
 											{section.description}
 										</p>
 									</div>
-									<div className='flex shrink-0 flex-col items-center justify-center self-center'>
-										<span
-											className={`flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/90 bg-white/90 text-slate-400 shadow-sm transition-all duration-300 group-hover:border-slate-300 group-hover:text-slate-700`}>
-											<ChevronRight className='h-5 w-5' />
-										</span>
+									<div className='flex shrink-0 flex-col items-center justify-center self-center pl-2'>
+										{section.upcoming ? (
+											<span className='inline-flex items-center rounded-lg border border-slate-200/90 bg-white/80 px-2.5 py-1 text-[10px] font-bold tracking-tight text-slate-500 shadow-sm'>
+												Coming Soon
+											</span>
+										) : (
+											<span
+												className={`flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/90 bg-white/90 text-slate-400 shadow-sm transition-all duration-300 group-hover:border-slate-300 group-hover:text-slate-700`}>
+												<ChevronRight className='h-5 w-5' />
+											</span>
+										)}
 									</div>
 								</div>
 							</motion.button>

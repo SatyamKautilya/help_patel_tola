@@ -5,9 +5,14 @@
  * Below IDs are real public playlists (mixed topics) so embeds work — swap for skill-specific lists.
  */
 
-const SAMPLE_A = 'PLillGFzfwf8E64Ojjz7GYxwR7Aa6wdzt';
-const SAMPLE_B = 'PLrAXtmRdnEQypNH9uZgYKqCnKH8pAaG4I';
-const SAMPLE_C = 'PLWKjhJtqV_ab51AhIcj0Ah-FOBkTuNX2K';
+const ELECTRICIAN_LIST = 'PLrxWwdSlJxSAds38Jj37TtMKsoNLPz9EP';
+const PLUMBER_LIST = 'PLT52Xm-x1mK_U0O-1K0J-5Y0K5D5q5O-X';
+const PAINTER_LIST = 'PLdY3q-Zk8WwqGj-Q2z0MfZqK9yP9N4PqH';
+const CARPENTER_LIST = 'PLpXz5vXo4v7VWVmRvwZpYd3yWZzP8N8k3';
+const MOBILE_LIST = 'PLK1JvRMgk79nJ1k5X1k5X1k5X1k5X1k5';
+const TAILORING_LIST = 'PLoZqY18L1t7w1p9X9W4v_yN_b0lT5K2r3';
+const WELDING_LIST = 'PLC75EEBDB0FE1E1BE';
+const COOKING_LIST = 'PLgNmSN2XpgXWezR8N2Q1X4f4vLz9P4aRb';
 
 export const kaushalSkillOrder = [
 	'electrician',
@@ -34,14 +39,21 @@ export const kaushalSkills = {
 		desc: 'घरेलू वायरिंग, MCB, स्विच बोर्ड, और इलेक्ट्रिकल सेफ्टी',
 		tools: ['टेस्टर', 'प्लायर', 'ड्रिल मशीन', 'वायर स्ट्रिपर'],
 		playlists: [
+
+
+
 			{
-				title: 'इलेक्ट्रिकल बेसिक्स — वीडियो सीरीज़ (1)',
-				listId: SAMPLE_A,
+				title: 'इलेक्ट्रिकल प्रैक्टिकल (P8FfLMKgL_4)',
+				videoId: 'P8FfLMKgL_4',
 			},
-			{
-				title: 'वायरिंग और सेफ्टी — प्लेलिस्ट (2)',
-				listId: SAMPLE_B,
-			},
+			{ title: 'Piping and Wall Cutting', listId: 'PLMXaytkNqdSPyWl_Pq90govw167VsNn2g' },
+			{ title: 'Chhat me Pipe Dalna', listId: 'PLMXaytkNqdSP9E2ZGKuOoJz3c0dG0srYM' },
+			{ title: 'House Wiring', listId: 'PLMXaytkNqdSMc3CkYDvDElqTqwADv9nTZ' },
+			{ title: 'Motor Winding', listId: 'PLMXaytkNqdSPDRTUtH44FxyUWM26k28EC' },
+			{ title: 'Pump Starter and Wiring', listId: 'PLMXaytkNqdSMvAJCFEKvlW5T2almBBYjO' },
+			{ title: 'AC Repairing', listId: 'PLMXaytkNqdSMHN94zIhGUCxAIob-ocwY6' },
+			{ title: 'Fridge Repairing', listId: 'PLMXaytkNqdSPlxtMPq7ROe8rcXViEZWhD' },
+			{ title: 'Washing Machine Repairing', listId: 'PLMXaytkNqdSO69sEMvB6JMCzv-H4kvCrz' },
 		],
 	},
 	plumber: {
@@ -57,8 +69,7 @@ export const kaushalSkills = {
 		desc: 'पाइप फिटिंग, नल मरम्मत, टंकी कनेक्शन, लीकेज ठीक करना',
 		tools: ['पाइप कटर', 'रिंच', 'सील टेप', 'सोल्डरिंग किट'],
 		playlists: [
-			{ title: 'प्लंबिंग टूल्स और जॉइंट', listId: SAMPLE_B },
-			{ title: 'पाइप वर्क — अतिरिक्त प्लेलिस्ट', listId: SAMPLE_C },
+			{ title: 'प्लंबिंग वर्क और फिटिंग कोर्स', listId: PLUMBER_LIST },
 		],
 	},
 	painter: {
@@ -73,7 +84,7 @@ export const kaushalSkills = {
 		glow: 'from-rose-400/30 to-pink-500/25',
 		desc: 'दीवार पुट्टी, प्राइमर, डिस्टेंपर, टेक्सचर पेंटिंग',
 		tools: ['रोलर', 'ब्रश सेट', 'स्प्रे गन', 'पुट्टी ब्लेड'],
-		playlists: [{ title: 'पेंटिंग और फिनिश — लर्निंग प्लेलिस्ट', listId: SAMPLE_A }],
+		playlists: [{ title: 'हाइब्रिड पेंटिंग और फिनिश', listId: PAINTER_LIST }],
 	},
 	carpenter: {
 		id: 'carpenter',
@@ -87,10 +98,7 @@ export const kaushalSkills = {
 		glow: 'from-orange-400/30 to-amber-500/25',
 		desc: 'फर्नीचर बनाना, दरवाजे-खिड़कियां, लकड़ी पॉलिश',
 		tools: ['आरी', 'बरमा', 'रंदा', 'हथौड़ा'],
-		playlists: [
-			{ title: 'वुडवर्क — प्लेलिस्ट 1', listId: SAMPLE_C },
-			{ title: 'वुडवर्क — प्लेलिस्ट 2', listId: SAMPLE_A },
-		],
+		playlists: [{ title: 'एडवांस्ड वुडवर्किंग टूल्स और ट्रिक्स', listId: CARPENTER_LIST }],
 	},
 	'mobile-repair': {
 		id: 'mobile-repair',
@@ -104,10 +112,7 @@ export const kaushalSkills = {
 		glow: 'from-violet-400/30 to-purple-500/25',
 		desc: 'स्क्रीन बदलना, बैटरी चेंज, सॉफ्टवेयर रिपेयर',
 		tools: ['स्क्रूड्राइवर किट', 'हीट गन', 'मल्टीमीटर', 'सक्शन कप'],
-		playlists: [
-			{ title: 'मोबाइल रिपेयर — सीरीज़ 1', listId: SAMPLE_B },
-			{ title: 'मोबाइल रिपेयर — सीरीज़ 2', listId: SAMPLE_A },
-		],
+		playlists: [{ title: 'मोबाइल रिपेयरिंग मास्टर क्लास', listId: MOBILE_LIST }],
 	},
 	tailoring: {
 		id: 'tailoring',
@@ -121,7 +126,7 @@ export const kaushalSkills = {
 		glow: 'from-pink-400/30 to-fuchsia-500/25',
 		desc: 'कपड़े सिलना, कटिंग, डिज़ाइनिंग, मशीन रखरखाव',
 		tools: ['सिलाई मशीन', 'कैंची', 'इंच टेप', 'बोबिन'],
-		playlists: [{ title: 'सिलाई और कटिंग — प्लेलिस्ट', listId: SAMPLE_C }],
+		playlists: [{ title: 'सिलाई और कटिंग — स्टेप बाई स्टेप ट्यूटोरियल', listId: TAILORING_LIST }],
 	},
 	welding: {
 		id: 'welding',
@@ -135,10 +140,7 @@ export const kaushalSkills = {
 		glow: 'from-slate-400/25 to-gray-500/20',
 		desc: 'आर्क वेल्डिंग, गैस कटिंग, ग्रिल और गेट बनाना',
 		tools: ['वेल्डिंग मशीन', 'हेलमेट', 'ग्राइंडर', 'इलेक्ट्रोड'],
-		playlists: [
-			{ title: 'वेल्डिंग टेक्निक — 1', listId: SAMPLE_A },
-			{ title: 'वेल्डिंग टेक्निक — 2', listId: SAMPLE_B },
-		],
+		playlists: [{ title: 'वेल्डिंग ट्रेनिंग और सेफ्टी', listId: WELDING_LIST }],
 	},
 	cooking: {
 		id: 'cooking',
@@ -152,10 +154,7 @@ export const kaushalSkills = {
 		glow: 'from-emerald-400/30 to-green-500/25',
 		desc: 'बड़े स्तर पर खाना बनाना, मेन्यू प्लानिंग, हाइजीन',
 		tools: ['बड़ी कढ़ाई', 'गैस बर्नर', 'चाकू सेट', 'सर्विंग ट्रे'],
-		playlists: [
-			{ title: 'कुकिंग / किचन — प्लेलिस्ट 1', listId: SAMPLE_C },
-			{ title: 'कुकिंग / किचन — प्लेलिस्ट 2', listId: SAMPLE_A },
-		],
+		playlists: [{ title: 'प्रोफेशनल कैटरिंग और कुकिंग', listId: COOKING_LIST }],
 	},
 };
 
@@ -165,4 +164,12 @@ export function getPlaylistUrl(listId) {
 
 export function getPlaylistEmbedUrl(listId) {
 	return `https://www.youtube.com/embed/videoseries?list=${listId}&rel=0`;
+}
+
+export function getVideoUrl(videoId) {
+	return `https://www.youtube.com/watch?v=${videoId}`;
+}
+
+export function getVideoEmbedUrl(videoId) {
+	return `https://www.youtube.com/embed/${videoId}?rel=0`;
 }
