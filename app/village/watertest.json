@@ -1,7 +1,7 @@
 [
 	{
 		"date": "13-04-2026",
-		"source": "Komal Shandilya",
+		"source": "कोमल शांडिल्य",
 		"type": "Well",
 		"pH": 5.5,
 		"hardness": 350,
@@ -20,7 +20,7 @@
 	},
 	{
 		"date": "13-04-2026",
-		"source": "Satyam Kautilya",
+		"source": "सत्यम कौटिल्य",
 		"type": "Well",
 		"pH": 6,
 		"hardness": 150,
@@ -42,7 +42,7 @@
 	},
 	{
 		"date": "13-04-2026",
-		"source": "Sandeep Shandilya",
+		"source": "संदीप शांडिल्य",
 		"type": "Well",
 		"pH": 6,
 		"hardness": 200,
@@ -61,7 +61,7 @@
 	},
 	{
 		"date": "13-04-2026",
-		"source": "Mahesh Tande",
+		"source": "महेश टांडे",
 		"type": "Well",
 		"pH": 7,
 		"hardness": 200,
@@ -80,7 +80,7 @@
 	},
 	{
 		"date": "13-04-2026",
-		"source": "Ravi Shandilya",
+		"source": "रवि शांडिल्य",
 		"type": "Well",
 		"pH": 5.5,
 		"hardness": 300,
@@ -99,7 +99,7 @@
 	},
 	{
 		"date": "13-04-2026",
-		"source": "Vimal Patil",
+		"source": "विमल पाटिल",
 		"type": "Well",
 		"pH": 7,
 		"hardness": 350,
@@ -118,7 +118,7 @@
 	},
 	{
 		"date": "13-04-2026",
-		"source": "Chaitram Dhurwey",
+		"source": "चैत्रम धुर्वे",
 		"type": "Well",
 		"pH": 7.5,
 		"hardness": 350,
@@ -137,7 +137,7 @@
 	},
 	{
 		"date": "11-04-2026",
-		"source": "Sudhir Shandilya",
+		"source": "सुधीर शांडिल्य",
 		"type": "Handpump",
 		"pH": 7,
 		"hardness": 450,
@@ -156,7 +156,7 @@
 	},
 	{
 		"date": "11-04-2026",
-		"source": "Toshram Randhwey",
+		"source": "तोशराम रंधवे",
 		"type": "Handpump",
 		"pH": 7,
 		"hardness": 250,
@@ -169,13 +169,13 @@
 		"alkalinity": 200,
 		"result": "अमोनिया थोड़ी मात्रा में।",
 		"possibleCause": "पुराना स्रोत",
-		"recommendation": ["कुए के पास कीचड़/गोबर हटाएं", "कुएं की सफाई कराएं"],
+		"recommendation": ["कुए के पास कीचड़/गोबर हटाएं", "कुएं की सफाई कराएं"],
 		"drinkable": "सुझाए सुधार के बाद पुनः टेस्ट",
 		"defaultRecommendation": ""
 	},
 	{
 		"date": "11-04-2026",
-		"source": "Hakesh Shandilya",
+		"source": "हाकेश शांडिल्य",
 		"type": "Well",
 		"pH": 6.5,
 		"hardness": 150,
@@ -187,10 +187,10 @@
 		"ammonia": 0.3,
 		"alkalinity": 100,
 		"result": "अमोनिया अधिक, जल प्रदूषित।",
-		"possibleCause": "कुए के पास कीचड़ युक्त पानी का जमाव, कुए के अंदर पेड़ों के पत्ते गिरकर सड़ना",
+		"possibleCause": "कुए के पास कीचड़ युक्त पानी का जमाव, कुए के अंदर पेड़ों के पत्ते गिरकर सड़ना",
 		"recommendation": [
 			"कुएं में पत्ते गिरने न दें",
-			"कुएं के पास कीचड़/गंदा पानी तुरंत हटाएँ",
+			"कुएं के पास कीचड़/गंदा पानी तुरंत हटाएँ",
 			"गंदा पानी कुएं से दूर ले जाएँ"
 		],
 		"drinkable": "सुधार के बाद पुनः परीक्षण करें",
@@ -198,7 +198,7 @@
 	},
 	{
 		"date": "11-04-2026",
-		"source": "Sudhir Shandilya",
+		"source": "सुधीर शांडिल्य (कुआं)",
 		"type": "Well",
 		"pH": 6.5,
 		"hardness": 450,
@@ -217,7 +217,7 @@
 	},
 	{
 		"date": "11-04-2026",
-		"source": "Manoj Das Dharwaiya",
+		"source": "मनोज दास धारवैया",
 		"type": "Well",
 		"pH": 6.5,
 		"hardness": 300,
@@ -236,7 +236,7 @@
 	},
 	{
 		"date": "11-04-2026",
-		"source": "Shivdayal Tande",
+		"source": "शिवदयाल टाडे",
 		"type": "Well",
 		"pH": 5.5,
 		"hardness": 200,
@@ -255,7 +255,7 @@
 	},
 	{
 		"date": "11-04-2026",
-		"source": "Gorelal Talware",
+		"source": "गोरेलाल तलवरे",
 		"type": "Well",
 		"pH": 6.5,
 		"hardness": 100,
@@ -274,7 +274,7 @@
 	},
 	{
 		"date": "11-04-2026",
-		"source": "Pankaj Bandeshwar",
+		"source": "पंकज बंदेश्वर",
 		"type": "Well",
 		"pH": 5.5,
 		"hardness": 600,
@@ -293,7 +293,7 @@
 	},
 	{
 		"date": "11-04-2026",
-		"source": "Ganesh Tande",
+		"source": "गणेश टाडे",
 		"type": "Well",
 		"pH": 8.5,
 		"hardness": 300,
@@ -312,7 +312,7 @@
 	},
 	{
 		"date": "11-04-2026",
-		"source": "Yogesh Dhurwey",
+		"source": "योगेश धुरवे",
 		"type": "Well",
 		"pH": 7,
 		"hardness": 250,
@@ -331,7 +331,7 @@
 	},
 	{
 		"date": "11-04-2026",
-		"source": "Murli Bandeshwar",
+		"source": "मुरली बंदेश्वर",
 		"type": "Well",
 		"pH": 6.5,
 		"hardness": 600,
@@ -350,7 +350,7 @@
 	},
 	{
 		"date": "10-04-2026",
-		"source": "Praveen Shandilya",
+		"source": "प्रवीण शांडिल्य",
 		"type": "Well",
 		"pH": 7.5,
 		"hardness": 150,
@@ -369,7 +369,7 @@
 	},
 	{
 		"date": "10-04-2026",
-		"source": "Handpump Post Office",
+		"source": "पोस्ट ऑफिस हैंडपंप",
 		"type": "Handpump",
 		"pH": 8.5,
 		"hardness": 200,
@@ -388,7 +388,7 @@
 	},
 	{
 		"date": "10-04-2026",
-		"source": "Lallan Prasad",
+		"source": "लल्लन प्रसाद",
 		"type": "Well",
 		"pH": 7.5,
 		"hardness": 250,
@@ -407,7 +407,7 @@
 	},
 	{
 		"date": "10-04-2026",
-		"source": "Raju Shandilya",
+		"source": "राजू शांडिल्य",
 		"type": "Well",
 		"pH": 7.5,
 		"hardness": 150,
@@ -426,7 +426,7 @@
 	},
 	{
 		"date": "10-04-2026",
-		"source": "Purana Aangnbadi",
+		"source": "पुराना आँगनबाड़ी",
 		"type": "Handpump",
 		"pH": 6.5,
 		"hardness": 100,
@@ -445,7 +445,7 @@
 	},
 	{
 		"date": "10-04-2026",
-		"source": "Ramnath Shandilya",
+		"source": "रामनाथ शांडिल्य",
 		"type": "Handpump",
 		"pH": 5.5,
 		"hardness": 150,
@@ -464,7 +464,7 @@
 	},
 	{
 		"date": "10-04-2026",
-		"source": "Prahalad Baghel",
+		"source": "प्रहलाद बघेल",
 		"type": "Well",
 		"pH": 7,
 		"hardness": 400,
@@ -483,7 +483,7 @@
 	},
 	{
 		"date": "10-04-2026",
-		"source": "Khemendra Choudary",
+		"source": "खेमेंद्र चौधरी",
 		"type": "Well",
 		"pH": 8.5,
 		"hardness": 250,
@@ -502,7 +502,7 @@
 	},
 	{
 		"date": "10-04-2026",
-		"source": "Pitamlal Talware",
+		"source": "पितमलाल तलवरे",
 		"type": "Well",
 		"pH": 6.5,
 		"hardness": 800,
@@ -521,7 +521,7 @@
 	},
 	{
 		"date": "10-04-2026",
-		"source": "Vetnary",
+		"source": "पशु चिकित्सालय",
 		"type": "Handpump",
 		"pH": 8.5,
 		"hardness": 200,
@@ -540,7 +540,7 @@
 	},
 	{
 		"date": "09-04-2026",
-		"source": "Brajendra Randhwe",
+		"source": "ब्रजेंद्र रंधवे",
 		"type": "Well",
 		"pH": 6.5,
 		"hardness": 200,
@@ -559,7 +559,7 @@
 	},
 	{
 		"date": "09-04-2026",
-		"source": "Tripurari Randhwey",
+		"source": "त्रिपुरारी रंधवे",
 		"type": "Well",
 		"pH": 5.5,
 		"hardness": 400,
@@ -578,7 +578,7 @@
 	},
 	{
 		"date": "09-04-2026",
-		"source": "Loksingh Dhurwey",
+		"source": "लोकसिंह धुरवे",
 		"type": "Well",
 		"pH": 7.5,
 		"hardness": 150,
@@ -597,7 +597,7 @@
 	},
 	{
 		"date": "09-04-2026",
-		"source": "Deepak Randhwey",
+		"source": "दीपक रंधवे",
 		"type": "Well",
 		"pH": 5.5,
 		"hardness": 300,
@@ -616,7 +616,7 @@
 	},
 	{
 		"date": "09-04-2026",
-		"source": "Madhulal Alware",
+		"source": "मधुलाल अलवरे",
 		"type": "Well",
 		"pH": 5.5,
 		"hardness": 300,
@@ -635,7 +635,7 @@
 	},
 	{
 		"date": "08-04-2026",
-		"source": "Sunita Patel",
+		"source": "सुनीता पटेल",
 		"type": "Well",
 		"pH": 7,
 		"hardness": 200,
