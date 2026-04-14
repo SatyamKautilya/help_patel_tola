@@ -230,7 +230,7 @@ const PDFPreviewModal = ({ water, isOpen, onClose }) => {
 								backgroundSize: 'cover',
 								backgroundPosition: 'center',
 								backgroundRepeat: 'no-repeat',
-								padding: '12px',
+								padding: '12px 12px 108px 12px',
 								width: '360px',
 								aspectRatio: '2/3',
 								fontFamily: 'Arial, sans-serif',
@@ -240,6 +240,7 @@ const PDFPreviewModal = ({ water, isOpen, onClose }) => {
 								overflow: 'hidden',
 								display: 'flex',
 								flexDirection: 'column',
+								position: 'relative',
 								boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
 								borderRadius: '8px',
 							}}>
@@ -248,13 +249,13 @@ const PDFPreviewModal = ({ water, isOpen, onClose }) => {
 									display: 'flex',
 									alignItems: 'center',
 									justifyContent: 'center',
-									marginBottom: '12px',
+									marginBottom: '2px',
 								}}>
 								<div
 									style={{
 										flex: '1',
 										marginTop: '20px',
-										paddingBottom: '6px',
+										paddingBottom: '0',
 										display: 'flex',
 										justifyContent: 'center',
 									}}>
@@ -275,7 +276,7 @@ const PDFPreviewModal = ({ water, isOpen, onClose }) => {
 								style={{
 									fontSize: '14px',
 									fontWeight: 'bold',
-									margin: '20px 0 6px 0',
+									margin: '10px 0 6px 0',
 									paddingLeft: '5px',
 									color: '#1e40af',
 								}}>
@@ -284,7 +285,7 @@ const PDFPreviewModal = ({ water, isOpen, onClose }) => {
 
 							<p
 								style={{
-									fontSize: '10px',
+									fontSize: '8px',
 									margin: '0',
 									lineHeight: '1.4',
 									color: '#1f2937',
@@ -594,7 +595,11 @@ const PDFPreviewModal = ({ water, isOpen, onClose }) => {
 										सुझाव
 									</h4>
 									<ul style={{ margin: '0', paddingLeft: '12px' }}>
-										{water.recommendation.map((rec, idx) => (
+										{[
+											water.defaultRecommendation,
+											'फ्लोराइड की कमी कोई भी एंटि केविटी टूथपेस्ट के उपयोग से दूर की जा सकती है।',
+											...water.recommendation,
+										].map((rec, idx) => (
 											<li
 												key={idx}
 												style={{
@@ -611,31 +616,19 @@ const PDFPreviewModal = ({ water, isOpen, onClose }) => {
 
 							<div
 								style={{
-									marginTop: 'auto',
-									paddingTop: '6px',
-									borderTop: '1px solid #1e40af',
+									position: 'absolute',
+									left: '12px',
+									right: '12px',
+									bottom: '48px',
 									textAlign: 'center',
 								}}>
-								<p
-									style={{
-										fontSize: '8px',
-										color: 'red',
-										margin: '0 0 4px 0',
-										fontStyle: 'italic',
-										lineHeight: '1.4',
-										textAlign: 'center',
-									}}>
-									<strong>आग्रह:</strong> ग्राम मे व्याप्त समस्याओ के समाधान एवं
-									ग्राम के भविस्य को बेहतर बनाने के लिए हर महीने तमोहर मिशन की
-									बैठक मे हिस्सा लें
-								</p>
 								<p
 									style={{
 										fontSize: '7px',
 										color: '#666',
 										margin: '0 0 2px 0',
 									}}>
-									तमोहर फाउंडेशन द्वारा जारी रिपोर्ट
+									<b>तमोहर फाउंडेशन फॉर विलेज डेव्लपमेंट</b> द्वारा जारी रिपोर्ट
 								</p>
 								<p style={{ fontSize: '7px', color: '#666', margin: '0' }}>
 									{new Date().toLocaleDateString('hi-IN', {
@@ -643,6 +636,31 @@ const PDFPreviewModal = ({ water, isOpen, onClose }) => {
 										month: 'long',
 										day: 'numeric',
 									})}
+								</p>
+							</div>
+
+							<div
+								style={{
+									position: 'absolute',
+									left: '12px',
+									right: '12px',
+									bottom: '12px',
+									paddingTop: '6px',
+									borderTop: '1px solid #1e40af',
+									textAlign: 'center',
+								}}>
+								<p
+									style={{
+										fontSize: '8px',
+										color: 'cyan',
+										margin: '0 0 4px 0',
+										fontStyle: 'italic',
+										lineHeight: '1.4',
+										textAlign: 'center',
+									}}>
+									<strong>आग्रह:</strong> ग्राम मे व्याप्त समस्याओ के समाधान एवं
+									ग्राम के भविष्य को बेहतर बनाने के लिए हर महीने तमोहर मिशन की
+									बैठक मे अवश्य भाग लें।
 								</p>
 							</div>
 						</div>
