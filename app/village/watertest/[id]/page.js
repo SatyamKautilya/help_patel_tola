@@ -652,7 +652,7 @@ const PDFPreviewModal = ({ water, isOpen, onClose }) => {
 								<p
 									style={{
 										fontSize: '8px',
-										color: 'cyan',
+										color: 'blue',
 										margin: '0 0 4px 0',
 										fontStyle: 'italic',
 										lineHeight: '1.4',
