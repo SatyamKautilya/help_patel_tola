@@ -20,21 +20,21 @@ const getStatusColor = (drinkable) => {
 	}
 	if (drinkable.includes('सीमित')) {
 		return {
-			bg: 'bg-yellow-50',
-			border: 'border-yellow-300',
-			badge: 'bg-yellow-100 text-yellow-800',
+			bg: 'bg-amber-200',
+			border: 'border-amber-400',
+			badge: 'bg-amber-200 text-amber-900',
 			icon: AlertCircle,
-			color: 'text-yellow-600',
-			fullBg: 'bg-yellow-600',
+			color: 'text-amber-700',
+			fullBg: 'bg-amber-500',
 			label: '⚠️ सीमित उपयोग',
 		};
 	}
 	return {
-		bg: 'bg-red-50',
-		border: 'border-red-300',
-		badge: 'bg-red-100 text-red-800',
+		bg: 'bg-red-200',
+		border: 'border-red-400',
+		badge: 'bg-red-200 text-red-900',
 		icon: XCircle,
-		color: 'text-red-600',
+		color: 'text-red-700',
 		fullBg: 'bg-red-600',
 		label: '✗ असुरक्षित',
 	};
@@ -279,8 +279,8 @@ const PDFPreviewModal = ({ water, isOpen, onClose }) => {
 										const status = getParameterStatus(param.name, param.value);
 										let bgColor = '#f9fafb';
 										if (status === 'good') bgColor = '#dcfce7';
-										else if (status === 'warning') bgColor = '#fef08a';
-										else if (status === 'danger') bgColor = '#fee2e2';
+										else if (status === 'warning') bgColor = '#fbbf24';
+										else if (status === 'danger') bgColor = '#fca5a5';
 
 										return (
 											<tr
@@ -292,7 +292,7 @@ const PDFPreviewModal = ({ water, isOpen, onClose }) => {
 												<td style={{ padding: '2px', borderRight: '1px solid #e5e7eb', fontWeight: '500', fontSize: '7px' }}>
 													{param.name}
 												</td>
-												<td style={{ padding: '2px', textAlign: 'center', borderRight: '1px solid #e5e7eb', fontWeight: 'bold', color: '#1e40af', fontSize: '7px' }}>
+												<td style={{ padding: '2px', textAlign: 'center', borderRight: '1px solid #e5e7eb', fontWeight: 'bold', color: '#000000', fontSize: '7px' }}>
 													{param.value}
 												</td>
 												<td style={{ padding: '2px', textAlign: 'center', borderRight: '1px solid #e5e7eb', color: '#666', fontSize: '7px' }}>
@@ -338,8 +338,8 @@ const PDFPreviewModal = ({ water, isOpen, onClose }) => {
 									backgroundColor: water.drinkable.includes('योग्य है')
 										? '#dcfce7'
 										: water.drinkable.includes('सीमित')
-											? '#fef08a'
-											: '#fee2e2',
+											? '#fbbf24'
+											: '#fca5a5',
 								}}>
 								<h4 style={{ fontSize: '8px', fontWeight: 'bold', margin: '0 0 2px 0', color: '#1f2937' }}>
 									पीने योग्यता
@@ -445,22 +445,6 @@ export default function WaterTestDetail({ params }) {
 					</div>
 				</motion.div>
 
-				{/* Status Indicator */}
-				<motion.div
-					initial={{ opacity: 0, y: 20 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ delay: 0.05 }}
-					className={`rounded-2xl border-2 ${statusColor.border} ${statusColor.bg} p-6 mb-8`}>
-					<div className='flex items-center gap-4'>
-						<div className={`w-16 h-16 rounded-full ${statusColor.fullBg} flex items-center justify-center flex-shrink-0`}>
-							<StatusIcon className='w-8 h-8 text-white' />
-						</div>
-						<div>
-							<p className={`text-lg font-bold ${statusColor.color}`}>{statusColor.label}</p>
-							<p className='text-sm text-slate-600 mt-1'>{water.drinkable}</p>
-						</div>
-					</div>
-				</motion.div>
 
 				{/* Key-Value Info */}
 				<motion.div
@@ -498,6 +482,12 @@ export default function WaterTestDetail({ params }) {
 								</ul>
 							</div>
 						)}
+n					{water.defaultRecommendation && (
+						<div className='flex justify-between items-start'>
+							<span className='text-slate-600 font-medium'>नियमित सुझाव</span>
+							<p className='text-slate-900 text-right max-w-xs text-sm'>{water.defaultRecommendation}</p>
+						</div>
+					)}
 					</div>
 				</motion.div>
 
@@ -534,15 +524,15 @@ export default function WaterTestDetail({ params }) {
 								const status = getParameterStatus(param.name, param.value);
 								let rowBgClass = 'bg-white';
 								if (status === 'good') rowBgClass = 'bg-green-50';
-								else if (status === 'warning') rowBgClass = 'bg-yellow-50';
-								else if (status === 'danger') rowBgClass = 'bg-red-50';
+								else if (status === 'warning') rowBgClass = 'bg-amber-300';
+								else if (status === 'danger') rowBgClass = 'bg-red-300';
 
 								return (
 									<tr
 										key={idx}
 										className={rowBgClass}>
 										<td className='px-6 py-3 text-sm text-slate-900 font-medium'>{param.name}</td>
-										<td className={`px-6 py-3 text-sm text-center font-bold ${statusColor.color}`}>
+										<td className='px-6 py-3 text-sm text-center font-bold text-slate-900'>
 											{param.value}
 										</td>
 										<td className='px-6 py-3 text-sm text-center text-slate-600'>{param.unit}</td>
