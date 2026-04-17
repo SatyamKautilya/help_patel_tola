@@ -21,6 +21,21 @@ export default function LoanRepaymentPage({ params }) {
 	const { shgid } = params;
 	const router = useRouter();
 
+	const formatHindiDate = (value) => {
+		if (!value) return '-';
+		const normalizedValue =
+			typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)
+				? `${value}T12:00:00`
+				: value;
+		const date = new Date(normalizedValue);
+		if (Number.isNaN(date.getTime())) return '-';
+		return date.toLocaleDateString('hi-IN', {
+			day: '2-digit',
+			month: 'short',
+			year: 'numeric',
+		});
+	};
+
 	const [stage, setStage] = useState('members'); // members | payment
 	const [loans, setLoans] = useState([]);
 	const [selectedMemberId, setSelectedMemberId] = useState(null);
@@ -74,7 +89,9 @@ export default function LoanRepaymentPage({ params }) {
 	}, [loans]);
 
 	const selectedMember = useMemo(() => {
-		return memberGroups.find((m) => m.memberId === String(selectedMemberId)) || null;
+		return (
+			memberGroups.find((m) => m.memberId === String(selectedMemberId)) || null
+		);
 	}, [memberGroups, selectedMemberId]);
 
 	const selectedLoan = useMemo(() => {
@@ -92,7 +109,8 @@ export default function LoanRepaymentPage({ params }) {
 
 	const validationError = useMemo(() => {
 		if (!selectedLoan) return 'ऋण चुनें';
-		if (principalPaid < 0 || interestPaid < 0) return 'नकारात्मक राशि मान्य नहीं है';
+		if (principalPaid < 0 || interestPaid < 0)
+			return 'नकारात्मक राशि मान्य नहीं है';
 		if (principalPaid > Number(selectedLoan.outstandingPrincipal || 0)) {
 			return 'मूलधन बकाया से अधिक नहीं हो सकता';
 		}
@@ -105,7 +123,10 @@ export default function LoanRepaymentPage({ params }) {
 		if (!member) return;
 		setSelectedMemberId(member.memberId);
 		setSelectedLoanId(member.loans[0]?._id || null);
-		setPayment({ principal: '', interest: member.loans[0]?.monthlyInterest || '' });
+		setPayment({
+			principal: '',
+			interest: member.loans[0]?.monthlyInterest || '',
+		});
 		setStage('payment');
 	};
 
@@ -117,7 +138,10 @@ export default function LoanRepaymentPage({ params }) {
 
 	const doSubmit = async (forceOverride = false) => {
 		if (validationError || !selectedLoan) {
-			setUiMessage({ type: 'error', text: validationError || 'कृपया सही जानकारी भरें' });
+			setUiMessage({
+				type: 'error',
+				text: validationError || 'कृपया सही जानकारी भरें',
+			});
 			return;
 		}
 
@@ -153,7 +177,10 @@ export default function LoanRepaymentPage({ params }) {
 			setPayment({ principal: '', interest: '' });
 			await loadLoans();
 		} catch (e) {
-			setUiMessage({ type: 'error', text: e.message || 'भुगतान सहेजते समय त्रुटि हुई' });
+			setUiMessage({
+				type: 'error',
+				text: e.message || 'भुगतान सहेजते समय त्रुटि हुई',
+			});
 		} finally {
 			setSaving(false);
 		}
@@ -181,15 +208,21 @@ export default function LoanRepaymentPage({ params }) {
 						<HandCoins className='w-6 h-6 text-white' />
 					</div>
 					<div>
-						<h1 className='text-xl font-black text-slate-800 tracking-tight'>ऋण वसूली</h1>
+						<h1 className='text-xl font-black text-slate-800 tracking-tight'>
+							ऋण वसूली
+						</h1>
 						<span className='text-[11px] font-bold text-emerald-700 tracking-wide'>
-							{stage === 'members' ? 'पहले सदस्य चुनें' : 'एक समय में एक ऋण भुगतान'}
+							{stage === 'members'
+								? 'पहले सदस्य चुनें'
+								: 'एक समय में एक ऋण भुगतान'}
 						</span>
 					</div>
 				</div>
 				<motion.button
 					whileTap={{ scale: 0.9 }}
-					onClick={() => (stage === 'payment' ? setStage('members') : router.back())}
+					onClick={() =>
+						stage === 'payment' ? setStage('members') : router.back()
+					}
 					className='p-3 bg-white rounded-2xl border shadow-sm'>
 					<ChevronLeft className='w-5 h-5 text-slate-600' />
 				</motion.button>
@@ -211,7 +244,10 @@ export default function LoanRepaymentPage({ params }) {
 								</div>
 								<div className='text-sm font-bold text-emerald-700'>
 									कुल बकाया: ₹
-									{memberGroups.reduce((sum, m) => sum + Number(m.totalOutstanding || 0), 0)}
+									{memberGroups.reduce(
+										(sum, m) => sum + Number(m.totalOutstanding || 0),
+										0,
+									)}
 								</div>
 							</div>
 
@@ -230,20 +266,22 @@ export default function LoanRepaymentPage({ params }) {
 											key={member.memberId}
 											onClick={() => openMemberPayment(member.memberId)}
 											className='w-full rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm hover:border-emerald-300 transition-colors'>
-												<div className='flex items-center justify-between gap-3'>
-													<div>
-														<p className='text-base font-bold text-slate-800'>{member.memberName}</p>
-														<p className='text-xs text-slate-500 mt-1'>
-															सक्रिय ऋण: {member.loans.length}
-														</p>
-													</div>
-													<div className='flex items-center gap-2'>
-														<p className='text-sm font-bold text-emerald-700'>
-															₹{member.totalOutstanding}
-														</p>
-														<ArrowRight className='w-4 h-4 text-slate-500' />
-													</div>
+											<div className='flex items-center justify-between gap-3'>
+												<div>
+													<p className='text-base font-bold text-slate-800'>
+														{member.memberName}
+													</p>
+													<p className='text-xs text-slate-500 mt-1'>
+														सक्रिय ऋण: {member.loans.length}
+													</p>
 												</div>
+												<div className='flex items-center gap-2'>
+													<p className='text-sm font-bold text-emerald-700'>
+														₹{member.totalOutstanding}
+													</p>
+													<ArrowRight className='w-4 h-4 text-slate-500' />
+												</div>
+											</div>
 										</button>
 									))}
 								</div>
@@ -257,7 +295,9 @@ export default function LoanRepaymentPage({ params }) {
 							exit={{ opacity: 0, x: 12 }}
 							className='space-y-4'>
 							<div className='rounded-2xl border border-slate-200 bg-white p-4'>
-								<p className='text-xs uppercase tracking-wide font-semibold text-slate-500'>चयनित सदस्य</p>
+								<p className='text-xs uppercase tracking-wide font-semibold text-slate-500'>
+									चयनित सदस्य
+								</p>
 								<p className='text-xl font-black text-slate-800 mt-1'>
 									{selectedMember?.memberName || '-'}
 								</p>
@@ -265,7 +305,9 @@ export default function LoanRepaymentPage({ params }) {
 
 							{selectedMember?.loans?.length > 1 ? (
 								<div className='rounded-2xl border border-slate-200 bg-white p-4'>
-									<p className='text-sm font-semibold text-slate-700 mb-2'>ऋण खाता चुनें</p>
+									<p className='text-sm font-semibold text-slate-700 mb-2'>
+										ऋण खाता चुनें
+									</p>
 									<div className='space-y-2'>
 										{selectedMember.loans.map((loan) => (
 											<button
@@ -280,7 +322,8 @@ export default function LoanRepaymentPage({ params }) {
 													ऋण ID: {String(loan._id).slice(-6)}
 												</p>
 												<p className='text-xs text-slate-600 mt-1'>
-													बकाया: ₹{loan.outstandingPrincipal} | अपेक्षित ब्याज: ₹{loan.monthlyInterest}
+													बकाया: ₹{loan.outstandingPrincipal} | अपेक्षित ब्याज:
+													₹{loan.monthlyInterest}
 												</p>
 											</button>
 										))}
@@ -291,9 +334,29 @@ export default function LoanRepaymentPage({ params }) {
 							{selectedLoan ? (
 								<>
 									<div className='grid grid-cols-1 sm:grid-cols-3 gap-3'>
-										<FocusMetric label='शेष ऋण राशि' value={selectedLoan.outstandingPrincipal} tone='slate' />
-										<FocusMetric label='अपेक्षित ब्याज' value={selectedLoan.monthlyInterest} tone='amber' />
-										<FocusMetric label='मूलधन जमा के बाद शेष' value={remainingAfterPrincipal} tone={remainingAfterPrincipal <= 0 ? 'emerald' : 'rose'} />
+										<div className='rounded-2xl border border-slate-200 bg-white p-4'>
+											<p className='text-xs font-semibold text-slate-500'>
+												जारी तिथि
+											</p>
+											<p className='text-sm font-bold text-slate-700 mt-1'>
+												{formatHindiDate(selectedLoan.issuedDate)}
+											</p>
+										</div>
+										<FocusMetric
+											label='शेष ऋण राशि'
+											value={selectedLoan.outstandingPrincipal}
+											tone='slate'
+										/>
+										<FocusMetric
+											label='अपेक्षित ब्याज'
+											value={selectedLoan.monthlyInterest}
+											tone='amber'
+										/>
+										<FocusMetric
+											label='मूलधन जमा के बाद शेष'
+											value={remainingAfterPrincipal}
+											tone={remainingAfterPrincipal <= 0 ? 'emerald' : 'rose'}
+										/>
 									</div>
 
 									<div className='rounded-2xl border border-slate-200 bg-white p-4 space-y-4'>
@@ -302,7 +365,9 @@ export default function LoanRepaymentPage({ params }) {
 											hint='आज जितना मूलधन लिया जा रहा है'
 											iconClass='text-emerald-600'
 											value={payment.principal}
-											onChange={(value) => setPayment((p) => ({ ...p, principal: value }))}
+											onChange={(value) =>
+												setPayment((p) => ({ ...p, principal: value }))
+											}
 											placeholder='0'
 										/>
 										<InputBlock
@@ -310,12 +375,18 @@ export default function LoanRepaymentPage({ params }) {
 											hint={`अपेक्षित: ₹${selectedLoan.monthlyInterest} (प्रतिबंध नहीं)`}
 											iconClass='text-amber-600'
 											value={payment.interest}
-											onChange={(value) => setPayment((p) => ({ ...p, interest: value }))}
+											onChange={(value) =>
+												setPayment((p) => ({ ...p, interest: value }))
+											}
 											placeholder='0'
 										/>
 										<div className='rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5 flex items-center justify-between'>
-											<p className='text-sm font-semibold text-emerald-700'>कुल भुगतान</p>
-											<p className='text-lg font-bold text-emerald-800'>₹{totalPayment}</p>
+											<p className='text-sm font-semibold text-emerald-700'>
+												कुल भुगतान
+											</p>
+											<p className='text-lg font-bold text-emerald-800'>
+												₹{totalPayment}
+											</p>
 										</div>
 										{validationError ? (
 											<div className='rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 flex items-center gap-2'>
@@ -370,15 +441,18 @@ export default function LoanRepaymentPage({ params }) {
 							exit={{ scale: 0.9, opacity: 0, y: 20 }}
 							transition={{ type: 'spring', stiffness: 300, damping: 25 }}
 							className='bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden'>
-
 							{/* Popup header */}
 							<div className='bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-4 flex items-center gap-3'>
 								<div className='w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center'>
 									<AlertTriangle className='w-5 h-5 text-white' />
 								</div>
 								<div>
-									<p className='text-base font-black text-white'>ब्याज मेल नहीं खाता</p>
-									<p className='text-[11px] font-semibold text-white/80'>कृपया पुष्टि करें</p>
+									<p className='text-base font-black text-white'>
+										ब्याज मेल नहीं खाता
+									</p>
+									<p className='text-[11px] font-semibold text-white/80'>
+										कृपया पुष्टि करें
+									</p>
 								</div>
 								<button
 									onClick={cancelMismatch}
@@ -392,12 +466,20 @@ export default function LoanRepaymentPage({ params }) {
 								{/* Mismatch details */}
 								<div className='grid grid-cols-2 gap-3'>
 									<div className='rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-center'>
-										<p className='text-[10px] font-semibold text-amber-600 uppercase tracking-wide'>अपेक्षित ब्याज</p>
-										<p className='text-lg font-black text-amber-800 mt-0.5'>₹{mismatchPopup.expectedInterest}</p>
+										<p className='text-[10px] font-semibold text-amber-600 uppercase tracking-wide'>
+											अपेक्षित ब्याज
+										</p>
+										<p className='text-lg font-black text-amber-800 mt-0.5'>
+											₹{mismatchPopup.expectedInterest}
+										</p>
 									</div>
 									<div className='rounded-xl border border-blue-200 bg-blue-50 px-3 py-2.5 text-center'>
-										<p className='text-[10px] font-semibold text-blue-600 uppercase tracking-wide'>दर्ज ब्याज</p>
-										<p className='text-lg font-black text-blue-800 mt-0.5'>₹{mismatchPopup.enteredInterest}</p>
+										<p className='text-[10px] font-semibold text-blue-600 uppercase tracking-wide'>
+											दर्ज ब्याज
+										</p>
+										<p className='text-lg font-black text-blue-800 mt-0.5'>
+											₹{mismatchPopup.enteredInterest}
+										</p>
 									</div>
 								</div>
 
@@ -407,9 +489,13 @@ export default function LoanRepaymentPage({ params }) {
 
 								{/* Warning note */}
 								<div className='rounded-xl border border-amber-200 bg-amber-50/50 px-3 py-2 flex items-start gap-2'>
-									<AlertTriangle size={14} className='text-amber-500 mt-0.5 shrink-0' />
+									<AlertTriangle
+										size={14}
+										className='text-amber-500 mt-0.5 shrink-0'
+									/>
 									<p className='text-xs text-amber-700 font-medium'>
-										यदि ब्याज अलग है तो कृपया सुनिश्चित करें कि यह सही है। एक बार जमा होने पर इसे रिवर्ट करना होगा।
+										यदि ब्याज अलग है तो कृपया सुनिश्चित करें कि यह सही है। एक
+										बार जमा होने पर इसे रिवर्ट करना होगा।
 									</p>
 								</div>
 							</div>
@@ -458,7 +544,11 @@ export default function LoanRepaymentPage({ params }) {
 								? 'bg-red-50/95 border-red-200 text-red-800'
 								: 'bg-emerald-50/95 border-emerald-200 text-emerald-800'
 						}`}>
-						{uiMessage.type === 'error' ? <AlertCircle size={18} /> : <CheckCircle2 size={18} />}
+						{uiMessage.type === 'error' ? (
+							<AlertCircle size={18} />
+						) : (
+							<CheckCircle2 size={18} />
+						)}
 						<p className='font-semibold text-sm'>{uiMessage.text}</p>
 					</motion.div>
 				) : null}
@@ -497,9 +587,12 @@ function FocusMetric({ label, value, tone = 'slate' }) {
 		rose: 'bg-rose-50 border-rose-200 text-rose-800',
 	};
 	return (
-		<div className={`rounded-xl border px-3 py-2.5 ${tones[tone] || tones.slate}`}>
+		<div
+			className={`rounded-xl border px-3 py-2.5 ${tones[tone] || tones.slate}`}>
 			<p className='text-xs font-semibold opacity-80'>{label}</p>
-			<p className='text-xl font-bold leading-tight mt-1'>₹{Number(value || 0)}</p>
+			<p className='text-xl font-bold leading-tight mt-1'>
+				₹{Number(value || 0)}
+			</p>
 		</div>
 	);
 }

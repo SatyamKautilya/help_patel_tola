@@ -494,10 +494,7 @@ async function saveExpense(data) {
 async function createLoan(data) {
 	const issuedDate = data.issuedDate ? new Date(data.issuedDate) : new Date();
 	if (Number.isNaN(issuedDate.getTime())) {
-		return NextResponse.json(
-			{ error: 'Invalid issuedDate' },
-			{ status: 400 },
-		);
+		return NextResponse.json({ error: 'Invalid issuedDate' }, { status: 400 });
 	}
 	const reportMonth = reportMonthForTxn(data.month, issuedDate);
 	const loan = await Loan.create({
@@ -1096,8 +1093,7 @@ async function ListActiveLoans(data) {
 		const outstandingPrincipal = Math.max(principal - principalPaid, 0);
 
 		// Full interest for the month
-		let fullMonthlyInterest =
-			outstandingPrincipal * (loan.interestRate / 100);
+		let fullMonthlyInterest = outstandingPrincipal * (loan.interestRate / 100);
 
 		// 📌 Minimum 1-month interest rule:
 		// If loan was issued this month, charge at least 1 full month interest on original principal
@@ -1128,6 +1124,7 @@ async function ListActiveLoans(data) {
 
 			principal,
 			interestRate: loan.interestRate,
+			issuedDate: loan.issuedDate || loan.createdAt || null,
 
 			outstandingPrincipal,
 			monthlyInterest: Number(remainingMonthlyInterest.toFixed(2)),
@@ -1138,8 +1135,16 @@ async function ListActiveLoans(data) {
 }
 
 async function collectRepayment(data) {
-	const { shgId, loanId, memberId, amount, principal, interest, receivedBy, forceOverride } =
-		data;
+	const {
+		shgId,
+		loanId,
+		memberId,
+		amount,
+		principal,
+		interest,
+		receivedBy,
+		forceOverride,
+	} = data;
 
 	if (
 		!shgId ||
@@ -1254,7 +1259,10 @@ async function collectRepayment(data) {
 	}
 
 	// Interest mismatch: return a warning so the frontend can show a confirmation popup
-	if (!forceOverride && interestComponent !== Number(remainingInterestThisMonth.toFixed(2))) {
+	if (
+		!forceOverride &&
+		interestComponent !== Number(remainingInterestThisMonth.toFixed(2))
+	) {
 		return NextResponse.json({
 			interestMismatch: true,
 			expectedInterest: Number(remainingInterestThisMonth.toFixed(2)),
@@ -1366,8 +1374,14 @@ async function collectRepayment(data) {
 }
 
 async function lumpSumContribution(data) {
-	const { shgId, date, month: monthParam, purpose, deposits, receivedBy } =
-		data;
+	const {
+		shgId,
+		date,
+		month: monthParam,
+		purpose,
+		deposits,
+		receivedBy,
+	} = data;
 
 	if (!shgId || !Array.isArray(deposits) || deposits.length === 0) {
 		throw new Error('Invalid request data');
@@ -1580,7 +1594,10 @@ async function revertTransaction(data) {
 			);
 		}
 
-		if (txn.type === TransactionType.LOAN_REPAYMENT || txn.type === TransactionType.INTEREST_PAYMENT) {
+		if (
+			txn.type === TransactionType.LOAN_REPAYMENT ||
+			txn.type === TransactionType.INTEREST_PAYMENT
+		) {
 			const repayment = await findLinkedRepaymentForTxn(txn, session);
 			if (!repayment) {
 				throw new Error('Linked loan repayment not found');
@@ -1593,9 +1610,10 @@ async function revertTransaction(data) {
 			);
 
 			// Also reverse the sibling transaction (principal ↔ interest) that shares the same loanRepaymentId
-			const siblingType = txn.type === TransactionType.LOAN_REPAYMENT
-				? TransactionType.INTEREST_PAYMENT
-				: TransactionType.LOAN_REPAYMENT;
+			const siblingType =
+				txn.type === TransactionType.LOAN_REPAYMENT
+					? TransactionType.INTEREST_PAYMENT
+					: TransactionType.LOAN_REPAYMENT;
 			const siblingTxn = await Transaction.findOne({
 				shgId: txn.shgId,
 				'meta.loanRepaymentId': repayment._id,
@@ -1613,7 +1631,8 @@ async function revertTransaction(data) {
 								...(siblingTxn.meta || {}),
 								revertedAt: new Date().toISOString(),
 								revertedBy: revertedBy || 'SYSTEM',
-								revertReason: String(reason || '').trim() || 'Sibling transaction reverted',
+								revertReason:
+									String(reason || '').trim() || 'Sibling transaction reverted',
 							},
 						},
 					},
@@ -1758,8 +1777,7 @@ function istMonthUtcRange(monthNorm) {
 
 /** YYYY-MM in Asia/Kolkata (matches how users expect “monthly” reports). */
 function monthKeyIST(dateInput) {
-	const date =
-		dateInput instanceof Date ? dateInput : new Date(dateInput);
+	const date = dateInput instanceof Date ? dateInput : new Date(dateInput);
 	if (Number.isNaN(date.getTime())) return null;
 	const parts = new Intl.DateTimeFormat('en-CA', {
 		timeZone: 'Asia/Kolkata',
@@ -1781,8 +1799,7 @@ function monthKeyIST(dateInput) {
 function reportMonthForTxn(explicitMonth, anchorDate) {
 	const fromExplicit = normalizeMonthKeyInput(explicitMonth);
 	if (fromExplicit) return fromExplicit;
-	const d =
-		anchorDate instanceof Date ? anchorDate : new Date(anchorDate);
+	const d = anchorDate instanceof Date ? anchorDate : new Date(anchorDate);
 	const fromDate = monthKeyIST(d);
 	if (fromDate) return fromDate;
 	return monthKeyFromDate(Number.isNaN(d.getTime()) ? new Date() : d);
@@ -2565,7 +2582,10 @@ async function dashboardSummary(data) {
 async function listMonthlyTransactions(data) {
 	const { shgId, month } = data || {};
 	if (!shgId || !month) {
-		return NextResponse.json({ error: 'shgId and month are required' }, { status: 400 });
+		return NextResponse.json(
+			{ error: 'shgId and month are required' },
+			{ status: 400 },
+		);
 	}
 
 	const monthNorm = normalizeMonthKeyInput(month);
@@ -2601,7 +2621,9 @@ async function listMonthlyTransactions(data) {
 		],
 	})
 		.sort({ date: 1, createdAt: 1 })
-		.select('_id type amount date memberId fromAccount toAccount meta createdAt')
+		.select(
+			'_id type amount date memberId fromAccount toAccount meta createdAt',
+		)
 		.lean();
 
 	const txns = txnsRaw.filter(
@@ -2617,7 +2639,7 @@ async function listMonthlyTransactions(data) {
 		.select('_id name')
 		.lean();
 	const memberMap = Object.fromEntries(
-		members.map((m) => [String(m._id), m.name])
+		members.map((m) => [String(m._id), m.name]),
 	);
 
 	// Fetch loan repayment breakdown for LOAN_REPAYMENT transactions
@@ -2639,7 +2661,7 @@ async function listMonthlyTransactions(data) {
 					principalComponent: r.principalComponent || 0,
 					interestComponent: r.interestComponent || 0,
 				},
-			])
+			]),
 		);
 	}
 
@@ -2662,4 +2684,3 @@ async function listMonthlyTransactions(data) {
 
 	return NextResponse.json({ transactions });
 }
-
