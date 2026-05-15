@@ -706,7 +706,7 @@ async function monthlyContributionDue(data) {
 			type: {
 				$in: [
 					TransactionType.MONTHLY_DEPOSIT,
-					TransactionType.LUMP_SUM_CONTRIBUTION,
+					//	TransactionType.LUMP_SUM_CONTRIBUTION,
 				],
 			},
 			'meta.month': month || baseDate.toISOString().slice(0, 7),
