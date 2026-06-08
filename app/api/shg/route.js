@@ -199,6 +199,7 @@ export async function saveBulkMonthlySavings(payload) {
 			date: new Date(), // actual collection date
 			meta: {
 				month: baseMonth.toISOString().slice(0, 7), // YYYY-MM
+				...(entry.sandesh ? { sandesh: String(entry.sandesh).trim() } : {}),
 			},
 			createdBy: 'SYSTEM', // or logged-in admin
 		});
@@ -844,7 +845,7 @@ async function MemberPassbook(data) {
 			shgId: shgObjectId,
 			memberId: memberObjectId,
 			isReversed: false,
-		}).sort({ date: -1 }),
+		}).sort({ date: -1 }).lean(),
 		Transaction.aggregate([
 			{
 				$match: {
@@ -1144,6 +1145,7 @@ async function collectRepayment(data) {
 		interest,
 		receivedBy,
 		forceOverride,
+		sandesh,
 	} = data;
 
 	if (
@@ -1304,6 +1306,7 @@ async function collectRepayment(data) {
 					month: currentMonth,
 					paymentDate: new Date(),
 					receivedBy: receivedBy || 'SYSTEM',
+					...(sandesh ? { sandesh: String(sandesh).trim() } : {}),
 				},
 			],
 			{ session },
@@ -1325,6 +1328,7 @@ async function collectRepayment(data) {
 					loanId: loan._id,
 					loanRepaymentId: repayment[0]._id,
 					month: currentMonth,
+					...(sandesh ? { sandesh: String(sandesh).trim() } : {}),
 				},
 			});
 		}
@@ -1342,6 +1346,7 @@ async function collectRepayment(data) {
 					loanId: loan._id,
 					loanRepaymentId: repayment[0]._id,
 					month: currentMonth,
+					...(sandesh ? { sandesh: String(sandesh).trim() } : {}),
 				},
 			});
 		}
@@ -1409,6 +1414,7 @@ async function lumpSumContribution(data) {
 			memberId: new Types.ObjectId(String(d.memberId)),
 			amount: Number(d.amount),
 			purpose,
+			sandesh: d.sandesh ? String(d.sandesh).trim() : undefined,
 			receivedBy: receivedBy || 'SYSTEM',
 			createdAt: depositDate,
 			updatedAt: depositDate,
@@ -1420,7 +1426,7 @@ async function lumpSumContribution(data) {
 		});
 
 		/* ---------------- 2ï¸âƒ£ Create Transaction entries ---------------- */
-		const transactionDocs = savedDeposits.map((dep) => ({
+		const transactionDocs = savedDeposits.map((dep, idx) => ({
 			shgId: dep.shgId,
 			fromAccount: AccountType.MEMBER_CASH,
 			toAccount: AccountType.SHG_CASH,
@@ -1433,6 +1439,7 @@ async function lumpSumContribution(data) {
 				lumpSumDepositId: dep._id,
 				purpose,
 				month: reportMonth,
+				...(deposits[idx]?.sandesh ? { sandesh: String(deposits[idx].sandesh).trim() } : {}),
 			},
 		}));
 

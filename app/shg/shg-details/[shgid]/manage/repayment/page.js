@@ -14,6 +14,7 @@ import {
 	ListChecks,
 	AlertTriangle,
 	X,
+	MessageSquare,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -40,7 +41,7 @@ export default function LoanRepaymentPage({ params }) {
 	const [loans, setLoans] = useState([]);
 	const [selectedMemberId, setSelectedMemberId] = useState(null);
 	const [selectedLoanId, setSelectedLoanId] = useState(null);
-	const [payment, setPayment] = useState({ principal: '', interest: '' });
+	const [payment, setPayment] = useState({ principal: '', interest: '', sandesh: '' });
 	const [loading, setLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [uiMessage, setUiMessage] = useState(null);
@@ -126,6 +127,7 @@ export default function LoanRepaymentPage({ params }) {
 		setPayment({
 			principal: '',
 			interest: member.loans[0]?.monthlyInterest || '',
+			sandesh: '',
 		});
 		setStage('payment');
 	};
@@ -133,7 +135,7 @@ export default function LoanRepaymentPage({ params }) {
 	const onLoanChange = (loanId) => {
 		setSelectedLoanId(loanId);
 		const nextLoan = selectedMember?.loans?.find((l) => l._id === loanId);
-		setPayment({ principal: '', interest: nextLoan?.monthlyInterest || '' });
+		setPayment((p) => ({ principal: '', interest: nextLoan?.monthlyInterest || '', sandesh: p.sandesh }));
 	};
 
 	const doSubmit = async (forceOverride = false) => {
@@ -158,6 +160,7 @@ export default function LoanRepaymentPage({ params }) {
 					interest: interestPaid,
 					amount: totalPayment,
 					forceOverride,
+					sandesh: payment.sandesh?.trim() || '',
 				}),
 			});
 			const data = await resp.json();
@@ -174,7 +177,7 @@ export default function LoanRepaymentPage({ params }) {
 			setStage('members');
 			setSelectedMemberId(null);
 			setSelectedLoanId(null);
-			setPayment({ principal: '', interest: '' });
+			setPayment({ principal: '', interest: '', sandesh: '' });
 			await loadLoans();
 		} catch (e) {
 			setUiMessage({
@@ -380,6 +383,28 @@ export default function LoanRepaymentPage({ params }) {
 											}
 											placeholder='0'
 										/>
+
+										{/* Sandesh (memo) */}
+										<div className='space-y-1.5'>
+											<label className='text-sm font-semibold text-slate-700'>
+												याद रखने के लिए संदेश
+											</label>
+											<div className='relative group'>
+												<div className='absolute left-3 top-3.5 text-slate-400 group-focus-within:text-emerald-500 transition-colors pointer-events-none'>
+													<MessageSquare size={15} />
+												</div>
+												<textarea
+													rows={2}
+													value={payment.sandesh}
+													onChange={(e) =>
+														setPayment((p) => ({ ...p, sandesh: e.target.value }))
+													}
+													placeholder='वैकल्पिक — जैसे "किस्त माफ की", "देरी से जमा"'
+													className='pl-10 w-full py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-200 outline-none resize-none'
+												/>
+											</div>
+											<p className='text-xs text-slate-500'>यह नोट ट्रांजेक्शन में सहेजा जाएगा</p>
+										</div>
 										<div className='rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5 flex items-center justify-between'>
 											<p className='text-sm font-semibold text-emerald-700'>
 												कुल भुगतान

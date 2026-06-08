@@ -854,6 +854,12 @@ export default function ReportsPage({ params }) {
 																								</span>
 																							)}
 																						</div>
+																						{tx.meta?.sandesh && (
+																							<div className='flex items-center gap-1.5 ml-7 mt-1'>
+																								<svg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2.5' strokeLinecap='round' strokeLinejoin='round' className='text-slate-400 shrink-0'><path d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'></path></svg>
+																								<span className='text-[11px] text-slate-500 italic truncate'>{tx.meta.sandesh}</span>
+																							</div>
+																						)}
 																					</div>
 																					<span className={`text-sm font-bold ${cfg.text} shrink-0 ml-2`}>
 																						{formatMoney(tx.amount)}

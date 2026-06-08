@@ -14,6 +14,7 @@ import {
 	FileText,
 	AlertCircle,
 	Copy,
+	MessageSquare,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -28,6 +29,7 @@ export default function LumpSumDepositEntry({ params }) {
 	const [purpose, setPurpose] = useState('');
 	const [bulkAmount, setBulkAmount] = useState(''); // State for custom bulk amount
 	const [members, setMembers] = useState([]);
+	// entries[memberId] = { amount: number|"", sandesh: string }
 	const [entries, setEntries] = useState({});
 	const [saving, setSaving] = useState(false);
 	const [loading, setLoading] = useState(false);
@@ -62,7 +64,13 @@ export default function LumpSumDepositEntry({ params }) {
 		}
 
 		const map = {};
-		members.forEach((m) => (map[m._id] = Number(bulkAmount)));
+		members.forEach(
+			(m) =>
+				(map[m._id] = {
+					amount: Number(bulkAmount),
+					sandesh: entries[m._id]?.sandesh || '',
+				}),
+		);
 		setEntries(map);
 		setUiMessage({
 			type: 'success',
@@ -77,16 +85,26 @@ export default function LumpSumDepositEntry({ params }) {
 			setEntries(newEntries);
 			return;
 		}
-		setEntries((p) => ({ ...p, [memberId]: Number(value) }));
+		setEntries((p) => ({
+			...p,
+			[memberId]: { amount: Number(value), sandesh: p[memberId]?.sandesh || '' },
+		}));
+	};
+
+	const handleSandeshChange = (memberId, value) => {
+		setEntries((p) => ({
+			...p,
+			[memberId]: { amount: p[memberId]?.amount || '', sandesh: value },
+		}));
 	};
 
 	const totalActual = Object.values(entries).reduce(
-		(acc, val) => acc + (Number(val) || 0),
+		(acc, val) => acc + (Number(val?.amount) || 0),
 		0,
 	);
 
 	// Filter members who are actually depositing
-	const activeDeposits = members.filter((m) => (entries[m._id] || 0) > 0);
+	const activeDeposits = members.filter((m) => (entries[m._id]?.amount || 0) > 0);
 
 	/* ---------------- HANDLERS ---------------- */
 	const handleReview = () => {
@@ -100,7 +118,8 @@ export default function LumpSumDepositEntry({ params }) {
 	const handleConfirmSave = async () => {
 		const deposits = activeDeposits.map((m) => ({
 			memberId: m._id,
-			amount: entries[m._id],
+			amount: entries[m._id]?.amount,
+			sandesh: entries[m._id]?.sandesh?.trim() || '',
 		}));
 
 		setSaving(true);
@@ -196,7 +215,7 @@ export default function LumpSumDepositEntry({ params }) {
 								</div>
 							</div>
 
-							{/* NEW: Smart Bulk Input */}
+							{/* Smart Bulk Input */}
 							<div className='bg-white/60 backdrop-blur-md p-2 rounded-[1.8rem] border border-white shadow-sm flex items-center gap-2'>
 								<div className='relative flex-1'>
 									<IndianRupee
@@ -233,7 +252,7 @@ export default function LumpSumDepositEntry({ params }) {
 											animate={{ opacity: 1, y: 0 }}
 											transition={{ delay: i * 0.03 }}
 											className={`relative p-5 rounded-[2rem] border transition-all ${
-												entries[m._id]
+												entries[m._id]?.amount
 													? 'bg-emerald-50/60 border-emerald-200 shadow-emerald-100/50'
 													: 'bg-white/70 border-white shadow-sm'
 											}`}>
@@ -244,17 +263,32 @@ export default function LumpSumDepositEntry({ params }) {
 												<h3 className='font-bold text-slate-800'>{m.name}</h3>
 											</div>
 
-											<div className='relative'>
+											{/* Amount input */}
+											<div className='relative mb-3'>
 												<IndianRupee
 													size={16}
 													className='absolute left-4 top-1/2 -translate-y-1/2 text-slate-400'
 												/>
 												<input
 													type='number'
-													value={entries[m._id] || ''}
+													value={entries[m._id]?.amount || ''}
 													onChange={(e) => handleChange(m._id, e.target.value)}
 													placeholder='0'
 													className='w-full bg-white/50 border border-slate-200 rounded-2xl py-3 pl-10 pr-4 text-lg font-black text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-300'
+												/>
+											</div>
+
+											{/* Sandesh (memo) input */}
+											<div className='relative group'>
+												<div className='absolute left-4 top-3.5 text-slate-400 group-focus-within:text-emerald-500 transition-colors pointer-events-none'>
+													<MessageSquare size={15} />
+												</div>
+												<textarea
+													rows={2}
+													value={entries[m._id]?.sandesh || ''}
+													onChange={(e) => handleSandeshChange(m._id, e.target.value)}
+													placeholder='याद रखने के लिए संदेश (वैकल्पिक)'
+													className='w-full bg-white/50 border border-slate-200 rounded-2xl py-3 pl-10 pr-4 text-sm font-medium text-slate-700 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-400 transition-all resize-none'
 												/>
 											</div>
 										</motion.div>
@@ -300,16 +334,24 @@ export default function LumpSumDepositEntry({ params }) {
 								{activeDeposits.map((m) => (
 									<div
 										key={m._id}
-										className='bg-white/70 backdrop-blur-md p-4 rounded-[2rem] border border-white shadow-sm flex justify-between items-center'>
-										<div className='flex items-center gap-3'>
-											<div className='w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs'>
-												{m.name.charAt(0)}
+										className='bg-white/70 backdrop-blur-md p-4 rounded-[2rem] border border-white shadow-sm'>
+										<div className='flex justify-between items-center'>
+											<div className='flex items-center gap-3'>
+												<div className='w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs'>
+													{m.name.charAt(0)}
+												</div>
+												<p className='font-bold text-slate-800'>{m.name}</p>
 											</div>
-											<p className='font-bold text-slate-800'>{m.name}</p>
+											<p className='font-black text-lg text-emerald-600'>
+												₹{entries[m._id]?.amount}
+											</p>
 										</div>
-										<p className='font-black text-lg text-emerald-600'>
-											₹{entries[m._id]}
-										</p>
+										{entries[m._id]?.sandesh && (
+											<div className='mt-2 ml-11 flex items-start gap-1.5 text-slate-500'>
+												<MessageSquare size={13} className='mt-0.5 shrink-0 text-emerald-400' />
+												<p className='text-xs font-medium italic'>{entries[m._id].sandesh}</p>
+											</div>
+										)}
 									</div>
 								))}
 							</div>

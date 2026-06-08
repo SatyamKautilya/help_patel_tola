@@ -12,6 +12,7 @@ import {
   Users,
   Zap,
   X,
+  MessageSquare,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -23,6 +24,7 @@ export default function MonthlySavingsEntry({ params }) {
 
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
   const [members, setMembers] = useState([]);
+  // entries[memberId] = { amount: number|"", sandesh: string }
   const [entries, setEntries] = useState({});
   const [memberDueMap, setMemberDueMap] = useState({});
   const [saving, setSaving] = useState(false);
@@ -50,7 +52,6 @@ export default function MonthlySavingsEntry({ params }) {
   }, [shgid, month]);
 
   /* ---------------- BULK LOGIC ---------------- */
-  // Check if all active dues are the same value
   const commonDueValue = useMemo(() => {
     const activeDues = members.filter((m) => m.due > 0).map((m) => m.due);
     if (activeDues.length === 0) return null;
@@ -58,12 +59,14 @@ export default function MonthlySavingsEntry({ params }) {
     return activeDues.every((d) => d === first) ? first : null;
   }, [members]);
 
-  console.log(members, memberDueMap);
-
   const applyBulkSavings = () => {
     const newEntries = {};
     members.forEach((m) => {
-      if (m.due > 0) newEntries[m.memberId] = m.due;
+      if (m.due > 0)
+        newEntries[m.memberId] = {
+          amount: m.due,
+          sandesh: entries[m.memberId]?.sandesh || "",
+        };
     });
     setEntries(newEntries);
     setUiMessage({ type: "success", text: "सभी सदस्यों की राशि भरी गई" });
@@ -73,14 +76,17 @@ export default function MonthlySavingsEntry({ params }) {
   /* ---------------- CALCULATIONS ---------------- */
   const totalExpected = members.reduce((acc, m) => acc + (m.due || 0), 0);
   const totalActual = Object.values(entries).reduce(
-    (acc, val) => acc + (Number(val) || 0),
+    (acc, val) => acc + (Number(val?.amount) || 0),
     0,
   );
 
   /* ---------------- HANDLERS ---------------- */
   const handleChange = (memberId, value) => {
     if (value === "") {
-      setEntries((p) => ({ ...p, [memberId]: "" }));
+      setEntries((p) => ({
+        ...p,
+        [memberId]: { amount: "", sandesh: p[memberId]?.sandesh || "" },
+      }));
       return;
     }
     let num = Number(value);
@@ -90,14 +96,28 @@ export default function MonthlySavingsEntry({ params }) {
       setUiMessage({ type: "error", text: "अधिकतम राशि ₹" + maxDue });
       setTimeout(() => setUiMessage(null), 2000);
     }
-    setEntries((p) => ({ ...p, [memberId]: num }));
+    setEntries((p) => ({
+      ...p,
+      [memberId]: { amount: num, sandesh: p[memberId]?.sandesh || "" },
+    }));
+  };
+
+  const handleSandeshChange = (memberId, value) => {
+    setEntries((p) => ({
+      ...p,
+      [memberId]: { amount: p[memberId]?.amount || "", sandesh: value },
+    }));
   };
 
   const handleConfirmSave = async () => {
     setShowSummary(false);
     const contributions = Object.entries(entries)
-      .filter(([_, amt]) => amt && amt > 0)
-      .map(([memberId, amount]) => ({ memberId, amount }));
+      .filter(([_, val]) => val?.amount && Number(val.amount) > 0)
+      .map(([memberId, val]) => ({
+        memberId,
+        amount: Number(val.amount),
+        sandesh: val.sandesh?.trim() || "",
+      }));
 
     setSaving(true);
     try {
@@ -199,22 +219,23 @@ export default function MonthlySavingsEntry({ params }) {
                 : "bg-white border-rose-50"
             }`}
           >
-            <div className="flex justify-between  items-start mb-4">
-             
-                <div className="flex items-center w-full gap-3">
-                  <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm ${idx % 2 === 0 ? "bg-indigo-100 text-indigo-600" : "bg-rose-100 text-rose-600"}`}
-                  >
-                    {m.name.charAt(0)}
-                  </div>
-                  <div className="flex w-full flex-row justify-between">
-                    <h3 className="font-bold text-slate-800">{m.name}</h3>
-                   {m.due > 0 && (  <p className="text-xs rounded-lg p-1 bg-yellow-200 font-semibold text-yellow-700 uppercase tracking-wider">
-                      बकाया: ₹{m.due}
-                    </p>)}
-                  </div>
+            <div className="flex justify-between items-start mb-4">
+              <div className="flex items-center w-full gap-3">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-sm ${idx % 2 === 0 ? "bg-indigo-100 text-indigo-600" : "bg-rose-100 text-rose-600"}`}
+                >
+                  {m.name.charAt(0)}
                 </div>
-              
+                <div className="flex w-full flex-row justify-between">
+                  <h3 className="font-bold text-slate-800">{m.name}</h3>
+                  {m.due > 0 && (
+                    <p className="text-xs rounded-lg p-1 bg-yellow-200 font-semibold text-yellow-700 uppercase tracking-wider">
+                      बकाया: ₹{m.due}
+                    </p>
+                  )}
+                </div>
+              </div>
+
               {m.due === 0 && (
                 <div className="flex items-center gap-1 text-emerald-600 font-bold text-xs bg-emerald-50 px-3 py-1 rounded-full">
                   <CheckCircle2 size={12} /> पूर्ण
@@ -223,17 +244,36 @@ export default function MonthlySavingsEntry({ params }) {
             </div>
 
             {m.due > 0 && (
-              <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors">
-                  <IndianRupee size={18} />
+              <div className="space-y-3">
+                {/* Amount input */}
+                <div className="relative group">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors">
+                    <IndianRupee size={18} />
+                  </div>
+                  <input
+                    type="number"
+                    value={entries[m.memberId]?.amount || ""}
+                    onChange={(e) => handleChange(m.memberId, e.target.value)}
+                    placeholder="0.00"
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 pl-12 pr-4 text-xl font-black text-slate-900 outline-none focus:border-indigo-400 focus:bg-white transition-all"
+                  />
                 </div>
-                <input
-                  type="number"
-                  value={entries[m.memberId] || ""}
-                  onChange={(e) => handleChange(m.memberId, e.target.value)}
-                  placeholder="0.00"
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-4 pl-12 pr-4 text-xl font-black text-slate-900 outline-none focus:border-indigo-400 focus:bg-white transition-all"
-                />
+
+                {/* Sandesh (memo) input */}
+                <div className="relative group">
+                  <div className="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-indigo-400 transition-colors pointer-events-none">
+                    <MessageSquare size={16} />
+                  </div>
+                  <textarea
+                    rows={2}
+                    value={entries[m.memberId]?.sandesh || ""}
+                    onChange={(e) =>
+                      handleSandeshChange(m.memberId, e.target.value)
+                    }
+                    placeholder="याद रखने के लिए संदेश (वैकल्पिक)"
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl py-3 pl-10 pr-4 text-sm font-medium text-slate-700 placeholder:text-slate-400 outline-none focus:border-indigo-300 focus:bg-white transition-all resize-none"
+                  />
+                </div>
               </div>
             )}
           </motion.div>
