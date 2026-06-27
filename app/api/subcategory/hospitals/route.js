@@ -37,7 +37,7 @@ export async function GET(request) {
 			return NextResponse.json({ hospitallists });
 		} else if (name === 'sops') {
 			const sops = await Sops.find({}).sort({
-				createdAt: 1,
+				createdAt: -1,
 			});
 
 			return NextResponse.json({ sops });
